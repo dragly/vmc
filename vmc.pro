@@ -16,7 +16,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    matrix.cpp
+    matrix.cpp \
+    wavefunction.cpp \
+    wavestandard.cpp \
+    montecarlo.cpp \
+    montecarlostandard.cpp \
+    random.cpp
 
 # MPI Settings
 QMAKE_CXX = mpicxx
@@ -30,6 +35,21 @@ QMAKE_CXXFLAGS = $$system(mpicxx --showme:compile)
 QMAKE_LFLAGS = $$system(mpicxx --showme:link)
 
 HEADERS += \
-    matrix.h
+    matrix.h \
+    wavefunction.h \
+    wavestandard.h \
+    montecarlo.h \
+    montecarlostandard.h \
+    random.h
+
+
+
+
+
+
+
+
+
+
 
 
