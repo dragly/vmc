@@ -19,10 +19,10 @@ SOURCES += main.cpp \
     matrix.cpp
 
 # MPI Settings
-QMAKE_CXX = mpic++
-QMAKE_CXX_RELEASE = mpic++
-QMAKE_CXX_DEBUG = mpic++
-QMAKE_LINK = mpic++
+QMAKE_CXX = mpicxx
+QMAKE_CXX_RELEASE = mpicxx
+QMAKE_CXX_DEBUG = mpicxx
+QMAKE_LINK = mpicxx
 QMAKE_CC = mpicc
 
 QMAKE_CFLAGS = $$system(mpicc --showme:compile)
