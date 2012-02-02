@@ -26,8 +26,8 @@ QMAKE_LINK = mpicxx
 QMAKE_CC = mpicc
 
 QMAKE_CFLAGS = $$system(mpicc --showme:compile)
-QMAKE_CXXFLAGS = $$system(mpic++ --showme:compile)
-QMAKE_LFLAGS = $$system(mpic++ --showme:link)
+QMAKE_CXXFLAGS = $$system(mpicxx --showme:compile)
+QMAKE_LFLAGS = $$system(mpicxx --showme:link)
 
 HEADERS += \
     matrix.h
