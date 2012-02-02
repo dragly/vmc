@@ -14,11 +14,6 @@ using namespace  std;
 // output file as global variable
 ofstream ofile, blockofile;
 
-// declaration of functions
-
-// The local energy
-double  local_energy(double **, double, double);
-
 //  Here we define global variables  used in various functions
 //  These can be changed by reading from file the different parameters
 int dimension = 3; // three-dimensional system
