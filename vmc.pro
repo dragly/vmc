@@ -14,26 +14,32 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
-
 SOURCES += main.cpp \
     matrix.cpp \
     wavefunction.cpp \
     wavestandard.cpp \
     montecarlo.cpp \
     montecarlostandard.cpp \
-    random.cpp
+    random.cpp \
+    wavesimple.cpp \
+    hamiltonian.cpp \
+    hamiltonianstandard.cpp \
+    hamiltoniansimple.cpp \
+    minimizer.cpp \
+    minimizerstandard.cpp \
+    mainwindow.cpp
 
 # MPI Settings
 QMAKE_CXX = mpicxx
-QMAKE_CXX_RELEASE = mpicxx
-QMAKE_CXX_DEBUG = mpicxx
-QMAKE_LINK = mpicxx
+QMAKE_CXX_RELEASE = $$QMAKE_CXX
+QMAKE_CXX_DEBUG = $$QMAKE_CXX
+QMAKE_LINK = $$QMAKE_CXX
 QMAKE_CC = mpicc
 
 QMAKE_CFLAGS = $$system(mpicc --showme:compile)
 QMAKE_LFLAGS = $$system(mpicxx --showme:link)
 QMAKE_CXXFLAGS = $$system(mpicxx --showme:compile) -DMPICH_IGNORE_CXX_SEEK
-QMAKE_CXXFLAGS_RELEASE = $$system(mpicxx --showme:compile) -DMPICH_IGNORE_CXX_SEEK
+QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS
 message($$QMAKE_CXXFLAGS_RELEASE)
 
 HEADERS += \
@@ -42,7 +48,38 @@ HEADERS += \
     wavestandard.h \
     montecarlo.h \
     montecarlostandard.h \
-    random.h
+    random.h \
+    wavesimple.h \
+    hamiltonian.h \
+    hamiltonianstandard.h \
+    utils.h \
+    hamiltoniansimple.h \
+    minimizer.h \
+    minimizerstandard.h \
+    mainwindow.h
+
+FORMS += \
+    mainwindow.ui
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

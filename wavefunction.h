@@ -5,7 +5,7 @@ class WaveFunction
 {
 public:
     WaveFunction();
-    virtual double wave(double **r, double alpha) {}
+    virtual double wave(double **r, double alpha) = 0;
 };
 
 #endif // WAVEFUNCTION_H
