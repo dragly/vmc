@@ -14,7 +14,7 @@ class MinimizerStandard : public Minimizer
 {
 public:
     MinimizerStandard(int rank, int nProcesses);
-    void run();
+    void runMinimizer();
 private:
     // output file as global variable
     ofstream ofile, blockofile;

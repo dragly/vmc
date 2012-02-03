@@ -9,7 +9,7 @@ class Minimizer
 {
 public:
     Minimizer(int rank, int nProcesses);
-    virtual void run() = 0;
+    virtual void runMinimizer() = 0;
 private:
     int rank;
     int nProcesses;

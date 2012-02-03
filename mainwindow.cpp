@@ -1,23 +1,29 @@
+#include <QFuture>
+#include <QtConcurrentRun>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include "minimizerstandard.h"
+#include "minimizerqobject.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(int rank, int nProcesses, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    rank(rank),
+    nProcesses(nProcesses)
 {
     ui->setupUi(this);
 
-    minimizer = new MinimizerStandard(rank, nProcesses);
+    minimizerQObject = new MinimizerQObject(rank, nProcesses);
+    minimizerThread = new QThread(this);
+    minimizerQObject->moveToThread(minimizerThread);
+    minimizerThread->start();
+
+    connect(ui->runButton, SIGNAL(clicked()), minimizerQObject, SLOT(runMinimizer()));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-void MainWindow::on_runButton_clicked()
-{
-
 }

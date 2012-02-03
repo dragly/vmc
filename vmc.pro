@@ -6,11 +6,7 @@
 
 QT       += core
 
-QT       -= gui
-
 TARGET = vmc
-CONFIG   += console
-CONFIG   -= app_bundle
 
 TEMPLATE = app
 
@@ -27,7 +23,8 @@ SOURCES += main.cpp \
     hamiltoniansimple.cpp \
     minimizer.cpp \
     minimizerstandard.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    minimizerqobject.cpp
 
 # MPI Settings
 QMAKE_CXX = mpicxx
@@ -56,10 +53,17 @@ HEADERS += \
     hamiltoniansimple.h \
     minimizer.h \
     minimizerstandard.h \
-    mainwindow.h
+    mainwindow.h \
+    minimizerqobject.h
 
 FORMS += \
     mainwindow.ui
+
+
+
+
+
+
 
 
 

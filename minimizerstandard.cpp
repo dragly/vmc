@@ -25,8 +25,9 @@ MinimizerStandard::MinimizerStandard(int rank, int nProcesses) :
 {
 }
 
-void MinimizerStandard::run()
+void MinimizerStandard::runMinimizer()
 {
+    cout << "MinimizerStandard::runMinimizer(): called" << endl;
     WaveSimple *wave = new WaveSimple(number_particles, dimension);
     HamiltonianSimple *hamiltonian = new HamiltonianSimple(number_particles, dimension, charge);
     string outfilename;
@@ -35,7 +36,7 @@ void MinimizerStandard::run()
     double *total_cumulative_e, *total_cumulative_e2;
     double *all_energies;
     double  time_start, time_end, total_time;
-    int number_cycles = 1000000; //  default number of cycles
+    int number_cycles = 1000; //  default number of cycles
     int max_variations = 11;    //  default number of variations
     double alpha, variance, energy, error;
 

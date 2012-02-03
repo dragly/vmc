@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iomanip>
 #include <mpi.h>
+#include <QApplication>
 
 #include "wavestandard.h"
 #include "wavesimple.h"
@@ -14,6 +15,7 @@
 #include "hamiltonianstandard.h"
 #include "hamiltoniansimple.h"
 #include "minimizerstandard.h"
+#include "mainwindow.h"
 using namespace  std;
 
 
@@ -26,16 +28,19 @@ int main(int argc, char* argv[])
     int rank, nProcesses;
     MPI_Comm_size (MPI_COMM_WORLD, &nProcesses);
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
-
-    cout << "Starting minimizer..." << endl;
-    MinimizerStandard *minimizer = new MinimizerStandard(rank, nProcesses);
-    cout << "Running minimizer..." << endl;
-    minimizer->run();
-    cout << "Minimizer done." << endl;
+    int execVal;
+    if(rank == 0) {
+        QApplication a(argc, argv);
+        MainWindow *mainWindow = new MainWindow(rank, nProcesses);
+        mainWindow->showNormal();
+        execVal = a.exec();
+    } else {
+        execVal = 0;
+    }
 
     // End MPI
     MPI_Finalize ();
 
-    return 0;
+    return execVal;
 }  //  end of main function
 

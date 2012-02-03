@@ -5,6 +5,8 @@
 
 #include <QMainWindow>
 
+class MinimizerQObject;
+
 namespace Ui {
     class MainWindow;
 }
@@ -14,16 +16,18 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(int rank, int nProcesses, QWidget *parent = 0);
     ~MainWindow();
 
 private slots:
-    void on_runButton_clicked();
 
 private:
     Ui::MainWindow *ui;
 
-    Minimizer *minimizer;
+    MinimizerQObject *minimizerQObject;
+    QThread *minimizerThread;
+    int rank;
+    int nProcesses;
 };
 
 #endif // MAINWINDOW_H
