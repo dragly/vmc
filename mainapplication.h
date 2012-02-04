@@ -1,9 +1,10 @@
 #ifndef MAINAPPLICATION_H
 #define MAINAPPLICATION_H
 
-#include <QSettings>
+//#include <QSettings>
 
 class Minimizer;
+class INIReader;
 
 class MainApplication
 {
@@ -14,7 +15,8 @@ public:
     int runApplication();
 
 private:
-    QSettings *settings;
+    INIReader *settings;
+
     Minimizer *minimizer;
 
     int* argc;

@@ -8,7 +8,7 @@
 
 #include "minimizer.h"
 
-class QSettings;
+class INIReader;
 
 using namespace std;
 
@@ -17,7 +17,7 @@ class MinimizerStandard : public Minimizer
 public:
     MinimizerStandard(int rank, int nProcesses);
     void runMinimizer();
-    void loadConfiguration(QSettings *settings);
+    void loadConfiguration(INIReader *settings);
 private:
     // output file as global variable
     ofstream ofile, blockofile;
@@ -33,7 +33,7 @@ private:
     int nCycles;
     int maxVariations;
 
-    QSettings *settings;
+    INIReader *settings;
 };
 
 #endif // MINIMIZERSTANDARD_H

@@ -8,6 +8,7 @@
 #include <mpi.h>
 
 #include "minimizerstandard.h"
+#include "inih/cpp/INIReader.h"
 
 #include "wavestandard.h"
 #include "wavesimple.h"
@@ -23,14 +24,14 @@ MinimizerStandard::MinimizerStandard(int rank, int nProcesses) :
 {
 }
 
-void MinimizerStandard::loadConfiguration(QSettings *settings)
+void MinimizerStandard::loadConfiguration(INIReader *settings)
 {
-    dimension = settings->value("MinimizerStandard/dimension", 3).toInt();
-    charge = settings->value("MinimizerStandard/charge", 2.0).toDouble();
-    stepLength = settings->value("MinimizerStandard/stepLength", 1.0).toDouble();
-    nParticles = settings->value("MinimizerStandard/nParticles", 2).toInt();
-    nCycles = settings->value("MinimizerStandard/nCycles", 1000).toInt();
-    maxVariations = settings->value("MinimizerStandard/maxVariations", 11).toInt();;    //  default number of variations
+    dimension = atoi(settings->Get("MinimizerStandard","dimension", "3").c_str());
+    charge = atof(settings->Get("MinimizerStandard","charge", "2.0").c_str());
+    stepLength = atof(settings->Get("MinimizerStandard","stepLength", "1.0").c_str());
+    nParticles = atoi(settings->Get("MinimizerStandard","nParticles", "2").c_str());
+    nCycles = atoi(settings->Get("MinimizerStandard","nCycles", "1000").c_str());
+    maxVariations = atoi(settings->Get("MinimizerStandard","maxVariations", "11").c_str());    //  default number of variations
     cout << "nCycles: " << nCycles << endl;
 }
 
@@ -84,7 +85,7 @@ void MinimizerStandard::runMinimizer()
     //  Do the mc sampling  and accumulate data with MPI_Reduce
     MonteCarloStandard *monteCarlo = new MonteCarloStandard(wave, hamiltonian, nParticles, dimension, charge, my_rank, stepLength);
     monteCarlo->sample(maxVariations, nCycles, cumulative_e, cumulative_e2,
-                all_energies);
+                       all_energies);
     //  Collect data in total averages
     for( i=1; i <= maxVariations; i++){
         MPI_Reduce(&cumulative_e[i], &total_cumulative_e[i], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);

@@ -1,5 +1,5 @@
 // Variational Monte Carlo for atoms with up to two electrons
-#include <QSettings>
+//#include <QSettings>
 
 #include <cmath>
 #include <iostream>
@@ -7,6 +7,8 @@
 #include <sstream>
 #include <iomanip>
 #include <mpi.h>
+
+#include "inih/cpp/INIReader.h"
 
 #include "mainapplication.h"
 
@@ -33,8 +35,7 @@ MainApplication::MainApplication(int* argc, char*** argv) :
 
 void MainApplication::loadConfiguration()
 {
-    settings = new QSettings("config.ini", QSettings::IniFormat);
-    cout << qPrintable(settings->value("nCycles", 200).toString()) << endl;
+    settings = new INIReader("config.ini");
 
     cout << "MainApplication::loadConfiguration(): Starting minimizer..." << endl;
     minimizer = new MinimizerStandard(rank, nProcesses);

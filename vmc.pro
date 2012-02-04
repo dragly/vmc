@@ -23,7 +23,9 @@ SOURCES += main.cpp \
     hamiltoniansimple.cpp \
     minimizer.cpp \
     minimizerstandard.cpp \
-    mainapplication.cpp
+    mainapplication.cpp \
+    inih/ini.c \
+    inih/cpp/INIReader.cpp
 
 # MPI Settings
 QMAKE_CXX = mpicxx
@@ -52,7 +54,9 @@ HEADERS += \
     hamiltoniansimple.h \
     minimizer.h \
     minimizerstandard.h \
-    mainapplication.h
+    mainapplication.h \
+    inih/ini.h \
+    inih/cpp/INIReader.h
 
 FORMS +=
 
