@@ -9,8 +9,8 @@ WaveSimple::WaveSimple(int number_particles, int dimension) : WaveFunction()
 
 double WaveSimple::wave(double **r, double alpha)
 {
-    int i, j, k;
-    double wf, argument, r_single_particle, r_12;
+    int i, j;
+    double wf, argument, r_single_particle;
 
     argument = wf = 0;
     for (i = 0; i < number_particles; i++) {

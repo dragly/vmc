@@ -10,13 +10,14 @@ MonteCarloStandard::MonteCarloStandard(WaveFunction *wave, Hamiltonian* hamilton
     number_particles(number_particles),
     dimension(dimension),
     charge(charge),
+    rank(rank),
     step_length(step_length)
 {
 }
 
 void MonteCarloStandard::sample(int max_variations, int number_cycles, double *cumulative_e, double *cumulative_e2, double *all_energies)
 {
-    int cycles, variate, accept, dim, i, j, k;
+    int cycles, variate, i, j, k;
     long idum;
     double wfnew, wfold, alpha, energy, energy2, delta_e;
     double **r_old, **r_new;
@@ -35,7 +36,7 @@ void MonteCarloStandard::sample(int max_variations, int number_cycles, double *c
     // loop over variational parameters
     for (variate=1; variate <= max_variations; variate++){
         // initialisations of variational parameters and energies
-        energy = energy2 = 0; accept =0; delta_e=0;
+        energy = energy2 = 0; delta_e=0;
         //  initial trial position, note calling with alpha
         for (i = 0; i < number_particles; i++) {
             for ( j=0; j < dimension; j++) {

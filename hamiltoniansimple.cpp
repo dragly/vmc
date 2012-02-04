@@ -14,8 +14,8 @@ HamiltonianSimple::HamiltonianSimple(int number_particles, int dimension, double
 
 double HamiltonianSimple::energy(WaveFunction *wave, double **r, double alpha, double wfold)
 {
-    int i, j , k;
-    double e_local, wfminus, wfplus, e_kinetic, e_potential, r_12,
+    int i, j;
+    double e_local, wfminus, wfplus, e_kinetic, e_potential,
             r_single_particle;
     double **r_plus, **r_minus;
 
