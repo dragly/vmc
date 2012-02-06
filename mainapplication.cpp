@@ -36,6 +36,9 @@ MainApplication::MainApplication(int* argc, char*** argv) :
 void MainApplication::loadConfiguration()
 {
     settings = new INIReader("config.ini");
+    if(settings->ParseError()) {
+        cerr << "Warning: " << __PRETTY_FUNCTION__ << ": Could not load configuration file. Does it exist?" << endl;
+    }
 
     cout << "MainApplication::loadConfiguration(): Starting minimizer..." << endl;
     minimizer = new MinimizerStandard(rank, nProcesses);
