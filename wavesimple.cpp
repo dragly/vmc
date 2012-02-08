@@ -20,6 +20,6 @@ double WaveSimple::wave(double **r, double alpha)
         }
         argument += r_single_particle;
     }
-    wf = exp(-argument*alpha) ;
+    wf = exp(-(argument*alpha) / 2) ;
     return wf;
 }

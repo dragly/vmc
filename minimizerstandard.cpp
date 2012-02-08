@@ -6,6 +6,8 @@
 #include <sstream>
 #include <iomanip>
 #include <mpi.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "minimizerstandard.h"
 #include "inih/cpp/INIReader.h"
@@ -17,6 +19,8 @@
 #include "hamiltonianstandard.h"
 #include "hamiltoniansimple.h"
 
+using namespace std;
+
 MinimizerStandard::MinimizerStandard(int rank, int nProcesses) :
     Minimizer(rank, nProcesses),
     my_rank(rank),
@@ -26,8 +30,8 @@ MinimizerStandard::MinimizerStandard(int rank, int nProcesses) :
 
 void MinimizerStandard::loadConfiguration(INIReader *settings)
 {
-    dimension = atoi(settings->Get("MinimizerStandard","dimension", "3").c_str());
-    charge = atof(settings->Get("MinimizerStandard","charge", "2.0").c_str());
+    dimension = atoi(settings->Get("MinimizerStandard","dimension", "2").c_str());
+    charge = atof(settings->Get("MinimizerStandard","charge", "1.0").c_str());
     stepLength = atof(settings->Get("MinimizerStandard","stepLength", "1.0").c_str());
     nParticles = atoi(settings->Get("MinimizerStandard","nParticles", "2").c_str());
     nCycles = atoi(settings->Get("MinimizerStandard","nCycles", "1000").c_str());

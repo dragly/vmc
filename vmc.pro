@@ -27,6 +27,8 @@ SOURCES += main.cpp \
     inih/ini.c \
     inih/cpp/INIReader.cpp
 
+OTHER_FILES += config.ini
+
 # MPI Settings
 QMAKE_CXX = mpicxx
 QMAKE_CXX_RELEASE = $$QMAKE_CXX
