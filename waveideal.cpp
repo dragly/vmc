@@ -1,14 +1,14 @@
-#include "wavesimple.h"
+#include "waveideal.h"
 #include <math.h>
 
-WaveSimple::WaveSimple(int number_particles, int dimension)  :
+WaveIdeal::WaveIdeal(int number_particles, int dimension) :
     WaveFunction(),
     number_particles(number_particles),
     dimension(dimension)
 {
 }
 
-double WaveSimple::wave(double **r)
+double WaveIdeal::wave(double **r)
 {
     int i, j;
     double wf, argument, r_single_particle;
@@ -21,6 +21,13 @@ double WaveSimple::wave(double **r)
         }
         argument += r_single_particle;
     }
-    wf = exp(-(argument*alpha) / 2) ;
+    double vec[2];
+    vec[0] = r[0][0]-r[1][0];
+    vec[1] = r[0][1]-r[1][1];
+    double r12 = sqrt(vec[0]*vec[0]+vec[1]*vec[1]);
+    double a = 1;
+    wf = exp(-(argument*alpha) / 2);
+    double jastrowArgument = (a * r12) / (1 + beta * r12);
+    wf *= exp(jastrowArgument);
     return wf;
 }

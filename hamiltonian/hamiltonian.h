@@ -7,7 +7,7 @@ class Hamiltonian
 {
 public:
     Hamiltonian();
-    virtual double energy(WaveFunction *wave, double **r, double alpha, double wfold) = 0;
+    virtual double energy(WaveFunction *wave, double **r, double wfold) = 0;
 
 };
 

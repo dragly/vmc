@@ -16,8 +16,10 @@
 #include "wavesimple.h"
 #include "montecarlostandard.h"
 #include "matrix.h"
-#include "hamiltonianstandard.h"
-#include "hamiltoniansimple.h"
+#include "hamiltonian/hamiltonianstandard.h"
+#include "hamiltonian/hamiltoniansimple.h"
+#include "hamiltonian/hamiltonianideal.h"
+#include "waveideal.h"
 
 using namespace std;
 
@@ -42,17 +44,18 @@ void MinimizerStandard::loadConfiguration(INIReader *settings)
 void MinimizerStandard::runMinimizer()
 {
     cout << "MinimizerStandard::runMinimizer(): called" << endl;
-    WaveSimple *wave = new WaveSimple(nParticles, dimension);
-    HamiltonianSimple *hamiltonian = new HamiltonianSimple(nParticles, dimension, charge);
+    WaveIdeal *wave = new WaveIdeal(nParticles, dimension);
+    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(nParticles, dimension, charge);
     string outfilename;
     int total_number_cycles, i;
     double *cumulative_e, *cumulative_e2;
     double *total_cumulative_e, *total_cumulative_e2;
-    double *all_energies;
     double  timeStart;
     double timeEnd;
     double totalTime;
-    double alpha, variance, energy, error;
+    double variance;
+    double energy;
+    double error;
 
     timeStart = MPI_Wtime();
 
@@ -84,12 +87,24 @@ void MinimizerStandard::runMinimizer()
     total_number_cycles = nCycles*numprocs;
 
     // array to store all energies for last variation of alpha
-    all_energies = new double[nCycles+1];
+//    all_energies = new double[nCycles+1];
+
+    double *energies = new double[2];
 
     //  Do the mc sampling  and accumulate data with MPI_Reduce
     MonteCarloStandard *monteCarlo = new MonteCarloStandard(wave, hamiltonian, nParticles, dimension, charge, my_rank, stepLength);
-    monteCarlo->sample(maxVariations, nCycles, cumulative_e, cumulative_e2,
-                       all_energies);
+
+    double beta = 0.4;
+    double alpha = 0.5*charge;
+    // loop over variational parameters
+    for (int variate=1; variate <= maxVariations; variate++){
+        wave->setParameters(alpha, beta);
+        monteCarlo->sample(nCycles, energies);
+        // update the energy average and its squared
+        cumulative_e[variate] = energies[0];
+        cumulative_e2[variate] = energies[1];
+        alpha += 0.1;
+    }
     //  Collect data in total averages
     for( i=1; i <= maxVariations; i++){
         MPI_Reduce(&cumulative_e[i], &total_cumulative_e[i], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
@@ -115,9 +130,11 @@ void MinimizerStandard::runMinimizer()
         }
         ofile.close();  // close output file
     }
-    blockofile.write((char*)(all_energies+1),
-                     nCycles*sizeof(double));
-    blockofile.close();
+//    blockofile.write((char*)(all_energies+1),
+//                     nCycles*sizeof(double));
+//    blockofile.close();
     delete [] total_cumulative_e; delete [] total_cumulative_e2;
-    delete [] cumulative_e; delete [] cumulative_e2; delete [] all_energies;
+    delete [] cumulative_e;
+    delete [] cumulative_e2;
+//    delete [] all_energies;
 }

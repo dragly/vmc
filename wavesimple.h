@@ -7,7 +7,7 @@ class WaveSimple : public WaveFunction
 {
 public:
     WaveSimple(int number_particles, int dimension);
-    double wave(double **r, double alpha);
+    double wave(double **r);
 private:
     int number_particles;
     int dimension;

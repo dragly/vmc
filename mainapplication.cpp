@@ -16,8 +16,6 @@
 #include "wavesimple.h"
 #include "montecarlostandard.h"
 #include "matrix.h"
-#include "hamiltonianstandard.h"
-#include "hamiltoniansimple.h"
 #include "minimizerstandard.h"
 #include "minimizer.h"
 using namespace  std;

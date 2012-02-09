@@ -8,7 +8,7 @@ WaveStandard::WaveStandard(int number_particles, int dimension)
     this->dimension = dimension;
 }
 
-double WaveStandard::wave(double **r, double alpha)
+double WaveStandard::wave(double **r)
 {
     int i, j;
     double wf, argument, r_single_particle;

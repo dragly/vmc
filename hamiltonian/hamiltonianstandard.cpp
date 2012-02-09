@@ -12,7 +12,7 @@ HamiltonianStandard::HamiltonianStandard(int number_particles, int dimension, do
 {
 }
 
-double HamiltonianStandard::energy(WaveFunction *wave, double **r, double alpha, double wfold)
+double HamiltonianStandard::energy(WaveFunction *wave, double **r, double wfold)
 {
     int i, j , k;
     double e_local, wfminus, wfplus, e_kinetic, e_potential, r_12,
@@ -34,8 +34,8 @@ double HamiltonianStandard::energy(WaveFunction *wave, double **r, double alpha,
         for (j = 0; j < dimension; j++) {
             r_plus[i][j] = r[i][j]+h;
             r_minus[i][j] = r[i][j]-h;
-            wfminus = wave->wave(r_minus, alpha);
-            wfplus  = wave->wave(r_plus, alpha);
+            wfminus = wave->wave(r_minus);
+            wfplus  = wave->wave(r_plus);
             e_kinetic -= (wfminus+wfplus-2*wfold);
             r_plus[i][j] = r[i][j];
             r_minus[i][j] = r[i][j];

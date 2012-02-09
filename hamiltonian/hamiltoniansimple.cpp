@@ -14,7 +14,7 @@ HamiltonianSimple::HamiltonianSimple(int number_particles, int dimension, double
 {
 }
 
-double HamiltonianSimple::energy(WaveFunction *wave, double **r, double alpha, double wfold)
+double HamiltonianSimple::energy(WaveFunction *wave, double **r, double wfold)
 {
     int i, j;
     double e_local, e_kinetic, e_potential,
@@ -22,7 +22,7 @@ double HamiltonianSimple::energy(WaveFunction *wave, double **r, double alpha, d
     // compute the kinetic energy
     // TODO: Use the exact derivative
     // TODO: Create a derivative-finder function that uses interpolation to approximate the derivative
-    e_kinetic = kineticEnergy(wave, r, alpha, wfold);
+    e_kinetic = kineticEnergy(wave, r, wfold);
     //    e_kinetic = 0.5*e_kinetic/h2;
     // compute the potential energy
     e_potential = 0;
@@ -48,7 +48,7 @@ double HamiltonianSimple::energy(WaveFunction *wave, double **r, double alpha, d
     return e_local;
 }
 
-double HamiltonianSimple::kineticEnergy(WaveFunction *wave, double **r, double alpha, double wfold)
+double HamiltonianSimple::kineticEnergy(WaveFunction *wave, double **r, double wfold)
 {
     double **r_plus, **r_minus;
 
@@ -66,8 +66,8 @@ double HamiltonianSimple::kineticEnergy(WaveFunction *wave, double **r, double a
         for (int j = 0; j < dimension; j++) {
             r_plus[i][j] = r[i][j]+h;
             r_minus[i][j] = r[i][j]-h;
-            double wfminus = wave->wave(r_minus, alpha);
-            double wfplus  = wave->wave(r_plus, alpha);
+            double wfminus = wave->wave(r_minus);
+            double wfplus  = wave->wave(r_plus);
             e_kinetic -= (wfminus+wfplus-2*wfold);
             r_plus[i][j] = r[i][j];
             r_minus[i][j] = r[i][j];
@@ -80,40 +80,3 @@ double HamiltonianSimple::kineticEnergy(WaveFunction *wave, double **r, double a
     free_matrix((void **) r_minus);
     return e_kinetic;
 }
-
-/*
-** The function
-**           splint()
-** takes xa[0,..,n - 1] and y[0,..,n - 1] which tabulates a function
-** (with the xa[i]'s in order) and given ya[0,..,n - 1], which is the
-** output from function spline() and with given value of x returns a
-** cubic--spline interpolation value y.
-**
-** The function is borrowed from the lib.cpp library from the FYS3150 course
-** by Morten H. Jensen
-*/
-
-void HamiltonianSimple::splint(double xa[], double ya[], double y2a[], int n, double x, double *y)
-{
-    int       klo,khi,k;
-    double    ha,b,a;
-
-    klo = 0;
-    khi = n - 1;
-    while((khi - klo) > 1) {   // binary search
-        k = (khi + klo) >> 1;
-        if(xa[k] > x)   khi = k;
-        else            klo = k;
-    }
-    ha = xa[khi] - xa[klo];
-    if(fabs(ha) < ZERO) {
-        printf("\n\n Error in function splint(): ");
-        printf("\n The difference h = %4.1E -- too small\n",h);
-        exit(1);
-    }
-    a  = (xa[khi] - x)/ha;
-    b  = (x - xa[klo])/ha;
-    *y =   a * ya[klo] + b * ya[khi] + ((a * a * a - a) * y2a[klo]
-                                        + (b * b * b - b) * y2a[khi]) * (ha * ha)/6.0;
-
-} // End: function splint()

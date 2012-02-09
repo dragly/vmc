@@ -18,14 +18,16 @@ SOURCES += main.cpp \
     montecarlostandard.cpp \
     random.cpp \
     wavesimple.cpp \
-    hamiltonian.cpp \
-    hamiltonianstandard.cpp \
-    hamiltoniansimple.cpp \
     minimizer.cpp \
     minimizerstandard.cpp \
     mainapplication.cpp \
     inih/ini.c \
-    inih/cpp/INIReader.cpp
+    inih/cpp/INIReader.cpp \
+    waveideal.cpp \
+    hamiltonian/hamiltonianideal.cpp \
+    hamiltonian/hamiltoniansimple.cpp \
+    hamiltonian/hamiltonianstandard.cpp \
+    hamiltonian/hamiltonian.cpp
 
 OTHER_FILES += config.ini
 
@@ -50,15 +52,17 @@ HEADERS += \
     montecarlostandard.h \
     random.h \
     wavesimple.h \
-    hamiltonian.h \
-    hamiltonianstandard.h \
     utils.h \
-    hamiltoniansimple.h \
     minimizer.h \
     minimizerstandard.h \
     mainapplication.h \
     inih/ini.h \
-    inih/cpp/INIReader.h
+    inih/cpp/INIReader.h \
+    waveideal.h \
+    hamiltonian/hamiltonianideal.h \
+    hamiltonian/hamiltonian.h \
+    hamiltonian/hamiltoniansimple.h \
+    hamiltonian/hamiltonianstandard.h
 
 FORMS +=
 
