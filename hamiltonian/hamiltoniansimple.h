@@ -13,7 +13,8 @@ private:
     int dimension;
     double charge;
     double kineticEnergy(WaveFunction *wave, double **r, double wfold);
-    bool analyticalKineticEnergy;
+    double analyticalKineticEnergy(WaveFunction *wave, double **r, double wfold);
+    bool useAnalyticalKineticEnergy;
 };
 
 #endif // HAMILTONIANSTANDARD_H

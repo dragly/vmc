@@ -44,8 +44,11 @@ void MinimizerStandard::loadConfiguration(INIReader *settings)
 void MinimizerStandard::runMinimizer()
 {
     cout << "MinimizerStandard::runMinimizer(): called" << endl;
-    WaveIdeal *wave = new WaveIdeal(nParticles, dimension);
-    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(nParticles, dimension, charge);
+//    WaveIdeal *wave = new WaveIdeal(nParticles, dimension);
+//    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(nParticles, dimension, charge);
+    WaveSimple *wave = new WaveSimple(nParticles, dimension);
+//    wave->setUseAnalytical(true);
+    HamiltonianSimple *hamiltonian = new HamiltonianSimple(nParticles, dimension, charge);
     string outfilename;
     int total_number_cycles, i;
     double *cumulative_e, *cumulative_e2;

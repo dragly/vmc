@@ -31,3 +31,8 @@ double WaveIdeal::wave(double **r)
     wf *= exp(jastrowArgument);
     return wf;
 }
+
+double WaveIdeal::laplace(double **r)
+{
+    return 0;
+}

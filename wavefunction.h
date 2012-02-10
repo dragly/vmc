@@ -6,6 +6,8 @@ class WaveFunction
 public:
     WaveFunction();
     virtual double wave(double **r) = 0;
+    virtual double gradient(double **r) = 0;
+    virtual double laplace(double **r) = 0;
     void setParameters(double alpha, double beta);
 protected:
     double alpha;
