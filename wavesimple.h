@@ -18,6 +18,17 @@ private:
     int number_particles;
     int dimension;
     bool useAnalytical;
+
+    double *preExp;
+
+    int nExp;
+    double aExp;
+    double bExp;
+    double ratioExp;
+    double ratioExpInverse;
+    double nExpInverse;
+
+    double myExp(double x);
 };
 
 #endif // WAVESIMPLE_H

@@ -2,17 +2,41 @@
 #include "matrix.h"
 #include "utils.h"
 #include <math.h>
+#include <iostream>
+using namespace std;
 
 WaveSimple::WaveSimple(int number_particles, int dimension)  :
     WaveFunction(),
     number_particles(number_particles),
     dimension(dimension),
-    useAnalytical(false)
+    useAnalytical(false),
+    nExp(100000)
 {
     // allocate matrices which contain the position of the particles
     // the function matrix is defined in the progam library
     r_plus = (double **) matrix( number_particles, dimension, sizeof(double));
     r_minus = (double **) matrix( number_particles, dimension, sizeof(double));
+    preExp = new double[nExp];
+    aExp = -6;
+    bExp = -3;
+    ratioExp = nExp / (bExp - aExp);
+    ratioExpInverse = (bExp - aExp) / nExp;
+    nExpInverse = 1. / nExp;
+
+    for(int i = 0; i < nExp; i++) {
+        double x = aExp + i * ratioExpInverse;
+        preExp[i] = exp(x);
+    }
+}
+
+double WaveSimple::myExp(double x) {
+    int lowIndex = (int)((x - aExp) * ratioExp);
+    if(lowIndex < 0 || lowIndex > nExp) {
+//        cerr << "Index error. x value was " << x << endl;
+        return exp(x);
+    } else {
+        return preExp[lowIndex];
+    }
 }
 
 double WaveSimple::wave(double **r)
@@ -28,7 +52,7 @@ double WaveSimple::wave(double **r)
         }
         argument += rSingleParticle;
     }
-    wf = exp(-(argument*alpha) / 2) ;
+    wf = myExp(-(argument*alpha) / 2) ;
     return wf;
 }
 
