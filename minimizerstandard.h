@@ -32,8 +32,13 @@ private:
     int nParticles;  //  we fix also the number of electrons to be 2
     int nCycles;
     int maxVariations;
+    // wave properties
+    string waveClass;
+    bool waveUseAnalyticalLaplace;
+    string hamiltonianClass;
 
     INIReader *settings;
+
 };
 
 #endif // MINIMIZERSTANDARD_H

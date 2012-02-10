@@ -6,18 +6,15 @@
 class WaveSimple : public WaveFunction
 {
 public:
-    WaveSimple(int number_particles, int dimension);
+    WaveSimple(int nParticles, int dimensions);
     double wave(double **r);
     double gradient(double **r) {return 0; }
     double laplace(double **r);
-    double **r_plus, **r_minus;
-    void setUseAnalytical(bool val);
-
-    ~WaveSimple();
+    void setUseAnalyticalLaplace(bool val);
 private:
-    int number_particles;
-    int dimension;
     bool useAnalytical;
+    double **rPlus;
+    double **rMinus;
 };
 
 #endif // WAVESIMPLE_H

@@ -1,10 +1,9 @@
 #include "waveideal.h"
 #include <math.h>
 
-WaveIdeal::WaveIdeal(int number_particles, int dimension) :
-    WaveFunction(),
-    number_particles(number_particles),
-    dimension(dimension)
+WaveIdeal::WaveIdeal(int nParticles, int dimensions) :
+    WaveFunction(nParticles, dimensions),
+    useAnalytical(false)
 {
 }
 
@@ -34,5 +33,18 @@ double WaveIdeal::wave(double **r)
 
 double WaveIdeal::laplace(double **r)
 {
-    return 0;
+    if(useAnalytical) {
+        double eKinetic = 0;
+        double rSingleParticle;
+        for (int i = 0; i < nParticles; i++) {
+            rSingleParticle = 0;
+            for (int j = 0; j < dimensions; j++) {
+                rSingleParticle  += r[i][j]*r[i][j];
+            }
+            eKinetic += -2*alpha  + alpha*alpha * rSingleParticle;
+        }
+        return eKinetic;
+    } else {
+        return laplaceNumerical(r);
+    }
 }

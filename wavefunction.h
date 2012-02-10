@@ -4,14 +4,20 @@
 class WaveFunction
 {
 public:
-    WaveFunction();
+    WaveFunction(int number_particles, int dimension);
     virtual double wave(double **r) = 0;
     virtual double gradient(double **r) = 0;
     virtual double laplace(double **r) = 0;
+    double laplaceNumerical(double **r);
     void setParameters(double alpha, double beta);
+    ~WaveFunction();
 protected:
+    int nParticles;
+    int dimensions;
     double alpha;
     double beta;
+    double **rPlus;
+    double **rMinus;
 };
 
 #endif // WAVEFUNCTION_H

@@ -38,17 +38,14 @@ void MinimizerStandard::loadConfiguration(INIReader *settings)
     nParticles = atoi(settings->Get("MinimizerStandard","nParticles", "2").c_str());
     nCycles = atoi(settings->Get("MinimizerStandard","nCycles", "1000").c_str());
     maxVariations = atoi(settings->Get("MinimizerStandard","maxVariations", "11").c_str());    //  default number of variations
+    waveClass = settings->Get("Wave","class", "WaveSimple");
+    waveUseAnalyticalLaplace = atoi(settings->Get("Wave","useAnalyticalLaplace", "0").c_str());
+    hamiltonianClass = settings->Get("Hamiltonian","class", "HamiltonianSimple");
     cout << "nCycles: " << nCycles << endl;
 }
 
 void MinimizerStandard::runMinimizer()
 {
-    cout << "MinimizerStandard::runMinimizer(): called" << endl;
-//    WaveIdeal *wave = new WaveIdeal(nParticles, dimension);
-//    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(nParticles, dimension, charge);
-    WaveSimple *wave = new WaveSimple(nParticles, dimension);
-//    wave->setUseAnalytical(true);
-    HamiltonianSimple *hamiltonian = new HamiltonianSimple(nParticles, dimension, charge);
     string outfilename;
     int total_number_cycles, i;
     double *cumulative_e, *cumulative_e2;
@@ -60,6 +57,34 @@ void MinimizerStandard::runMinimizer()
     double energy;
     double error;
 
+    cout << "MinimizerStandard::runMinimizer(): called" << endl;
+    //    WaveIdeal *wave = new WaveIdeal(nParticles, dimension);
+    //    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(nParticles, dimension, charge);
+    WaveFunction *wave;
+    if(waveClass == "WaveSimple") {
+        WaveSimple *waveSimple = new WaveSimple(nParticles, dimension);
+        waveSimple->setUseAnalyticalLaplace(waveUseAnalyticalLaplace);
+        wave = waveSimple;
+    } else if(waveClass == "WaveIdeal") {
+        WaveIdeal *waveIdeal = new WaveIdeal(nParticles, dimension);
+        waveIdeal->setUseAnalyticalLaplace(waveUseAnalyticalLaplace);
+        wave = waveIdeal;
+    } else {
+        cerr << "Unknown wave class!" << endl;
+        exit(99);
+    }
+
+    Hamiltonian *hamiltonian;
+    if(hamiltonianClass == "HamiltonianSimple") {
+        HamiltonianSimple *hamiltonianSimple = new HamiltonianSimple(nParticles, dimension, charge);
+        hamiltonian = hamiltonianSimple;
+    } else if(hamiltonianClass == "HamiltonianIdeal") {
+        HamiltonianIdeal *hamiltonianIdeal = new HamiltonianIdeal(nParticles, dimension, charge);
+        hamiltonian = hamiltonianIdeal;
+    } else {
+        cerr << "Unknown hamiltonian class!" << endl;
+        exit(98);
+    }
     timeStart = MPI_Wtime();
 
     if (my_rank == 0) {
@@ -90,7 +115,7 @@ void MinimizerStandard::runMinimizer()
     total_number_cycles = nCycles*numprocs;
 
     // array to store all energies for last variation of alpha
-//    all_energies = new double[nCycles+1];
+    //    all_energies = new double[nCycles+1];
 
     double *energies = new double[2];
 
@@ -133,11 +158,11 @@ void MinimizerStandard::runMinimizer()
         }
         ofile.close();  // close output file
     }
-//    blockofile.write((char*)(all_energies+1),
-//                     nCycles*sizeof(double));
-//    blockofile.close();
+    //    blockofile.write((char*)(all_energies+1),
+    //                     nCycles*sizeof(double));
+    //    blockofile.close();
     delete [] total_cumulative_e; delete [] total_cumulative_e2;
     delete [] cumulative_e;
     delete [] cumulative_e2;
-//    delete [] all_energies;
+    //    delete [] all_energies;
 }

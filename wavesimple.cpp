@@ -3,16 +3,10 @@
 #include "utils.h"
 #include <math.h>
 
-WaveSimple::WaveSimple(int number_particles, int dimension)  :
-    WaveFunction(),
-    number_particles(number_particles),
-    dimension(dimension),
+WaveSimple::WaveSimple(int nParticles, int dimensions)  :
+    WaveFunction(nParticles, dimensions),
     useAnalytical(false)
 {
-    // allocate matrices which contain the position of the particles
-    // the function matrix is defined in the progam library
-    r_plus = (double **) matrix( number_particles, dimension, sizeof(double));
-    r_minus = (double **) matrix( number_particles, dimension, sizeof(double));
 }
 
 double WaveSimple::wave(double **r)
@@ -21,9 +15,9 @@ double WaveSimple::wave(double **r)
     double wf, argument, rSingleParticle;
 
     argument = wf = 0;
-    for (i = 0; i < number_particles; i++) {
+    for (i = 0; i < nParticles; i++) {
         rSingleParticle = 0;
-        for (j = 0; j < dimension; j++) {
+        for (j = 0; j < dimensions; j++) {
             rSingleParticle  += r[i][j]*r[i][j];
         }
         argument += rSingleParticle;
@@ -34,52 +28,23 @@ double WaveSimple::wave(double **r)
 
 double WaveSimple::laplace(double **r)
 {
-    double eKinetic = 0;
     if(useAnalytical) {
-        int i, j;
-        double argument;
+        double eKinetic = 0;
         double rSingleParticle;
-
-        argument = 0;
-        double prefix = 0;
-        for (i = 0; i < number_particles; i++) {
+        for (int i = 0; i < nParticles; i++) {
             rSingleParticle = 0;
-            for (j = 0; j < dimension; j++) {
+            for (int j = 0; j < dimensions; j++) {
                 rSingleParticle  += r[i][j]*r[i][j];
             }
-            argument += rSingleParticle;
-            prefix += rSingleParticle;
+            eKinetic += -2*alpha  + alpha*alpha * rSingleParticle;
         }
-        eKinetic = prefix * alpha * exp(-(argument*alpha) / 2) ;
+        return eKinetic;
     } else {
-        for (int i = 0; i < number_particles; i++) {
-            for (int j=0; j < dimension; j++) {
-                r_plus[i][j] = r_minus[i][j] = r[i][j];
-            }
-        }
-        for (int i = 0; i < number_particles; i++) {
-            for (int j = 0; j < dimension; j++) {
-                r_plus[i][j] = r[i][j]+h;
-                r_minus[i][j] = r[i][j]-h;
-                double wfminus = wave(r_minus);
-                double wfplus  = wave(r_plus);
-                double wfold = wave(r);
-                eKinetic += (wfminus+wfplus-2*wfold);
-                r_plus[i][j] = r[i][j];
-                r_minus[i][j] = r[i][j];
-            }
-        }
+        return laplaceNumerical(r);
     }
-    return eKinetic;
 }
 
-void WaveSimple::setUseAnalytical(bool val)
+void WaveSimple::setUseAnalyticalLaplace(bool val)
 {
     useAnalytical = val;
-}
-
-WaveSimple::~WaveSimple()
-{
-    free_matrix((void **) r_plus); // free memory
-    free_matrix((void **) r_minus);
 }

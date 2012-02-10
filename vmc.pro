@@ -13,7 +13,6 @@ TEMPLATE = app
 SOURCES += main.cpp \
     matrix.cpp \
     wavefunction.cpp \
-    wavestandard.cpp \
     montecarlo.cpp \
     montecarlostandard.cpp \
     random.cpp \
@@ -26,7 +25,6 @@ SOURCES += main.cpp \
     waveideal.cpp \
     hamiltonian/hamiltonianideal.cpp \
     hamiltonian/hamiltoniansimple.cpp \
-    hamiltonian/hamiltonianstandard.cpp \
     hamiltonian/hamiltonian.cpp
 
 OTHER_FILES += config.ini

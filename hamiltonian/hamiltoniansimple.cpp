@@ -25,7 +25,7 @@ double HamiltonianSimple::energy(WaveFunction *wave, double **r, double wfold)
     // compute the kinetic energy
     // TODO: Use the exact derivative
     // TODO: Create a derivative-finder function that uses interpolation to approximate the derivative
-    eKinetic = -0.5*h2*wave->laplace(r)/wfold;
+    eKinetic = -0.5*wave->laplace(r);
     //    e_kinetic = 0.5*e_kinetic/h2;
     // compute the potential energy
     ePotential = 0;
