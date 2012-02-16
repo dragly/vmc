@@ -2,6 +2,8 @@
 #include "matrix.h"
 #include "utils.h"
 #include <math.h>
+#include <iostream>
+using namespace std;
 
 WaveSimple::WaveSimple(int nParticles, int dimensions)  :
     WaveFunction(nParticles, dimensions),
