@@ -8,7 +8,7 @@ class HamiltonianIdeal : public Hamiltonian
 {
 public:
     HamiltonianIdeal(int number_particles, int dimension, double charge);
-    double energy(WaveFunction *wave, double **r, double wfold);
+    double energy(WaveFunction *wave, double **r);
 private:
     int number_particles;
     int dimension;

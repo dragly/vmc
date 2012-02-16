@@ -27,7 +27,7 @@ MonteCarloStandard::MonteCarloStandard(WaveFunction *wave, Hamiltonian* hamilton
 
 void MonteCarloStandard::sample(int number_cycles, double *energies)
 {
-    int cycles, variate, i, j, k;
+    int cycles, i, j, k;
     long idum;
     double wfnew;
     double wfold;
@@ -70,7 +70,7 @@ void MonteCarloStandard::sample(int number_cycles, double *energies)
             }
         }  //  end of loop over particles
         // compute local energy
-        delta_e = hamiltonian->energy(wave, r_old, wfold);
+        delta_e = hamiltonian->energy(wave, r_old);
         // save all energies on last variate
 //        if(variate==max_variations){
 //            all_energies[cycles] = delta_e;

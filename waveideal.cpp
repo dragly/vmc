@@ -13,9 +13,9 @@ double WaveIdeal::wave(double **r)
     double wf, argument, r_single_particle;
 
     argument = wf = 0;
-    for (i = 0; i < number_particles; i++) {
+    for (i = 0; i < nParticles; i++) {
         r_single_particle = 0;
-        for (j = 0; j < dimension; j++) {
+        for (j = 0; j < dimensions; j++) {
             r_single_particle  += r[i][j]*r[i][j];
         }
         argument += r_single_particle;
@@ -34,15 +34,28 @@ double WaveIdeal::wave(double **r)
 double WaveIdeal::laplace(double **r)
 {
     if(useAnalytical) {
-        double eKinetic = 0;
-        double rSingleParticle;
+        double omega = 1;
+        double aconst = 1;
+        // TODO: Generalize for more dimensions
+        double r12vec[2];
+        r12vec[0] = r[0][0]-r[1][0];
+        r12vec[1] = r[0][1]-r[1][1];
+        double r12 = sqrt(r12vec[0]*r12vec[0]+r12vec[1]*r12vec[1]);
+        double dotProduct = r[0][0]*r[1][0]+r[0][1]*r[1][1];
+        double denom = (1 + beta*r12);
+
+        double crossProd = 0;
+        double laplaceE = 0;
         for (int i = 0; i < nParticles; i++) {
-            rSingleParticle = 0;
+            double rSquared = 0;
             for (int j = 0; j < dimensions; j++) {
-                rSingleParticle  += r[i][j]*r[i][j];
+                rSquared  += r[i][j]*r[i][j];
             }
-            eKinetic += -2*alpha  + alpha*alpha * rSingleParticle;
+            laplaceE += - 2*omega*alpha + omega*omega*alpha*alpha * rSquared;
+            crossProd += - omega * alpha * (rSquared - dotProduct) * aconst / (r12 * denom*denom);
         }
+        double laplaceC = 2 *(aconst/(denom*denom)) * (aconst/(denom*denom) - 2*beta/denom + 1/r12);
+        double eKinetic = laplaceE + laplaceC + 2*crossProd;
         return eKinetic;
     } else {
         return laplaceNumerical(r);
