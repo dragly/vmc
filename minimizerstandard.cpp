@@ -1,4 +1,4 @@
-#include <QSettings>
+//#include <QSettings>
 
 #include <cmath>
 #include <iostream>

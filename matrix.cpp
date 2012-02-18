@@ -6,6 +6,7 @@
 #include <iomanip>
 
 using namespace  std;
+
 /*
  * The function
  *      void  **matrix()
@@ -18,7 +19,6 @@ using namespace  std;
  *                 element
  * Returns a void  **pointer to the reserved memory location.
  */
-
 void **matrix(int row, int col, int num_bytes)
 {
     int      i, num;
