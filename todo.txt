@@ -1,0 +1,5 @@
+Things to do:
+
+- calculate and plot onebody density for harmonic oscillator
+- calculate and plot onebody density for our best trial wave function
+- add blocking calculations

@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     hamiltonian/hamiltoniansimple.cpp \
     hamiltonian/hamiltonian.cpp
 
-OTHER_FILES += config.ini
+OTHER_FILES += config.ini \
+    todo.txt
 
 HEADERS += \
     matrix.h \
