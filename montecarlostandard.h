@@ -9,7 +9,7 @@ class MonteCarloStandard : public MonteCarlo
 {
 public:
     MonteCarloStandard(WaveFunction* wave, Hamiltonian* hamiltonian, int number_particles, int dimension, double charge, int rank, double step_length);
-    void sample(int number_cycles, double *energies);
+    void sample(int nCycles, double *energies, double *allEnergies);
     double local_energy(double **r, double alpha, double wfold);
 
     ~MonteCarloStandard();

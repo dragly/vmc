@@ -9,7 +9,7 @@ class MonteCarlo
 public:
     MonteCarlo(WaveFunction *wave, Hamiltonian *hamiltonian);
 
-    virtual void sample(int number_cycles, double *energies) = 0;
+    virtual void sample(int number_cycles, double *energies, double *allEnergies) = 0;
 protected:
     WaveFunction *wave;
     Hamiltonian *hamiltonian;

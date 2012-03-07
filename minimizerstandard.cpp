@@ -5,10 +5,19 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+// disable annoying unused parameter warnings from the MPI library which we don't have any control over
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <mpi.h>
+// Enable warnings again
+#pragma GCC diagnostic warning "-Wunused-parameter"
 #include <stdio.h>
 #include <stdlib.h>
+// Stat stuff
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
+// local stuff
 #include "minimizerstandard.h"
 #include "inih/cpp/INIReader.h"
 
@@ -24,9 +33,7 @@
 using namespace std;
 
 MinimizerStandard::MinimizerStandard(int rank, int nProcesses) :
-    Minimizer(rank, nProcesses),
-    my_rank(rank),
-    numprocs(nProcesses)
+    Minimizer(rank, nProcesses)
 {
 }
 
@@ -46,7 +53,6 @@ void MinimizerStandard::loadConfiguration(INIReader *settings)
 
 void MinimizerStandard::runMinimizer()
 {
-    string outfilename;
     int total_number_cycles, i;
     double *cumulative_e, *cumulative_e2;
     double *total_cumulative_e, *total_cumulative_e2;
@@ -87,16 +93,11 @@ void MinimizerStandard::runMinimizer()
     }
     timeStart = MPI_Wtime();
 
-    if (my_rank == 0) {
+    string outfilename;
+    if (rank == 0) {
         outfilename = "output.dat";
         ofile.open(outfilename.c_str());
     }
-
-    // Setting output file name for this rank:
-    ostringstream ost;
-    ost << "blocks_rank" << my_rank << ".dat";
-    // Open file for writing:
-    blockofile.open(ost.str().c_str(), ios::out | ios::binary);
 
     total_cumulative_e = new double[maxVariations+1];
     total_cumulative_e2 = new double[maxVariations+1];
@@ -112,22 +113,22 @@ void MinimizerStandard::runMinimizer()
     MPI_Bcast (&maxVariations, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast (&nCycles, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    total_number_cycles = nCycles*numprocs;
+    total_number_cycles = nCycles*nProcesses;
 
     // array to store all energies for last variation of alpha
-    //    all_energies = new double[nCycles+1];
+    allEnergies = new double[nCycles+1];
 
     double *energies = new double[2];
 
     //  Do the mc sampling  and accumulate data with MPI_Reduce
-    MonteCarloStandard *monteCarlo = new MonteCarloStandard(wave, hamiltonian, nParticles, dimension, charge, my_rank, stepLength);
+    MonteCarloStandard *monteCarlo = new MonteCarloStandard(wave, hamiltonian, nParticles, dimension, charge, rank, stepLength);
 
     double beta = 0.4;
     double alpha = 0.5*charge;
     // loop over variational parameters
     for (int variate=1; variate <= maxVariations; variate++){
         wave->setParameters(alpha, beta);
-        monteCarlo->sample(nCycles, energies);
+        monteCarlo->sample(nCycles, energies, allEnergies);
         // update the energy average and its squared
         cumulative_e[variate] = energies[0];
         cumulative_e2[variate] = energies[1];
@@ -142,8 +143,8 @@ void MinimizerStandard::runMinimizer()
     timeEnd = MPI_Wtime();
     totalTime = timeEnd-timeStart;
     // Print out results
-    if ( my_rank == 0) {
-        cout << "Time = " <<  totalTime  << " on number of processors: "  << numprocs  << endl;
+    if ( rank == 0) {
+        cout << "Time = " <<  totalTime  << " on number of processors: "  << nProcesses  << endl;
         alpha = 0.5*charge;
         for( i=1; i <= maxVariations; i++){
             energy = total_cumulative_e[i]/total_number_cycles;
@@ -158,11 +159,48 @@ void MinimizerStandard::runMinimizer()
         }
         ofile.close();  // close output file
     }
-    //    blockofile.write((char*)(all_energies+1),
-    //                     nCycles*sizeof(double));
-    //    blockofile.close();
+    writeBlockData();
+    // Wait till all processes has written their block data to file
+    MPI_Barrier(MPI_COMM_WORLD);
+    // load block data
+    if(rank == 0) {
+        // TODO: Move this to a new function
+        struct stat result;
+        int nLocal = 0;
+        int nBlockData = 0;
+        if(stat("blocks_rank0.dat", &result) == 0) {
+            nLocal = result.st_size / sizeof(double);
+            nBlockData = nLocal * nProcesses;
+        } else {
+            cerr << "Trouble loading blocks_rank0.dat" << endl;
+            exit(99);
+        }
+
+        double *mcResults = new double[nBlockData];
+        for(int i = 0; i < nProcesses; i++) {
+            ostringstream ost;
+            ost << "blocks_rank" << i << ".dat";
+            ifstream infile;
+            infile.open(ost.str().c_str(), ios::in | ios::binary);
+            infile.read((char*)&(mcResults[i*nLocal]), result.st_size);
+            infile.close();
+        }
+        for(int i = 0; i < nProcesses; i++) {
+            // TODO implement blocking import
+        }
+    }
     delete [] total_cumulative_e; delete [] total_cumulative_e2;
     delete [] cumulative_e;
     delete [] cumulative_e2;
-    //    delete [] all_energies;
+    delete [] allEnergies;
+}
+
+void MinimizerStandard::blocking(double *values, int nValues, int blockSize, double *result) {
+    int nBlocks = nValues / blockSize;
+    double *blockValues = new double[nBlocks];
+    for(int i = 0; i < nBlocks; i++) {
+        blockValues[i] = mean(values + i * blockSize, blockSize);
+    }
+    // TODO implement mean and mean variance
+    meanvar(blockValues, nBlocks, result);
 }
