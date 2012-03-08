@@ -25,10 +25,13 @@ SOURCES += main.cpp \
     waveideal.cpp \
     hamiltonian/hamiltonianideal.cpp \
     hamiltonian/hamiltoniansimple.cpp \
-    hamiltonian/hamiltonian.cpp
+    hamiltonian/hamiltonian.cpp \
+    blocker.cpp \
+    densityplotter.cpp
 
 OTHER_FILES += config.ini \
-    todo.txt
+    todo.txt \
+    vmc.pri
 
 HEADERS += \
     matrix.h \
@@ -48,7 +51,9 @@ HEADERS += \
     hamiltonian/hamiltonianideal.h \
     hamiltonian/hamiltonian.h \
     hamiltonian/hamiltoniansimple.h \
-    hamiltonian/hamiltonianstandard.h
+    hamiltonian/hamiltonianstandard.h \
+    blocker.h \
+    densityplotter.h
 
 FORMS +=
 

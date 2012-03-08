@@ -12,10 +12,6 @@
 #pragma GCC diagnostic warning "-Wunused-parameter"
 #include <stdio.h>
 #include <stdlib.h>
-// Stat stuff
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 // local stuff
 #include "minimizerstandard.h"
@@ -39,6 +35,7 @@ MinimizerStandard::MinimizerStandard(int rank, int nProcesses) :
 
 void MinimizerStandard::loadConfiguration(INIReader *settings)
 {
+    m_settings = settings;
     dimension = atoi(settings->Get("MinimizerStandard","dimension", "2").c_str());
     charge = atof(settings->Get("MinimizerStandard","charge", "1.0").c_str());
     stepLength = atof(settings->Get("MinimizerStandard","stepLength", "1.0").c_str());
@@ -48,7 +45,6 @@ void MinimizerStandard::loadConfiguration(INIReader *settings)
     waveClass = settings->Get("Wave","class", "WaveSimple");
     waveUseAnalyticalLaplace = atoi(settings->Get("Wave","useAnalyticalLaplace", "0").c_str());
     hamiltonianClass = settings->Get("Hamiltonian","class", "HamiltonianSimple");
-    cout << "nCycles: " << nCycles << endl;
 }
 
 void MinimizerStandard::runMinimizer()
@@ -69,16 +65,15 @@ void MinimizerStandard::runMinimizer()
     WaveFunction *wave;
     if(waveClass == "WaveSimple") {
         WaveSimple *waveSimple = new WaveSimple(nParticles, dimension);
-        waveSimple->setUseAnalyticalLaplace(waveUseAnalyticalLaplace);
         wave = waveSimple;
     } else if(waveClass == "WaveIdeal") {
         WaveIdeal *waveIdeal = new WaveIdeal(nParticles, dimension);
-        waveIdeal->setUseAnalyticalLaplace(waveUseAnalyticalLaplace);
         wave = waveIdeal;
     } else {
         cerr << "Unknown wave class!" << endl;
         exit(99);
     }
+    wave->loadConfiguration(m_settings);
 
     Hamiltonian *hamiltonian;
     if(hamiltonianClass == "HamiltonianSimple") {
@@ -94,7 +89,7 @@ void MinimizerStandard::runMinimizer()
     timeStart = MPI_Wtime();
 
     string outfilename;
-    if (rank == 0) {
+    if (m_rank == 0) {
         outfilename = "output.dat";
         ofile.open(outfilename.c_str());
     }
@@ -113,7 +108,7 @@ void MinimizerStandard::runMinimizer()
     MPI_Bcast (&maxVariations, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast (&nCycles, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    total_number_cycles = nCycles*nProcesses;
+    total_number_cycles = nCycles*m_nProcesses;
 
     // array to store all energies for last variation of alpha
     allEnergies = new double[nCycles+1];
@@ -121,7 +116,7 @@ void MinimizerStandard::runMinimizer()
     double *energies = new double[2];
 
     //  Do the mc sampling  and accumulate data with MPI_Reduce
-    MonteCarloStandard *monteCarlo = new MonteCarloStandard(wave, hamiltonian, nParticles, dimension, charge, rank, stepLength);
+    MonteCarloStandard *monteCarlo = new MonteCarloStandard(wave, hamiltonian, nParticles, dimension, charge, m_rank, stepLength);
 
     double beta = 0.4;
     double alpha = 0.5*charge;
@@ -143,8 +138,8 @@ void MinimizerStandard::runMinimizer()
     timeEnd = MPI_Wtime();
     totalTime = timeEnd-timeStart;
     // Print out results
-    if ( rank == 0) {
-        cout << "Time = " <<  totalTime  << " on number of processors: "  << nProcesses  << endl;
+    if ( m_rank == 0) {
+        cout << "Time = " <<  totalTime  << " on number of processors: "  << m_nProcesses  << endl;
         alpha = 0.5*charge;
         for( i=1; i <= maxVariations; i++){
             energy = total_cumulative_e[i]/total_number_cycles;
@@ -160,47 +155,8 @@ void MinimizerStandard::runMinimizer()
         ofile.close();  // close output file
     }
     writeBlockData();
-    // Wait till all processes has written their block data to file
-    MPI_Barrier(MPI_COMM_WORLD);
-    // load block data
-    if(rank == 0) {
-        // TODO: Move this to a new function
-        struct stat result;
-        int nLocal = 0;
-        int nBlockData = 0;
-        if(stat("blocks_rank0.dat", &result) == 0) {
-            nLocal = result.st_size / sizeof(double);
-            nBlockData = nLocal * nProcesses;
-        } else {
-            cerr << "Trouble loading blocks_rank0.dat" << endl;
-            exit(99);
-        }
-
-        double *mcResults = new double[nBlockData];
-        for(int i = 0; i < nProcesses; i++) {
-            ostringstream ost;
-            ost << "blocks_rank" << i << ".dat";
-            ifstream infile;
-            infile.open(ost.str().c_str(), ios::in | ios::binary);
-            infile.read((char*)&(mcResults[i*nLocal]), result.st_size);
-            infile.close();
-        }
-        for(int i = 0; i < nProcesses; i++) {
-            // TODO implement blocking import
-        }
-    }
     delete [] total_cumulative_e; delete [] total_cumulative_e2;
     delete [] cumulative_e;
     delete [] cumulative_e2;
     delete [] allEnergies;
-}
-
-void MinimizerStandard::blocking(double *values, int nValues, int blockSize, double *result) {
-    int nBlocks = nValues / blockSize;
-    double *blockValues = new double[nBlocks];
-    for(int i = 0; i < nBlocks; i++) {
-        blockValues[i] = mean(values + i * blockSize, blockSize);
-    }
-    // TODO implement mean and mean variance
-    meanvar(blockValues, nBlocks, result);
 }

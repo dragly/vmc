@@ -70,7 +70,8 @@ void MonteCarloStandard::sample(int nCycles, double *energies, double *allEnergi
             }
         }  //  end of loop over particles
         // compute local energy
-        delta_e = hamiltonian->energy(wave, r_old);
+        delta_e = hamiltonian->energy
+                (wave, r_old);
         // save all energies on last variate
         //        if(variate==max_variations){
         allEnergies[cycle] = delta_e;

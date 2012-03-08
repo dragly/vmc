@@ -11,18 +11,30 @@ class MainApplication
 public:
     MainApplication(int* argc, char ***argv);
 
-    void loadConfiguration();
-    int runApplication();
+    enum Mode {
+        BlockingMode,
+        DensityMode,
+        MinimizerMode
+    };
 
+    void loadConfiguration();
+    void runConfiguration();
+
+    void runMinimizer();
+    void runBlocking();
+    void runDensity();
+    void finalize();
 private:
     INIReader *settings;
 
-    Minimizer *minimizer;
+
 
     int* argc;
     char*** argv;
     int rank;
     int nProcesses;
+
+    Mode mode;
 };
 
 #endif // MAINAPPLICATION_H

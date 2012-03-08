@@ -15,7 +15,7 @@ using namespace std;
 class MinimizerStandard : public Minimizer
 {
 public:
-    MinimizerStandard(int rank, int nProcesses);
+    MinimizerStandard(int m_rank, int m_nProcesses);
     void runMinimizer();
     void loadConfiguration(INIReader *settings);
 private:
@@ -32,7 +32,7 @@ private:
     bool waveUseAnalyticalLaplace;
     string hamiltonianClass;
 
-    INIReader *settings;
+    INIReader *m_settings;
 
 };
 

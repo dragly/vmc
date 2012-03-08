@@ -8,8 +8,12 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    MainApplication *app = new MainApplication(&argc, &argv);
     cout << "Running main application..." << endl;
-    return app->runApplication();;
+    MainApplication *app = new MainApplication(&argc, &argv);
+
+    app->loadConfiguration();
+    app->runConfiguration();
+    app->finalize();
+    return 0;
 }  //  end of main function
 

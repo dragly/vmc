@@ -1,6 +1,8 @@
 #ifndef WAVEFUNCTION_H
 #define WAVEFUNCTION_H
 
+class INIReader;
+
 class WaveFunction
 {
 public:
@@ -8,6 +10,7 @@ public:
     virtual double wave(double **r) = 0;
     virtual double gradient(double **r) = 0;
     virtual double laplace(double **r) = 0;
+    virtual void loadConfiguration(INIReader *settings) {}
     double laplaceNumerical(double **r);
     void setParameters(double alpha, double beta);
     ~WaveFunction();

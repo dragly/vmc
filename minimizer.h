@@ -1,13 +1,8 @@
 #ifndef MINIMIZER_H
 #define MINIMIZER_H
-#include <fstream>
-#include <iostream>
-#include <fstream>
+
 #include <sstream>
 #include <iomanip>
-#include <stdio.h>
-#include <stdlib.h>
-
 using namespace std;
 
 /*!
@@ -21,15 +16,18 @@ class Minimizer
 public:
     Minimizer(int rank, int nProcesses);
     virtual void runMinimizer() = 0;
+    void runBlocking();
 
     virtual void loadConfiguration(INIReader *settings) = 0;
     void writeBlockData();
+    void blocking(double *values, int nValues, int blockSize, double *result);
+    double mean(double *values, double nValues);
 protected:
     // output file as global variable
     ofstream ofile;
     ofstream blockofile;
-    int rank;
-    int nProcesses;
+    int m_rank;
+    int m_nProcesses;
     // monte carlo settings
     int nCycles;
     // energies to store in block files
