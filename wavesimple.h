@@ -6,7 +6,7 @@
 class WaveSimple : public WaveFunction
 {
 public:
-    WaveSimple(int nParticles, int dimensions);
+    WaveSimple(int m_nParticles, int m_nDimensions);
     double wave(double **r);
     double gradient(double **r) { (void) r; return 0; }
     double laplace(double **r);

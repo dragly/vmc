@@ -1,29 +1,34 @@
+#include <string>
+
 #include "wavefunction.h"
 
 #include "matrix.h"
 #include "utils.h"
 
-WaveFunction::WaveFunction(int nParticles, int dimensions) :
-    nParticles(nParticles),
-    dimensions(dimensions)
+#include "wavesimple.h"
+#include "waveideal.h"
+
+WaveFunction::WaveFunction(int nParticles, int nDimensions) :
+    m_nParticles(nParticles),
+    m_nDimensions(nDimensions)
 {
     // allocate matrices which contain the position of the particles
     // the function matrix is defined in the progam library
-    rPlus = (double **) matrix( nParticles, dimensions, sizeof(double));
-    rMinus = (double **) matrix( nParticles, dimensions, sizeof(double));
+    rPlus = (double **) matrix( nParticles, nDimensions, sizeof(double));
+    rMinus = (double **) matrix( nParticles, nDimensions, sizeof(double));
 }
 
 double WaveFunction::laplaceNumerical(double **r)
 {
     double eKinetic = 0;
     double wfold = wave(r);
-    for (int i = 0; i < nParticles; i++) {
-        for (int j=0; j < dimensions; j++) {
+    for (int i = 0; i < m_nParticles; i++) {
+        for (int j=0; j < m_nDimensions; j++) {
             rPlus[i][j] = rMinus[i][j] = r[i][j];
         }
     }
-    for (int i = 0; i < nParticles; i++) {
-        for (int j = 0; j < dimensions; j++) {
+    for (int i = 0; i < m_nParticles; i++) {
+        for (int j = 0; j < m_nDimensions; j++) {
             rPlus[i][j] = r[i][j]+h;
             rMinus[i][j] = r[i][j]-h;
             double wfminus = wave(rMinus);
@@ -42,6 +47,21 @@ void WaveFunction::setParameters(double alpha, double beta)
 {
     this->alpha = alpha;
     this->beta = beta;
+}
+
+/*!
+  Creates and returns a new wave function based on the class specified by the parameter string.
+  */
+WaveFunction* WaveFunction::functionFromName(std::string waveClass, int nParticles, int nDimensions) {
+    if(waveClass == "WaveSimple") {
+        WaveSimple *waveSimple = new WaveSimple(nParticles, nDimensions);
+        return waveSimple;
+    } else if(waveClass == "WaveIdeal") {
+        WaveIdeal *waveIdeal = new WaveIdeal(nParticles, nDimensions);
+        return waveIdeal;
+    } else {
+        return 0;
+    }
 }
 
 

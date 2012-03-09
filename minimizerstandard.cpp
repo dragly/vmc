@@ -6,10 +6,12 @@
 #include <sstream>
 #include <iomanip>
 // disable annoying unused parameter warnings from the MPI library which we don't have any control over
+#ifdef USE_MPI
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <mpi.h>
 // Enable warnings again
 #pragma GCC diagnostic warning "-Wunused-parameter"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -52,8 +54,11 @@ void MinimizerStandard::runMinimizer()
     int total_number_cycles, i;
     double *cumulative_e, *cumulative_e2;
     double *total_cumulative_e, *total_cumulative_e2;
-    double  timeStart;
+    double timeStart;
     double timeEnd;
+#ifndef USE_MPI
+    timeStart = timeEnd = -1;
+#endif
     double totalTime;
     double variance;
     double energy;
@@ -62,14 +67,8 @@ void MinimizerStandard::runMinimizer()
     cout << "MinimizerStandard::runMinimizer(): called" << endl;
     //    WaveIdeal *wave = new WaveIdeal(nParticles, dimension);
     //    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(nParticles, dimension, charge);
-    WaveFunction *wave;
-    if(waveClass == "WaveSimple") {
-        WaveSimple *waveSimple = new WaveSimple(nParticles, dimension);
-        wave = waveSimple;
-    } else if(waveClass == "WaveIdeal") {
-        WaveIdeal *waveIdeal = new WaveIdeal(nParticles, dimension);
-        wave = waveIdeal;
-    } else {
+    WaveFunction *wave = WaveFunction::functionFromName(waveClass, nParticles, dimension);
+    if(wave == 0) {
         cerr << "Unknown wave class!" << endl;
         exit(99);
     }
@@ -86,7 +85,9 @@ void MinimizerStandard::runMinimizer()
         cerr << "Unknown hamiltonian class!" << endl;
         exit(98);
     }
+#ifdef USE_MPI
     timeStart = MPI_Wtime();
+#endif
 
     string outfilename;
     if (m_rank == 0) {
@@ -103,11 +104,11 @@ void MinimizerStandard::runMinimizer()
     for( i=1; i <= maxVariations; i++){
         cumulative_e[i] = cumulative_e2[i]  = total_cumulative_e[i] = total_cumulative_e2[i]  = 0.0;
     }
-
+#ifdef USE_MPI
     // broadcast the total number of  variations
     MPI_Bcast (&maxVariations, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast (&nCycles, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
+#endif
     total_number_cycles = nCycles*m_nProcesses;
 
     // array to store all energies for last variation of alpha
@@ -129,14 +130,17 @@ void MinimizerStandard::runMinimizer()
         cumulative_e2[variate] = energies[1];
         alpha += 0.1;
     }
+#ifdef USE_MPI
     //  Collect data in total averages
     for( i=1; i <= maxVariations; i++){
         MPI_Reduce(&cumulative_e[i], &total_cumulative_e[i], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
         MPI_Reduce(&cumulative_e2[i], &total_cumulative_e2[i], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     }
-
     timeEnd = MPI_Wtime();
     totalTime = timeEnd-timeStart;
+#else
+    totalTime = -1;
+#endif
     // Print out results
     if ( m_rank == 0) {
         cout << "Time = " <<  totalTime  << " on number of processors: "  << m_nProcesses  << endl;

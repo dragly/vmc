@@ -8,11 +8,13 @@
 #include <iomanip>
 #include <stdlib.h>
 #include <stdio.h>
+#ifdef USE_MPI
 // disable annoying unused parameter warnings from the MPI library which we don't have any control over
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <mpi.h>
 // Enable warnings again
 #pragma GCC diagnostic warning "-Wunused-parameter"
+#endif
 
 #include "inih/cpp/INIReader.h"
 
@@ -32,10 +34,15 @@ MainApplication::MainApplication(int* argc, char*** argv) :
     argc(argc),
     argv(argv)
 {
+#ifdef USE_MPI
     //  MPI initializations
     MPI_Init (argc, argv);
     MPI_Comm_size (MPI_COMM_WORLD, &nProcesses);
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+#else
+    nProcesses = 1;
+    rank = 0;
+#endif
 }
 
 void MainApplication::loadConfiguration()
@@ -93,10 +100,11 @@ void MainApplication::runDensity()
 {
     DensityPlotter *densityPlotter = new DensityPlotter(rank, nProcesses);
     densityPlotter->makePlot();
-
 }
 
 void MainApplication::finalize() {
+#ifdef USE_MPI
     // End MPI
     MPI_Finalize ();
+#endif
 }

@@ -1,6 +1,8 @@
 #ifndef DENSITYPLOTTER_H
 #define DENSITYPLOTTER_H
 
+class WaveFunction;
+
 /*!
   A class that uses the given wave function to plot the onebody density.
   */
@@ -13,6 +15,7 @@ public:
 private:
     int m_rank;
     int m_nProcesses;
+    WaveFunction *wave;
 };
 
 #endif // DENSITYPLOTTER_H

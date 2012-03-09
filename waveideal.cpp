@@ -13,9 +13,9 @@ double WaveIdeal::wave(double **r)
     double wf, argument, r_single_particle;
 
     argument = wf = 0;
-    for (i = 0; i < nParticles; i++) {
+    for (i = 0; i < m_nParticles; i++) {
         r_single_particle = 0;
-        for (j = 0; j < dimensions; j++) {
+        for (j = 0; j < m_nDimensions; j++) {
             r_single_particle  += r[i][j]*r[i][j];
         }
         argument += r_single_particle;
@@ -46,9 +46,9 @@ double WaveIdeal::laplace(double **r)
 
         double crossProd = 0;
         double laplaceE = 0;
-        for (int i = 0; i < nParticles; i++) {
+        for (int i = 0; i < m_nParticles; i++) {
             double rSquared = 0;
-            for (int j = 0; j < dimensions; j++) {
+            for (int j = 0; j < m_nDimensions; j++) {
                 rSquared  += r[i][j]*r[i][j];
             }
             laplaceE += - 2*omega*alpha + omega*omega*alpha*alpha * rSquared;
