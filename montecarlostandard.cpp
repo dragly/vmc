@@ -40,7 +40,7 @@ void MonteCarloStandard::sample(int nCycles, double *energies, double *allEnergi
             r_old[i][j] = step_length*(ran2(&idum)-0.5);
         }
     }
-    wfold = wave->wave(r_old);
+    wfold = m_wave->wave(r_old);
     // loop over monte carlo cycles
     for (int cycle = 1; cycle <= nCycles; cycle++){
         // new position
@@ -58,7 +58,7 @@ void MonteCarloStandard::sample(int nCycles, double *energies, double *allEnergi
                     }
                 }
             }
-            wfnew = wave->wave(r_new);
+            wfnew = m_wave->wave(r_new);
             // The Metropolis test is performed by moving one particle at the time
             if(ran2(&idum) <= wfnew*wfnew/wfold/wfold ) {
                 for (int l=0; l < dimension; l++) {
@@ -68,7 +68,7 @@ void MonteCarloStandard::sample(int nCycles, double *energies, double *allEnergi
             }
         }  //  end of loop over particles
         // compute local energy
-        delta_e = hamiltonian->energy(wave, r_old);
+        delta_e = m_hamiltonian->energy(m_wave, r_old);
         // save all energies on last variate
         //        if(variate==max_variations){
         allEnergies[cycle] = delta_e;

@@ -3,9 +3,9 @@
 #include <stdlib.h>
 
 #include "hamiltoniansimple.h"
-#include "wavefunction.h"
-#include "matrix.h"
-#include "utils.h"
+#include "../wavefunction.h"
+#include "../matrix.h"
+#include "../utils.h"
 
 HamiltonianSimple::HamiltonianSimple(int number_particles, int dimension, double charge) :
     number_particles(number_particles),

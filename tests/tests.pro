@@ -14,28 +14,18 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
-SOURCES += tst_vmctests.cpp \
-        ../wavefunction.cpp \
-        ../wavesimple.cpp \
-        ../matrix.cpp \
-        ../waveideal.cpp \
-        ../hamiltonian/hamiltonianideal.cpp \
-        ../config.cpp \
-        ../montecarlostandard.cpp \
-        ../montecarlo.cpp \
-        ../random.cpp \
-        ../hamiltonian/hamiltonian.cpp
+include(../vmc.pri)
 
-HEADERS += ../wavefunction.h \
-        ../wavesimple.h \
-        ../matrix.h \
-        ../waveideal.h \
-        ../hamiltonian/hamiltonianideal.h \
-        ../config.h \
-        ../montecarlostandard.h \
-        ../montecarlo.h \
-        ../random.h \
-        ../hamiltonian/hamiltonian.h
+MY_SOURCES =
+
+for(source, SOURCES):MY_SOURCES+=../$$source
+
+SOURCES = $$MY_SOURCES
+SOURCES -= ../main.cpp
+
+message($$SOURCES)
+
+SOURCES += tst_vmctests.cpp
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 

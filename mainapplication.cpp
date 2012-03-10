@@ -41,7 +41,7 @@ MainApplication::MainApplication(int* argc, char*** argv) :
     MPI_Comm_size (MPI_COMM_WORLD, &m_nProcesses);
     MPI_Comm_rank (MPI_COMM_WORLD, &m_rank);
 #else
-    nProcesses = 1;
+    m_nProcesses = 1;
     m_rank = 0;
 #endif
 }

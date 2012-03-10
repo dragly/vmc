@@ -10,9 +10,10 @@ public:
     MonteCarlo(WaveFunction *wave, Hamiltonian *hamiltonian);
 
     virtual void sample(int number_cycles, double *energies, double *allEnergies) = 0;
+    virtual void loadConfiguration(INIReader *settings) {(void)settings;}
 protected:
-    WaveFunction *wave;
-    Hamiltonian *hamiltonian;
+    WaveFunction *m_wave;
+    Hamiltonian *m_hamiltonian;
 };
 
 #endif // MONTECARLO_H

@@ -27,7 +27,7 @@ private:
     int dimension; // three-dimensional system
     double charge;  //  we fix the charge to be that of the helium atom
     double stepLength;  //  we fix the brute force jump to 1 Bohr radius
-    int maxVariations;
+    int m_nVariations;
     string hamiltonianClass;
     WaveFunction *m_wave;
 

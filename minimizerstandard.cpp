@@ -41,7 +41,7 @@ void MinimizerStandard::loadConfiguration(INIReader *settings)
     charge = atof(settings->Get("MinimizerStandard","charge", "1.0").c_str());
     stepLength = atof(settings->Get("MinimizerStandard","stepLength", "1.0").c_str());
     m_nCycles = atoi(settings->Get("MinimizerStandard","nCycles", "1000").c_str());
-    maxVariations = atoi(settings->Get("MinimizerStandard","maxVariations", "11").c_str());    //  default number of variations
+    m_nVariations = settings->GetInteger("MinimizerStandard","nVariations", 11);    //  default number of variations
 
     // Wave properties
     string waveClass = settings->Get("Wave","class", "WaveSimple");
@@ -53,14 +53,8 @@ void MinimizerStandard::loadConfiguration(INIReader *settings)
     m_wave->loadConfiguration(m_settings);
 
     // Hamiltonian
-    hamiltonianClass = settings->Get("Hamiltonian","class", "HamiltonianSimple");
-    if(hamiltonianClass == "HamiltonianSimple") {
-        HamiltonianSimple *hamiltonianSimple = new HamiltonianSimple(m_config->nParticles(), m_config->nDimensions(), charge);
-        m_hamiltonian = hamiltonianSimple;
-    } else if(hamiltonianClass == "HamiltonianIdeal") {
-        HamiltonianIdeal *hamiltonianIdeal = new HamiltonianIdeal(m_config->nParticles(), m_config->nDimensions(), charge);
-        m_hamiltonian = hamiltonianIdeal;
-    } else {
+    m_hamiltonian = Hamiltonian::fromName(settings->Get("Hamiltonian","class", "HamiltonianSimple"), m_config, charge);
+    if(m_hamiltonian == 0) {
         cerr << "Unknown hamiltonian class '" << hamiltonianClass << "'" << endl;
         exit(98);
     }
@@ -96,18 +90,18 @@ void MinimizerStandard::runMinimizer()
         ofile.open(outfilename.c_str());
     }
 
-    total_cumulative_e = new double[maxVariations+1];
-    total_cumulative_e2 = new double[maxVariations+1];
-    cumulative_e = new double[maxVariations+1];
-    cumulative_e2 = new double[maxVariations+1];
+    total_cumulative_e = new double[m_nVariations+1];
+    total_cumulative_e2 = new double[m_nVariations+1];
+    cumulative_e = new double[m_nVariations+1];
+    cumulative_e2 = new double[m_nVariations+1];
 
     //  initialize the arrays  by zeroing them
-    for( i=1; i <= maxVariations; i++){
+    for( i=1; i <= m_nVariations; i++){
         cumulative_e[i] = cumulative_e2[i]  = total_cumulative_e[i] = total_cumulative_e2[i]  = 0.0;
     }
 #ifdef USE_MPI
     // broadcast the total number of  variations
-    MPI_Bcast (&maxVariations, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast (&m_nVariations, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast (&m_nCycles, 1, MPI_INT, 0, MPI_COMM_WORLD);
 #endif
     total_number_cycles = m_nCycles*m_config->nProcesses();
@@ -123,7 +117,7 @@ void MinimizerStandard::runMinimizer()
     double beta = 0.4;
     double alpha = 0.5*charge;
     // loop over variational parameters
-    for (int variate=1; variate <= maxVariations; variate++){
+    for (int variate=1; variate <= m_nVariations; variate++){
         m_wave->setParameters(alpha, beta);
         monteCarlo->sample(m_nCycles, energies, m_allEnergies);
         // update the energy average and its squared
@@ -133,14 +127,14 @@ void MinimizerStandard::runMinimizer()
     }
 #ifdef USE_MPI
     //  Collect data in total averages
-    for( i=1; i <= maxVariations; i++){
+    for( i=1; i <= m_nVariations; i++){
         MPI_Reduce(&cumulative_e[i], &total_cumulative_e[i], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
         MPI_Reduce(&cumulative_e2[i], &total_cumulative_e2[i], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     }
     timeEnd = MPI_Wtime();
     totalTime = timeEnd-timeStart;
 #else
-    for( i=1; i <= maxVariations; i++){
+    for( i=1; i <= m_nVariations; i++){
         total_cumulative_e[i] = cumulative_e[i];
         total_cumulative_e2[i] = cumulative_e2[i];
     }
@@ -150,7 +144,7 @@ void MinimizerStandard::runMinimizer()
     if ( m_config->rank() == 0) {
         cout << "Time = " <<  totalTime  << " on number of processors: "  << m_config->nProcesses()  << endl;
         alpha = 0.5*charge;
-        for( i=1; i <= maxVariations; i++){
+        for( i=1; i <= m_nVariations; i++){
             energy = total_cumulative_e[i]/total_number_cycles;
             variance = total_cumulative_e2[i]/total_number_cycles-energy*energy;
             error=sqrt(variance/(total_number_cycles-1));
