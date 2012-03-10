@@ -6,6 +6,7 @@
 using namespace std;
 
 class INIReader;
+class Config;
 
 class WaveFunction
 {
@@ -19,7 +20,7 @@ public:
     }
     double laplaceNumerical(double **r);
     void setParameters(double alpha, double beta);
-    static WaveFunction* functionFromName(string waveClass, int nParticles, int nDimensions);
+    static WaveFunction* fromName(string waveClass, Config *config);
     ~WaveFunction();
 protected:
     int m_nParticles;

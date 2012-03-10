@@ -7,6 +7,7 @@
 
 #include "wavesimple.h"
 #include "waveideal.h"
+#include "config.h"
 
 WaveFunction::WaveFunction(int nParticles, int nDimensions) :
     m_nParticles(nParticles),
@@ -52,12 +53,12 @@ void WaveFunction::setParameters(double alpha, double beta)
 /*!
   Creates and returns a new wave function based on the class specified by the parameter string.
   */
-WaveFunction* WaveFunction::functionFromName(std::string waveClass, int nParticles, int nDimensions) {
+WaveFunction* WaveFunction::fromName(std::string waveClass, Config* config) {
     if(waveClass == "WaveSimple") {
-        WaveSimple *waveSimple = new WaveSimple(nParticles, nDimensions);
+        WaveSimple *waveSimple = new WaveSimple(config->nParticles(), config->nDimensions());
         return waveSimple;
     } else if(waveClass == "WaveIdeal") {
-        WaveIdeal *waveIdeal = new WaveIdeal(nParticles, nDimensions);
+        WaveIdeal *waveIdeal = new WaveIdeal(config->nParticles(), config->nDimensions());
         return waveIdeal;
     } else {
         return 0;

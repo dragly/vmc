@@ -1,6 +1,8 @@
 #ifndef BLOCKER_H
 #define BLOCKER_H
 
+class INIReader;
+
 class Blocker
 {
 public:
@@ -8,9 +10,10 @@ public:
     void runBlocking();
     double mean(double *values, double nValues);
     void blocking(double *values, int nValues, int blockSize, double *result);
+    void loadConfiguration(INIReader *settings);
 private:
-    int m_rank;
     int m_nProcesses;
+    INIReader *m_settings;
 };
 
 #endif // BLOCKER_H

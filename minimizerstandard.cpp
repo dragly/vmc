@@ -30,23 +30,40 @@
 
 using namespace std;
 
-MinimizerStandard::MinimizerStandard(int rank, int nProcesses) :
-    Minimizer(rank, nProcesses)
+MinimizerStandard::MinimizerStandard(Config *config) :
+    Minimizer(config)
 {
 }
 
 void MinimizerStandard::loadConfiguration(INIReader *settings)
 {
     m_settings = settings;
-    dimension = atoi(settings->Get("MinimizerStandard","dimension", "2").c_str());
     charge = atof(settings->Get("MinimizerStandard","charge", "1.0").c_str());
     stepLength = atof(settings->Get("MinimizerStandard","stepLength", "1.0").c_str());
-    nParticles = atoi(settings->Get("MinimizerStandard","nParticles", "2").c_str());
-    nCycles = atoi(settings->Get("MinimizerStandard","nCycles", "1000").c_str());
+    m_nCycles = atoi(settings->Get("MinimizerStandard","nCycles", "1000").c_str());
     maxVariations = atoi(settings->Get("MinimizerStandard","maxVariations", "11").c_str());    //  default number of variations
-    waveClass = settings->Get("Wave","class", "WaveSimple");
-    waveUseAnalyticalLaplace = atoi(settings->Get("Wave","useAnalyticalLaplace", "0").c_str());
+
+    // Wave properties
+    string waveClass = settings->Get("Wave","class", "WaveSimple");
+    m_wave = WaveFunction::fromName(waveClass, m_config);
+    if(m_wave == 0) {
+        cerr << "Unknown wave class '" << waveClass << "'" << endl;
+        exit(99);
+    }
+    m_wave->loadConfiguration(m_settings);
+
+    // Hamiltonian
     hamiltonianClass = settings->Get("Hamiltonian","class", "HamiltonianSimple");
+    if(hamiltonianClass == "HamiltonianSimple") {
+        HamiltonianSimple *hamiltonianSimple = new HamiltonianSimple(m_config->nParticles(), m_config->nDimensions(), charge);
+        m_hamiltonian = hamiltonianSimple;
+    } else if(hamiltonianClass == "HamiltonianIdeal") {
+        HamiltonianIdeal *hamiltonianIdeal = new HamiltonianIdeal(m_config->nParticles(), m_config->nDimensions(), charge);
+        m_hamiltonian = hamiltonianIdeal;
+    } else {
+        cerr << "Unknown hamiltonian class '" << hamiltonianClass << "'" << endl;
+        exit(98);
+    }
 }
 
 void MinimizerStandard::runMinimizer()
@@ -65,32 +82,16 @@ void MinimizerStandard::runMinimizer()
     double error;
 
     cout << "MinimizerStandard::runMinimizer(): called" << endl;
-    //    WaveIdeal *wave = new WaveIdeal(nParticles, dimension);
-    //    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(nParticles, dimension, charge);
-    WaveFunction *wave = WaveFunction::functionFromName(waveClass, nParticles, dimension);
-    if(wave == 0) {
-        cerr << "Unknown wave class!" << endl;
-        exit(99);
-    }
-    wave->loadConfiguration(m_settings);
+    //    WaveIdeal *wave = new WaveIdeal(nParticles, m_config->nDimensions());
+    //    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(nParticles, m_config->nDimensions(), charge);
 
-    Hamiltonian *hamiltonian;
-    if(hamiltonianClass == "HamiltonianSimple") {
-        HamiltonianSimple *hamiltonianSimple = new HamiltonianSimple(nParticles, dimension, charge);
-        hamiltonian = hamiltonianSimple;
-    } else if(hamiltonianClass == "HamiltonianIdeal") {
-        HamiltonianIdeal *hamiltonianIdeal = new HamiltonianIdeal(nParticles, dimension, charge);
-        hamiltonian = hamiltonianIdeal;
-    } else {
-        cerr << "Unknown hamiltonian class!" << endl;
-        exit(98);
-    }
+
 #ifdef USE_MPI
     timeStart = MPI_Wtime();
 #endif
 
     string outfilename;
-    if (m_rank == 0) {
+    if (m_config->rank() == 0) {
         outfilename = "output.dat";
         ofile.open(outfilename.c_str());
     }
@@ -107,24 +108,24 @@ void MinimizerStandard::runMinimizer()
 #ifdef USE_MPI
     // broadcast the total number of  variations
     MPI_Bcast (&maxVariations, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast (&nCycles, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast (&m_nCycles, 1, MPI_INT, 0, MPI_COMM_WORLD);
 #endif
-    total_number_cycles = nCycles*m_nProcesses;
+    total_number_cycles = m_nCycles*m_config->nProcesses();
 
     // array to store all energies for last variation of alpha
-    allEnergies = new double[nCycles+1];
+    m_allEnergies = new double[m_nCycles+1];
 
     double *energies = new double[2];
 
     //  Do the mc sampling  and accumulate data with MPI_Reduce
-    MonteCarloStandard *monteCarlo = new MonteCarloStandard(wave, hamiltonian, nParticles, dimension, charge, m_rank, stepLength);
+    MonteCarloStandard *monteCarlo = new MonteCarloStandard(m_wave, m_hamiltonian, m_config->nParticles(), m_config->nDimensions(), charge, m_config->rank(), stepLength);
 
     double beta = 0.4;
     double alpha = 0.5*charge;
     // loop over variational parameters
     for (int variate=1; variate <= maxVariations; variate++){
-        wave->setParameters(alpha, beta);
-        monteCarlo->sample(nCycles, energies, allEnergies);
+        m_wave->setParameters(alpha, beta);
+        monteCarlo->sample(m_nCycles, energies, m_allEnergies);
         // update the energy average and its squared
         cumulative_e[variate] = energies[0];
         cumulative_e2[variate] = energies[1];
@@ -146,8 +147,8 @@ void MinimizerStandard::runMinimizer()
     totalTime = -1;
 #endif
     // Print out results
-    if ( m_rank == 0) {
-        cout << "Time = " <<  totalTime  << " on number of processors: "  << m_nProcesses  << endl;
+    if ( m_config->rank() == 0) {
+        cout << "Time = " <<  totalTime  << " on number of processors: "  << m_config->nProcesses()  << endl;
         alpha = 0.5*charge;
         for( i=1; i <= maxVariations; i++){
             energy = total_cumulative_e[i]/total_number_cycles;
@@ -166,5 +167,5 @@ void MinimizerStandard::runMinimizer()
     delete [] total_cumulative_e; delete [] total_cumulative_e2;
     delete [] cumulative_e;
     delete [] cumulative_e2;
-    delete [] allEnergies;
+    delete [] m_allEnergies;
 }

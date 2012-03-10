@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     hamiltonian/hamiltoniansimple.cpp \
     hamiltonian/hamiltonian.cpp \
     blocker.cpp \
-    densityplotter.cpp
+    densityplotter.cpp \
+    config.cpp
 
 OTHER_FILES += config.ini \
     todo.txt \
@@ -53,7 +54,8 @@ HEADERS += \
     hamiltonian/hamiltoniansimple.h \
     hamiltonian/hamiltonianstandard.h \
     blocker.h \
-    densityplotter.h
+    densityplotter.h \
+    config.h
 
 FORMS +=
 
@@ -76,6 +78,10 @@ contains(CONFIG,mpi) {
 } else {
     message(Not using MPI)
     # slow debug mode
+}
+
+contains(CONFIG,debug) {
+    message(Debug mode. Disabling optimization)
     QMAKE_CXXFLAGS = -O0
 }
 QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS
@@ -84,7 +90,7 @@ message(compiler: $$QMAKE_CXX)
 message(compile flags: $$QMAKE_CXXFLAGS_RELEASE)
 
 # Copy config file to shadow build directory
-copyCommand = cp $$PWD/config.ini $$OUT_PWD/config.ini
+copyCommand = $(COPY_DIR) $$PWD/config.ini $$OUT_PWD/config.ini
 copyFiles.commands = $$copyCommand
 copyFiles.target = copyFiles
 first.depends = $(first) copyFiles

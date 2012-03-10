@@ -5,6 +5,7 @@
 
 class Minimizer;
 class INIReader;
+class Config;
 
 class MainApplication
 {
@@ -31,10 +32,13 @@ private:
 
     int* argc;
     char*** argv;
-    int rank;
-    int nProcesses;
+    int m_rank;
+    int m_nProcesses;
+    int m_nParticles;
+    int m_nDimensions;
+    Config *m_config;
 
-    Mode mode;
+    Mode m_mode;
 };
 
 #endif // MAINAPPLICATION_H

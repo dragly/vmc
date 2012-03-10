@@ -20,9 +20,8 @@ using namespace std;
 // local includes
 
 
-Minimizer::Minimizer(int rank, int nProcesses) :
-    m_rank(rank),
-    m_nProcesses(nProcesses)
+Minimizer::Minimizer(Config *config) :
+    m_config(config)
 {
 }
 
@@ -32,7 +31,7 @@ void Minimizer::writeBlockData() {
     ost << "blocks_rank" << m_rank << ".dat";
     // Open file for writing:
     blockofile.open(ost.str().c_str(), ios::out | ios::binary);
-    blockofile.write((char*)(allEnergies+1),
-                     nCycles*sizeof(double));
+    blockofile.write((char*)(m_allEnergies+1),
+                     m_nCycles*sizeof(double));
     blockofile.close();
 }

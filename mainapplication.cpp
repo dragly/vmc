@@ -28,6 +28,7 @@
 #include "minimizer.h"
 #include "blocker.h"
 #include "densityplotter.h"
+#include "config.h"
 using namespace  std;
 
 MainApplication::MainApplication(int* argc, char*** argv) :
@@ -37,11 +38,11 @@ MainApplication::MainApplication(int* argc, char*** argv) :
 #ifdef USE_MPI
     //  MPI initializations
     MPI_Init (argc, argv);
-    MPI_Comm_size (MPI_COMM_WORLD, &nProcesses);
-    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+    MPI_Comm_size (MPI_COMM_WORLD, &m_nProcesses);
+    MPI_Comm_rank (MPI_COMM_WORLD, &m_rank);
 #else
     nProcesses = 1;
-    rank = 0;
+    m_rank = 0;
 #endif
 }
 
@@ -51,29 +52,33 @@ void MainApplication::loadConfiguration()
     if(settings->ParseError()) {
         cerr << "Warning: " << __PRETTY_FUNCTION__ << ": Could not load configuration file 'config.ini'. Does it exist?" << endl;
     }
+    m_nParticles = settings->GetInteger("General", "nParticles", 2);
+    m_nDimensions = settings->GetInteger("General", "nDimensions", 2);
+
     string modeString = settings->Get("General","mode","minimizer");
     if(modeString == "minimizer") {
-        mode = MinimizerMode;
+        m_mode = MinimizerMode;
     } else if(modeString == "density") {
-        mode = DensityMode;
+        m_mode = DensityMode;
     } else if(modeString == "blocking") {
-        mode = BlockingMode;
+        m_mode = BlockingMode;
     } else {
         cerr << __PRETTY_FUNCTION__ << ": Unknown mode '" << modeString << "'" << endl;
         exit(460);
     }
-    if(rank == 0) {
+    if(m_rank == 0) {
         cout << __PRETTY_FUNCTION__ << ": Config loaded. Mode is " << modeString << endl;
     }
+    m_config = new Config(m_rank, m_nProcesses, m_nDimensions, m_nParticles);
 }
 
 void MainApplication::runConfiguration()
 {
-    if(mode == MinimizerMode) {
+    if(m_mode == MinimizerMode) {
         runMinimizer();
-    } else if(mode== DensityMode) {
+    } else if(m_mode== DensityMode) {
         runDensity();
-    } else if(mode == BlockingMode) {
+    } else if(m_mode == BlockingMode) {
         runBlocking();
     } else {
         cerr << __PRETTY_FUNCTION__ << ": Unknown mode" << endl;
@@ -83,22 +88,23 @@ void MainApplication::runConfiguration()
 
 void MainApplication::runMinimizer()
 {
-    Minimizer *minimizer = new MinimizerStandard(rank, nProcesses);
+    Minimizer *minimizer = new MinimizerStandard(m_config);
     minimizer->loadConfiguration(settings);
     minimizer->runMinimizer();
 }
 
 void MainApplication::runBlocking()
 {
-    if(rank == 0) {
+    if(m_rank == 0) {
         Blocker* blocker = new Blocker();
+        blocker->loadConfiguration(settings);
         blocker->runBlocking();
     }
 }
 
 void MainApplication::runDensity()
 {
-    DensityPlotter *densityPlotter = new DensityPlotter(rank, nProcesses);
+    DensityPlotter *densityPlotter = new DensityPlotter(m_config);
     densityPlotter->makePlot();
 }
 

@@ -16,6 +16,7 @@
 using namespace std;
 
 #include "blocker.h"
+#include "inih/cpp/INIReader.h"
 
 //TODO make sure that this class actually does what it is supposed to
 
@@ -23,6 +24,11 @@ Blocker::Blocker()
 {
 }
 
+void Blocker::loadConfiguration(INIReader *settings)
+{
+    m_settings = settings;
+    m_nProcesses = atoi(settings->Get("Blocker","nProcesses", "1").c_str());
+}
 
 void Blocker::runBlocking() {
     // load block data
@@ -31,6 +37,7 @@ void Blocker::runBlocking() {
     int nBlockData = 0;
     if(stat("blocks_rank0.dat", &result) == 0) {
         nLocal = result.st_size / sizeof(double);
+        cout << nLocal << endl;
         nBlockData = nLocal * m_nProcesses;
     } else {
         cerr << "Trouble loading blocks_rank0.dat" << endl;
@@ -46,10 +53,10 @@ void Blocker::runBlocking() {
         infile.read((char*)&(mcResults[i*nLocal]), result.st_size);
         infile.close();
     }
-    int nBlockSamples = 40;
-    int minBlockSize = nBlockData / 20;
+    int nBlockSamples = 41;
+    int minBlockSize = nBlockData / 50;
     int maxBlockSize = nBlockData / 10;
-    int blockStepSize = (maxBlockSize - minBlockSize) / nBlockSamples;
+    int blockStepSize = (maxBlockSize - minBlockSize) / (nBlockSamples - 1);
     int blockSize = -1;
     double meanSigma[2];
     for(int i = 0; i < nBlockSamples; i++) {
@@ -57,7 +64,7 @@ void Blocker::runBlocking() {
         blocking(mcResults, nBlockData, blockSize, meanSigma);
         double mean = meanSigma[0];
         double sigma = meanSigma[1];
-        cout << "BlockSize: " << blockSize << "\tMean: " << mean << "\tSigma: " << sqrt(sigma/((nBlockData/blockSize)-1)) << endl;
+        printf("BlockSize: %d    Mean: %.6f     Sigma: %.6f\n", blockSize, mean, sqrt(sigma/((nBlockData/blockSize)-1)));
     }
 }
 

@@ -5,6 +5,8 @@
 #include <iomanip>
 using namespace std;
 
+#include "config.h"
+
 /*!
   Runs with multiple parameters and attempts to find the lowest possible value of the energy by adjusting the parameters.
   */
@@ -14,11 +16,11 @@ class INIReader;
 class Minimizer
 {
 public:
-    Minimizer(int rank, int nProcesses);
+    Minimizer(Config *config);
     virtual void runMinimizer() = 0;
     void runBlocking();
 
-    virtual void loadConfiguration(INIReader *settings) = 0;
+    virtual void loadConfiguration(INIReader *settings) {(void)settings;}
     void writeBlockData();
     void blocking(double *values, int nValues, int blockSize, double *result);
     double mean(double *values, double nValues);
@@ -28,10 +30,13 @@ protected:
     ofstream blockofile;
     int m_rank;
     int m_nProcesses;
+    int m_nParticles;
+    int m_nDimensions;
     // monte carlo settings
-    int nCycles;
+    int m_nCycles;
     // energies to store in block files
-    double *allEnergies;
+    double *m_allEnergies;
+    Config *m_config;
 private:
 };
 

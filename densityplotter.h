@@ -2,6 +2,8 @@
 #define DENSITYPLOTTER_H
 
 class WaveFunction;
+class INIReader;
+class Config;
 
 /*!
   A class that uses the given wave function to plot the onebody density.
@@ -10,12 +12,13 @@ class WaveFunction;
 class DensityPlotter
 {
 public:
-    DensityPlotter(int rank, int nProcesses);
+    DensityPlotter(Config *config);
     void makePlot();
+    void loadConfiguration(INIReader *settings);
 private:
-    int m_rank;
-    int m_nProcesses;
-    WaveFunction *wave;
+    Config *m_config;
+    WaveFunction *m_wave;
+    INIReader *m_settings;
 };
 
 #endif // DENSITYPLOTTER_H

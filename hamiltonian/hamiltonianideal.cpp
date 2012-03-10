@@ -1,7 +1,7 @@
-#include "hamiltonian/hamiltonianideal.h"
-#include "matrix.h"
-#include "utils.h"
-#include "wavefunction.h"
+#include "hamiltonianideal.h"
+#include "../matrix.h"
+#include "../utils.h"
+#include "../wavefunction.h"
 #include <math.h>
 
 HamiltonianIdeal::HamiltonianIdeal(int number_particles, int dimension, double charge) :
