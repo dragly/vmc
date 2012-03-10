@@ -139,6 +139,10 @@ void MinimizerStandard::runMinimizer()
     timeEnd = MPI_Wtime();
     totalTime = timeEnd-timeStart;
 #else
+    for( i=1; i <= maxVariations; i++){
+        total_cumulative_e[i] = cumulative_e[i];
+        total_cumulative_e2[i] = cumulative_e2[i];
+    }
     totalTime = -1;
 #endif
     // Print out results

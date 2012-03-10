@@ -59,9 +59,8 @@ FORMS +=
 
 # MPI Settings
 
-#DEFINES += USE_MPI
-
-contains(DEFINES,USE_MPI) {
+contains(CONFIG,mpi) {
+    message(Using MPI)
     QMAKE_CXX = mpicxx
     QMAKE_CXX_RELEASE = $$QMAKE_CXX
     QMAKE_CXX_DEBUG = $$QMAKE_CXX
@@ -72,7 +71,10 @@ contains(DEFINES,USE_MPI) {
 #    QMAKE_LFLAGS = $$system(mpicxx --showme:link)
 #    QMAKE_CXXFLAGS = $$system(mpicxx --showme:compile)
     QMAKE_CXXFLAGS += -DMPICH_IGNORE_CXX_SEEK
+
+    DEFINES += USE_MPI
 } else {
+    message(Not using MPI)
     # slow debug mode
     QMAKE_CXXFLAGS = -O0
 }
@@ -80,6 +82,15 @@ QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS
 
 message(compiler: $$QMAKE_CXX)
 message(compile flags: $$QMAKE_CXXFLAGS_RELEASE)
+
+# Copy config file to shadow build directory
+copyCommand = cp $$PWD/config.ini $$OUT_PWD/config.ini
+copyFiles.commands = $$copyCommand
+copyFiles.target = copyFiles
+first.depends = $(first) copyFiles
+export(first.depends)
+export(copyFiles.commands)
+QMAKE_EXTRA_TARGETS += first copyFiles
 
 
 
