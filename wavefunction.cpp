@@ -1,4 +1,5 @@
 #include <string>
+#include <stdio.h>
 
 #include "wavefunction.h"
 
@@ -42,6 +43,30 @@ double WaveFunction::laplaceNumerical(double **r)
     eKinetic /= wfold;
 
     return eKinetic;
+}
+
+void WaveFunction::gradientNumerical(double **r, double *rGradient)
+{
+    double wfold = wave(r);
+    for (int i = 0; i < m_nParticles; i++) {
+        for (int j=0; j < m_nDimensions; j++) {
+            rPlus[i][j] = rMinus[i][j] = r[i][j];
+        }
+    }
+    for (int j = 0; j < m_nDimensions; j++) {
+        rGradient[j] = 0;
+        for (int i = 0; i < m_nParticles; i++) {
+            rPlus[i][j] = r[i][j]+h;
+            rMinus[i][j] = r[i][j]-h;
+            double wfminus = wave(rMinus);
+            double wfplus  = wave(rPlus);
+            // TODO Remove this output
+            printf("Wfplus: %.10f\n", wfplus);
+            rGradient[j] += (wfplus - wfold)/h;
+            rPlus[i][j] = r[i][j];
+            rMinus[i][j] = r[i][j];
+        }
+    }
 }
 
 void WaveFunction::setParameters(double alpha, double beta)

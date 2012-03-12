@@ -24,6 +24,8 @@ double WaveSimple::wave(double **r)
         }
         argument += rSingleParticle;
     }
+    // TODO Remove this output
+    cout << argument << " " << alpha << endl;
     wf = exp(-(argument*alpha) / 2) ;
     return wf;
 }

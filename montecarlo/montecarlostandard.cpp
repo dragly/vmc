@@ -1,9 +1,9 @@
 #include <math.h>
 
 #include "montecarlostandard.h"
-#include "matrix.h"
-#include "random.h"
-#include "utils.h"
+#include "../matrix.h"
+#include "../random.h"
+#include "../utils.h"
 
 MonteCarloStandard::MonteCarloStandard(WaveFunction *wave, Hamiltonian* hamiltonian, int number_particles, int dimension, double charge, int rank, double step_length) :
     MonteCarlo(wave, hamiltonian),

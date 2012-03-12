@@ -2,8 +2,8 @@
 #define MONTECARLOSTANDARD_H
 
 #include "montecarlo.h"
-#include "hamiltonian/hamiltonian.h"
-#include "wavefunction.h"
+#include "../hamiltonian/hamiltonian.h"
+#include "../wavefunction.h"
 
 class MonteCarloStandard : public MonteCarlo
 {

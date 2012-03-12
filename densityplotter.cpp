@@ -76,7 +76,9 @@ void DensityPlotter::divideSteps(int rank, int nProcesses, int totalSteps, StepC
 
 void DensityPlotter::makePlot()
 {
+#ifdef USE_MPI
     MPI_Status status;
+#endif
     double da = (aMax - aMin) / aSteps;
     double db = (bMax - bMin) / bSteps;
     double **probability = 0;
@@ -93,7 +95,9 @@ void DensityPlotter::makePlot()
             cout << myStepConfig.firstStep << " " << myStepConfig.lastStep << " " << myStepConfig.nSteps << endl;
             cout.flush();
         }
+#ifdef USE_MPI
         MPI_Barrier(MPI_COMM_WORLD);
+#endif
     }
     // allocate my portion of the whole cake
     myProbability = (double**)matrix(myStepConfig.nSteps, bSteps, sizeof(double));
@@ -117,15 +121,19 @@ void DensityPlotter::makePlot()
         }
     }
     if(m_config->rank() == 0) {
+#ifdef USE_MPI
         // collect all the data in the main matrix
         for(int i = 1; i < m_config->nProcesses(); i++) {
             StepConfig stepConfig;
             divideSteps(i, m_config->nProcesses(), aSteps, &stepConfig);
             MPI_Recv(probability[stepConfig.firstStep], stepConfig.nSteps * bSteps, MPI_DOUBLE, i, 100, MPI_COMM_WORLD, &status);
         }
+#endif
         memcpy(probability, myProbability, myStepConfig.nSteps * sizeof(double));
     } else {
+#ifdef USE_MPI
         MPI_Send(myProbability[0], myStepConfig.nSteps * bSteps, MPI_DOUBLE, 0, 100, MPI_COMM_WORLD);
+#endif
     }
 
     if(m_config->rank() == 0) {

@@ -20,7 +20,9 @@ public:
     virtual void runMinimizer() = 0;
     void runBlocking();
 
-    virtual void loadConfiguration(INIReader *settings) {(void)settings;}
+    virtual void loadConfiguration(INIReader *settings) {
+        (void)settings;
+    }
     void writeBlockData();
     void blocking(double *values, int nValues, int blockSize, double *result);
     double mean(double *values, double nValues);

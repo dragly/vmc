@@ -1,8 +1,8 @@
 #include "montecarlometropolishastings.h"
 #include <math.h>
-#include "matrix.h"
-#include "random.h"
-#include "utils.h"
+#include "../matrix.h"
+#include "../random.h"
+#include "../utils.h"
 
 MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(WaveFunction *wave, Hamiltonian *hamiltonian, int number_particles, int dimension, double charge, int rank, double step_length) :
     MonteCarlo(wave, hamiltonian),
@@ -32,6 +32,8 @@ MonteCarloMetropolisHastings::~MonteCarloMetropolisHastings()
 
 void MonteCarloMetropolisHastings::sample(int nCycles, double *energies, double *allEnergies)
 {
+    double waveGradientNew = 0;
+    double waveGradientOld = 0;
     double wfnew = 0;
     double wfold = 0;
     double energy = 0;
@@ -46,6 +48,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles, double *energies, double 
         }
     }
     wfold = m_wave->wave(r_old);
+//    waveGradientOld = m_wave->gradient(r_old);
     // loop over monte carlo cycles
     for (int cycle = 1; cycle <= nCycles; cycle++){
         // new position
@@ -53,7 +56,6 @@ void MonteCarloMetropolisHastings::sample(int nCycles, double *energies, double 
             for (int j=0; j < dimension; j++) {
                 r_new[i][j] = r_old[i][j]+step_length*(ran2(&idum)-0.5);
             }
-            // TODO Optimize MonteCarloStandard by removing the if-test. Profile first!
             //  for the other particles we need to set the position to the old position since
             //  we move only one particle at the time
             for (int k = 0; k < number_particles; k++) {
@@ -64,12 +66,14 @@ void MonteCarloMetropolisHastings::sample(int nCycles, double *energies, double 
                 }
             }
             wfnew = m_wave->wave(r_new);
+//            waveGradientNew = m_wave->gradient(r_new);
             // The Metropolis test is performed by moving one particle at the time
-            if(ran2(&idum) <= wfnew*wfnew/wfold/wfold ) {
+            if(ran2(&idum) <= exp(0.5) ) {
                 for (int l=0; l < dimension; l++) {
                     r_old[i][l]=r_new[i][l];
                 }
                 wfold = wfnew;
+                waveGradientOld = waveGradientNew;
             }
         }  //  end of loop over particles
         // compute local energy

@@ -2,8 +2,8 @@
 #define MONTECARLOMETROPOLISHASTINGS_H
 
 #include "montecarlo.h"
-#include "hamiltonian/hamiltonian.h"
-#include "wavefunction.h"
+#include "../hamiltonian/hamiltonian.h"
+#include "../wavefunction.h"
 
 class MonteCarloMetropolisHastings : public MonteCarlo
 {

@@ -9,6 +9,7 @@
 #include "../config.h"
 #include "../hamiltonian/hamiltonianideal.h"
 #include "../montecarlo/montecarlostandard.h"
+#include "../montecarlo/montecarlometropolishastings.h"
 
 class VmcTests : public QObject
 {
@@ -17,12 +18,14 @@ class VmcTests : public QObject
 public:
     VmcTests();
     
-private Q_SLOTS:
+private slots:
     void initTestCase();
     void cleanupTestCase();
     void waveSimpleLaplaceTest();
     void waveIdealLaplaceTest();
     void fullIdealTest();
+    void fullIdealHastingsTest();
+    void waveSimpleGradientTest();
 
 private:
     Config *config;
@@ -81,6 +84,24 @@ void VmcTests::waveIdealLaplaceTest()
     QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 0.001);
 }
 
+void VmcTests::waveSimpleGradientTest()
+{
+
+    int nParticles = 1;
+    int nDimensions = 2;
+    WaveSimple *waveSimpleNew = new WaveSimple(nParticles,nDimensions);
+    double** rPositions = (double **) matrix( nParticles, nDimensions, sizeof(double));
+    for (int i = 0; i < nParticles; i++) {
+        for (int j=0; j < nDimensions; j++) {
+            rPositions[i][j] = 1.0 - j;
+        }
+    }
+    double rgrad[2];
+    waveSimpleNew->gradient(r_old, rgrad);
+    printf("Gradient: %.10f %.10f\n", rgrad[0], rgrad[1]);
+    QVERIFY(fabs(rgrad[0] - 2) < 0.001);
+}
+
 void VmcTests::fullIdealTest()
 {
     double alpha = 1.0;
@@ -91,6 +112,23 @@ void VmcTests::fullIdealTest()
     waveIdeal->setUseAnalyticalLaplace(true);
     waveIdeal->setParameters(alpha, beta);
     MonteCarloStandard *monteCarlo = new MonteCarloStandard(waveIdeal, hamiltonianIdeal, config->nParticles(), config->nDimensions(), charge, config->rank(), stepLength);
+    double *allEnergies = new double[nCycles+1];
+    double *energies = new double[2];
+    //  Do the mc sampling
+    monteCarlo->sample(nCycles, energies, allEnergies);
+    QVERIFY(fabs(energies[0] / nTotalCycles - 3.00034530284643397025) < 1e-20);
+}
+
+void VmcTests::fullIdealHastingsTest()
+{
+    double alpha = 1.0;
+    double beta = 0.4;
+    double stepLength = 1.0;
+    int nCycles = 500000;
+    int nTotalCycles = nCycles;
+    waveIdeal->setUseAnalyticalLaplace(true);
+    waveIdeal->setParameters(alpha, beta);
+    MonteCarloMetropolisHastings *monteCarlo = new MonteCarloMetropolisHastings(waveIdeal, hamiltonianIdeal, config->nParticles(), config->nDimensions(), charge, config->rank(), stepLength);
     double *allEnergies = new double[nCycles+1];
     double *energies = new double[2];
     //  Do the mc sampling

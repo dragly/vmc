@@ -21,7 +21,7 @@ sub checkLine {
     $row = escape($row);
 
     if ($file =~ /(.cpp|.c|.cxx|.h)$/ && $line =~ /(FIXME|TODO)(.*)$/) {
-        print "$file\t$row\tWARNING\t$1$2\n";
+        print "$file\t$row\tTODO\t$1$2\n";
     }
     if ($line =~ /^(<<<<|====|>>>>)/) {
         print "$file\n$row\tERROR\tResolved conflict.\n";
@@ -33,7 +33,7 @@ sub checkLine {
         print "$file\t$row\t$1\tClean up preprocessor $1:$2.\n";
     }
     if ($file =~ /(.cpp|.c|.cxx|.h)$/ && $line =~ /\s+$/) {
-        print "$file\t$row\tWARNING\tTrailing whitespaces found.\n";
+#        print "$file\t$row\tWARNING\tTrailing whitespaces found.\n";
     }
     if ($file =~ /(.cpp|.c|.cxx|.h)$/ && $line =~ /^ *\t */) {
         print "$file\t$row\tWARNING\tTabs used to indent.\n";
@@ -52,13 +52,13 @@ sub getDiffOrigin {
    chop $currentBranch;
    $currentBranch =~ s/^* //;
 
-   return "HEAD";
+   return "958504f9eedf0d9c8ff65435dab4dad4d83e1fa0";
 
    my $remoteBranch = `git config --local --get branch.$currentBranch.merge`;
    chop $remoteBranch;
    $remoteBranch =~ s!^refts/heads/!!;
 
-   return "HEAD" if (!$remoteBranch);
+   return "958504f9eedf0d9c8ff65435dab4dad4d83e1fa0" if (!$remoteBranch);
 }
 
 my $origin = getDiffOrigin;
