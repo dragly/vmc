@@ -26,7 +26,7 @@ public:
     void runDensity();
     void finalize();
 private:
-    INIReader *settings;
+    INIReader *m_settings;
 
 
 

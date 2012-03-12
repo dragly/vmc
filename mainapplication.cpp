@@ -48,14 +48,14 @@ MainApplication::MainApplication(int* argc, char*** argv) :
 
 void MainApplication::loadConfiguration()
 {
-    settings = new INIReader("config.ini");
-    if(settings->ParseError()) {
+    m_settings = new INIReader("config.ini");
+    if(m_settings->ParseError()) {
         cerr << "Warning: " << __PRETTY_FUNCTION__ << ": Could not load configuration file 'config.ini'. Does it exist?" << endl;
     }
-    m_nParticles = settings->GetInteger("General", "nParticles", 2);
-    m_nDimensions = settings->GetInteger("General", "nDimensions", 2);
+    m_nParticles = m_settings->GetInteger("General", "nParticles", 2);
+    m_nDimensions = m_settings->GetInteger("General", "nDimensions", 2);
 
-    string modeString = settings->Get("General","mode","minimizer");
+    string modeString = m_settings->Get("General","mode","minimizer");
     if(modeString == "minimizer") {
         m_mode = MinimizerMode;
     } else if(modeString == "density") {
@@ -89,22 +89,23 @@ void MainApplication::runConfiguration()
 void MainApplication::runMinimizer()
 {
     Minimizer *minimizer = new MinimizerStandard(m_config);
-    minimizer->loadConfiguration(settings);
+    minimizer->loadConfiguration(m_settings);
     minimizer->runMinimizer();
 }
 
 void MainApplication::runBlocking()
 {
-    if(m_rank == 0) {
-        Blocker* blocker = new Blocker();
-        blocker->loadConfiguration(settings);
-        blocker->runBlocking();
-    }
+//    if(m_rank == 0) {
+    Blocker* blocker = new Blocker();
+    blocker->loadConfiguration(m_settings);
+    blocker->runBlocking();
+//    }
 }
 
 void MainApplication::runDensity()
 {
     DensityPlotter *densityPlotter = new DensityPlotter(m_config);
+    densityPlotter->loadConfiguration(m_settings);
     densityPlotter->makePlot();
 }
 

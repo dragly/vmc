@@ -25,6 +25,12 @@ MonteCarloStandard::MonteCarloStandard(WaveFunction *wave, Hamiltonian* hamilton
     }
 }
 
+MonteCarloStandard::~MonteCarloStandard()
+{
+    free_matrix((void **) r_old); // free memory
+    free_matrix((void **) r_new); // free memory
+}
+
 void MonteCarloStandard::sample(int nCycles, double *energies, double *allEnergies)
 {
     double wfnew = 0;
@@ -80,10 +86,4 @@ void MonteCarloStandard::sample(int nCycles, double *energies, double *allEnergi
     // return the energy and the energy squared
     energies[0] = energy;
     energies[1] = energy2;
-}
-
-MonteCarloStandard::~MonteCarloStandard()
-{
-    free_matrix((void **) r_old); // free memory
-    free_matrix((void **) r_new); // free memory
 }

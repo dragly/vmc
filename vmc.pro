@@ -14,7 +14,8 @@ include(vmc.pri)
 
 OTHER_FILES += config.ini \
     todo.txt \
-    vmc.pri
+    vmc.pri \
+    scripts_mytasks.pl
 
 FORMS +=
 
@@ -54,13 +55,16 @@ message(compile flags: $$QMAKE_CXXFLAGS_RELEASE)
 copyCommand = $(COPY_DIR) $$PWD/config.ini $$OUT_PWD/config.ini
 copyFiles.commands = $$copyCommand
 copyFiles.target = copyFiles
-first.depends = $(first) copyFiles
+# update todo list
+todoCommand = cd $$PWD; $$PWD/scripts_mytasks.pl > tasks.tasks; cd $$OUT_PWD
+todoStuff.commands = $$todoCommand
+todoStuff.target = todoStuff
+# add dependencies
+first.depends = $(first) copyFiles todoStuff
 export(first.depends)
 export(copyFiles.commands)
-QMAKE_EXTRA_TARGETS += first copyFiles
-
-
-
+export(todoStuff.commands)
+QMAKE_EXTRA_TARGETS += first copyFiles todoStuff
 
 
 

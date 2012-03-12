@@ -19,7 +19,8 @@ private:
     double charge;
     int rank;
     double step_length;
-    double **r_old, **r_new;
+    double **r_old;
+    double **r_new;
     long idum;
 };
 
