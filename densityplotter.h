@@ -48,6 +48,12 @@ private:
     double **r_new;
     double m_charge;
     double m_stepLength;
+    double aMin;
+    double bMin;
+    double aMax;
+    double bMax;
+    int aSteps;
+    int bSteps;
     int m_nCycles;
     ofstream plotFile;
 };

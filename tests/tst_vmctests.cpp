@@ -8,7 +8,7 @@
 #include "../matrix.h"
 #include "../config.h"
 #include "../hamiltonian/hamiltonianideal.h"
-#include "../montecarlostandard.h"
+#include "../montecarlo/montecarlostandard.h"
 
 class VmcTests : public QObject
 {

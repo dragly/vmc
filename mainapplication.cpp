@@ -22,7 +22,7 @@
 
 #include "wavestandard.h"
 #include "wavesimple.h"
-#include "montecarlostandard.h"
+#include "montecarlo/montecarlostandard.h"
 #include "matrix.h"
 #include "minimizerstandard.h"
 #include "minimizer.h"

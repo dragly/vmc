@@ -1,0 +1,19 @@
+#ifndef MONTECARLO_H
+#define MONTECARLO_H
+
+#include "wavefunction.h"
+#include "hamiltonian/hamiltonian.h"
+
+class MonteCarlo
+{
+public:
+    MonteCarlo(WaveFunction *wave, Hamiltonian *hamiltonian);
+
+    virtual void sample(int number_cycles, double *energies, double *allEnergies) = 0;
+    virtual void loadConfiguration(INIReader *settings) {(void)settings;}
+protected:
+    WaveFunction *m_wave;
+    Hamiltonian *m_hamiltonian;
+};
+
+#endif // MONTECARLO_H

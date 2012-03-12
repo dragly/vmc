@@ -1,8 +1,8 @@
 SOURCES += main.cpp \
     matrix.cpp \
     wavefunction.cpp \
-    montecarlo.cpp \
-    montecarlostandard.cpp \
+    montecarlo/montecarlo.cpp \
+    montecarlo/montecarlostandard.cpp \
     random.cpp \
     wavesimple.cpp \
     minimizer.cpp \
@@ -16,14 +16,15 @@ SOURCES += main.cpp \
     hamiltonian/hamiltonian.cpp \
     blocker.cpp \
     densityplotter.cpp \
-    config.cpp
+    config.cpp \
+    montecarlo/montecarlometropolishastings.cpp
 
 HEADERS += \
     matrix.h \
     wavefunction.h \
     wavestandard.h \
-    montecarlo.h \
-    montecarlostandard.h \
+    montecarlo/montecarlo.h \
+    montecarlo/montecarlostandard.h \
     random.h \
     wavesimple.h \
     utils.h \
@@ -39,4 +40,6 @@ HEADERS += \
     hamiltonian/hamiltonianstandard.h \
     blocker.h \
     densityplotter.h \
-    config.h
+    config.h \
+    montecarlo/montecarlometropolishastings.h
+

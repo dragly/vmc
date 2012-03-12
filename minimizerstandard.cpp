@@ -21,7 +21,7 @@
 
 #include "wavestandard.h"
 #include "wavesimple.h"
-#include "montecarlostandard.h"
+#include "montecarlo/montecarlostandard.h"
 #include "matrix.h"
 #include "hamiltonian/hamiltonianstandard.h"
 #include "hamiltonian/hamiltoniansimple.h"

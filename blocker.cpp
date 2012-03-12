@@ -18,7 +18,7 @@ using namespace std;
 #include "blocker.h"
 #include "inih/cpp/INIReader.h"
 
-//TODO make sure that this class actually does what it is supposed to
+// TODO make sure that the Blocker class actually does what it is supposed to
 
 Blocker::Blocker()
 {

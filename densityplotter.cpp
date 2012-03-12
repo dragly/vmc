@@ -18,7 +18,7 @@
 #include "wavefunction.h"
 #include "inih/cpp/INIReader.h"
 #include "config.h"
-#include "montecarlostandard.h"
+#include "montecarlo/montecarlostandard.h"
 #include "matrix.h"
 #include "random.h"
 
@@ -60,6 +60,12 @@ void DensityPlotter::loadConfiguration(INIReader *settings)
     double alpha = atof(settings->Get("DensityPlotter", "alpha", "1.0").c_str());
     double beta = atof(settings->Get("DensityPlotter", "beta", "1.0").c_str());
     m_wave->setParameters(alpha, beta);
+    aMax = atof(settings->Get("DensityPlotter", "aMax", "6.0").c_str());
+    bMax = atof(settings->Get("DensityPlotter", "bMax", "6.0").c_str());
+    aMin = atof(settings->Get("DensityPlotter", "aMin", "-6.0").c_str());
+    bMin = atof(settings->Get("DensityPlotter", "bMin", "-6.0").c_str());
+    aSteps = settings->GetInteger("DensityPlotter", "aSteps", 51);
+    bSteps = settings->GetInteger("DensityPlotter", "bSteps", 51);
 }
 
 void DensityPlotter::divideSteps(int rank, int nProcesses, int totalSteps, StepConfig *stepConfig) {
@@ -71,12 +77,6 @@ void DensityPlotter::divideSteps(int rank, int nProcesses, int totalSteps, StepC
 void DensityPlotter::makePlot()
 {
     MPI_Status status;
-    double aMin = -3;
-    double aMax = 3;
-    double bMin = -3;
-    double bMax = 3;
-    int aSteps = 51;
-    int bSteps = 51;
     double da = (aMax - aMin) / aSteps;
     double db = (bMax - bMin) / bSteps;
     double **probability = 0;
