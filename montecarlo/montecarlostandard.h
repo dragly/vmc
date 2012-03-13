@@ -3,7 +3,7 @@
 
 #include "montecarlo.h"
 #include "../hamiltonian/hamiltonian.h"
-#include "../wavefunction.h"
+#include "../wavefunction/wavefunction.h"
 #include "../config.h"
 
 class MonteCarloStandard : public MonteCarlo

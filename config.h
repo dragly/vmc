@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "wavefunction.h"
+#include "wavefunction/wavefunction.h"
 #include "hamiltonian/hamiltonian.h"
 #include "montecarlo/montecarlo.h"
 

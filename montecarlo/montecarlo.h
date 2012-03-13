@@ -1,7 +1,7 @@
 #ifndef MONTECARLO_H
 #define MONTECARLO_H
 
-#include "../wavefunction.h"
+#include "../wavefunction/wavefunction.h"
 #include "../hamiltonian/hamiltonian.h"
 
 class MonteCarlo

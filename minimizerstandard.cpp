@@ -19,14 +19,14 @@
 #include "minimizerstandard.h"
 #include "inih/cpp/INIReader.h"
 
-#include "wavestandard.h"
-#include "wavesimple.h"
+#include "wavefunction/wavestandard.h"
+#include "wavefunction/wavesimple.h"
 #include "montecarlo/montecarlostandard.h"
 #include "matrix.h"
 #include "hamiltonian/hamiltonianstandard.h"
 #include "hamiltonian/hamiltoniansimple.h"
 #include "hamiltonian/hamiltonianideal.h"
-#include "waveideal.h"
+#include "wavefunction/waveideal.h"
 
 using namespace std;
 

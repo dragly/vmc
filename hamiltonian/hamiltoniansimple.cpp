@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "hamiltoniansimple.h"
-#include "../wavefunction.h"
+#include "../wavefunction/wavefunction.h"
 #include "../matrix.h"
 #include "../utils.h"
 

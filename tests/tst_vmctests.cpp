@@ -5,8 +5,8 @@
 #include <iostream>
 #include <armadillo>
 
-#include "../wavesimple.h"
-#include "../waveideal.h"
+#include "../wavefunction/wavesimple.h"
+#include "../wavefunction/waveideal.h"
 #include "../matrix.h"
 #include "../config.h"
 #include "../hamiltonian/hamiltonianideal.h"
@@ -128,7 +128,7 @@ void VmcTests::fullIdealHastingsTest()
 {
     double alpha = 1.0;
     double beta = 0.4;
-    int nCycles = 500000;
+    int nCycles = 100000;
     int nTotalCycles = nCycles;
     config->setWave(waveIdeal);
     config->setHamiltonian(hamiltonianIdeal);

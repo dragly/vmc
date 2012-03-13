@@ -15,7 +15,7 @@
 
 #include "densityplotter.h"
 
-#include "wavefunction.h"
+#include "wavefunction/wavefunction.h"
 #include "inih/cpp/INIReader.h"
 #include "config.h"
 #include "montecarlo/montecarlostandard.h"

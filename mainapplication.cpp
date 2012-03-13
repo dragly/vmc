@@ -20,8 +20,8 @@
 
 #include "mainapplication.h"
 
-#include "wavestandard.h"
-#include "wavesimple.h"
+#include "wavefunction/wavestandard.h"
+#include "wavefunction/wavesimple.h"
 #include "montecarlo/montecarlostandard.h"
 #include "matrix.h"
 #include "minimizerstandard.h"
