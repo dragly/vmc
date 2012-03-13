@@ -1,5 +1,7 @@
 // Begin of main program
 
+// TODO: Convert every vector to armadillo code ...
+
 #include <iostream>
 
 #include "mainapplication.h"
@@ -8,7 +10,6 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    cout << "Running main application..." << endl;
     MainApplication *app = new MainApplication(&argc, &argv);
 
     app->loadConfiguration();

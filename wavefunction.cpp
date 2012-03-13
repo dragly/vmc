@@ -1,6 +1,8 @@
 #include <string>
 #include <stdio.h>
 
+#include <armadillo>
+
 #include "wavefunction.h"
 
 #include "matrix.h"

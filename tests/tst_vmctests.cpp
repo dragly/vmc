@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <armadillo>
 
 #include "../wavesimple.h"
 #include "../waveideal.h"
@@ -13,6 +14,7 @@
 #include "../montecarlo/montecarlometropolishastings.h"
 
 using namespace std;
+using namespace arma;
 
 class VmcTests : public QObject
 {
@@ -137,7 +139,6 @@ void VmcTests::fullIdealHastingsTest()
     double *energies = new double[2];
     //  Do the mc sampling
     monteCarlo->sample(nCycles, energies, allEnergies);
-    cout << energies[0] / nTotalCycles << endl;
     QVERIFY(fabs(energies[0] / nTotalCycles - 3.000) < 1e-2);
 }
 

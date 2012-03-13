@@ -1,3 +1,6 @@
+myHome = $$system(echo $HOME)
+INCLUDEPATH+=$$myHome/apps/armadillo-2.4.4/include
+
 SOURCES += main.cpp \
     matrix.cpp \
     wavefunction.cpp \

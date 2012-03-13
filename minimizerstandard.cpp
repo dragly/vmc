@@ -62,7 +62,6 @@ void MinimizerStandard::runMinimizer()
     double energy;
     double error;
 
-    cout << "MinimizerStandard::runMinimizer(): called" << endl;
     //    WaveIdeal *wave = new WaveIdeal(nParticles, m_config->nDimensions());
     //    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(nParticles, m_config->nDimensions(), charge);
 
