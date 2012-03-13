@@ -9,13 +9,13 @@
 class MonteCarloStandard : public MonteCarlo
 {
 public:
-    MonteCarloStandard(Config* config, double step_length);
+    MonteCarloStandard(Config* config);
     void sample(int nCycles, double *energies, double *allEnergies);
 
     ~MonteCarloStandard();
 private:
-    int number_particles;
-    int dimension;
+    int m_nParticles;
+    int m_nDimensions;
     double charge;
     int rank;
     double step_length;

@@ -8,7 +8,7 @@
 class MonteCarloMetropolisHastings : public MonteCarlo
 {
 public:
-    MonteCarloMetropolisHastings(WaveFunction* wave, Hamiltonian* hamiltonian, int nParticles, int nDimensions, double charge, int rank, double step_length);
+    MonteCarloMetropolisHastings(Config *config);
     void sample(int nCycles, double *energies, double *allEnergies);
 
     ~MonteCarloMetropolisHastings();
@@ -29,6 +29,8 @@ private:
     double* forceVectorDiff ;
     double* positionDiff ;
     long idum;
+    WaveFunction* wave;
+    Hamiltonian* hamiltonian;
 };
 
 #endif // MONTECARLOMETROPOLISHASTINGS_H

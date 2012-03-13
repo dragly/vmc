@@ -2,6 +2,7 @@
 #include <QtTest/QtTest>
 
 #include <stdio.h>
+#include <iostream>
 
 #include "../wavesimple.h"
 #include "../waveideal.h"
@@ -10,6 +11,8 @@
 #include "../hamiltonian/hamiltonianideal.h"
 #include "../montecarlo/montecarlostandard.h"
 #include "../montecarlo/montecarlometropolishastings.h"
+
+using namespace std;
 
 class VmcTests : public QObject
 {
@@ -42,9 +45,10 @@ VmcTests::VmcTests()
 
 void VmcTests::initTestCase()
 {
-    config = new Config(0,1,2,2);
+    config = new Config(0,1);
     // Set up waveSimple
     int nParticles = config->nParticles();
+    cout << nParticles << endl;
     int nDimensions = config->nDimensions();
     charge = 1.0;
     r_old = (double **) matrix( nParticles, nDimensions, sizeof(double));
@@ -104,12 +108,13 @@ void VmcTests::fullIdealTest()
 {
     double alpha = 1.0;
     double beta = 0.4;
-    double stepLength = 1.0;
     int nCycles = 500000;
     int nTotalCycles = nCycles;
+    config->setWave(waveIdeal);
+    config->setHamiltonian(hamiltonianIdeal);
     waveIdeal->setUseAnalyticalLaplace(true);
     waveIdeal->setParameters(alpha, beta);
-    MonteCarloStandard *monteCarlo = new MonteCarloStandard(waveIdeal, hamiltonianIdeal, config->nParticles(), config->nDimensions(), charge, config->rank(), stepLength);
+    MonteCarloStandard *monteCarlo = new MonteCarloStandard(config);
     double *allEnergies = new double[nCycles+1];
     double *energies = new double[2];
     //  Do the mc sampling
@@ -121,17 +126,19 @@ void VmcTests::fullIdealHastingsTest()
 {
     double alpha = 1.0;
     double beta = 0.4;
-    double stepLength = 1.0;
     int nCycles = 500000;
     int nTotalCycles = nCycles;
+    config->setWave(waveIdeal);
+    config->setHamiltonian(hamiltonianIdeal);
     waveIdeal->setUseAnalyticalLaplace(true);
     waveIdeal->setParameters(alpha, beta);
-    MonteCarloMetropolisHastings *monteCarlo = new MonteCarloMetropolisHastings(waveIdeal, hamiltonianIdeal, config->nParticles(), config->nDimensions(), charge, config->rank(), stepLength);
+    MonteCarloMetropolisHastings *monteCarlo = new MonteCarloMetropolisHastings(config);
     double *allEnergies = new double[nCycles+1];
     double *energies = new double[2];
     //  Do the mc sampling
     monteCarlo->sample(nCycles, energies, allEnergies);
-    QVERIFY(fabs(energies[0] / nTotalCycles - 3.00034530284643397025) < 1e-20);
+    cout << energies[0] / nTotalCycles << endl;
+    QVERIFY(fabs(energies[0] / nTotalCycles - 3.000) < 1e-2);
 }
 
 QTEST_APPLESS_MAIN(VmcTests)

@@ -3,28 +3,32 @@
 #include "../matrix.h"
 #include "../random.h"
 #include "../utils.h"
+#include "../config.h"
 
-MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(WaveFunction *wave, Hamiltonian *hamiltonian, int nParticles, int nDimensions, double charge, int rank, double step_length) :
-    MonteCarlo(wave, hamiltonian),
-    m_nParticles(nParticles),
-    m_nDimensions(nDimensions),
-    charge(charge),
-    rank(rank),
-    step_length(step_length)
+MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(Config *config) :
+    MonteCarlo(config),
+    m_nParticles(config->nParticles()),
+    m_nDimensions(config->nDimensions()),
+    charge(config->charge()),
+    rank(config->rank()),
+    step_length(config->stepLength()),
+    wave(config->wave()),
+    hamiltonian(config->hamiltonian())
 {
     // every node has its own seed for the random numbers
     idum = -1-rank;
     // allocate matrices which contain the position of the particles
-    rOld = (double **) matrix( nParticles, nDimensions, sizeof(double));
-    rNew = (double **) matrix( nParticles, nDimensions, sizeof(double));
-    waveGradientOld = new double[nDimensions];
-    waveGradientNew = new double[nDimensions];
+    rOld = (double **) matrix( m_nParticles, m_nDimensions, sizeof(double));
+    rNew = (double **) matrix( m_nParticles, m_nDimensions, sizeof(double));
+    waveGradientOld = new double[m_nDimensions];
+    waveGradientNew = new double[m_nDimensions];
+    forceVectorOld = new double[m_nDimensions];
     forceVectorNew = new double[m_nDimensions];
     forceVectorSum = new double[m_nDimensions];
     forceVectorDiff = new double[m_nDimensions];
     positionDiff = new double[m_nDimensions];
-    for (int i = 0; i < nParticles; i++) {
-        for (int j=0; j < nDimensions; j++) {
+    for (int i = 0; i < m_nParticles; i++) {
+        for (int j=0; j < m_nDimensions; j++) {
             rOld[i][j] = rNew[i][j] = 0;
         }
     }
@@ -36,6 +40,7 @@ MonteCarloMetropolisHastings::~MonteCarloMetropolisHastings()
     free_matrix((void **) rNew); // free memory
     delete [] waveGradientOld ;
     delete [] waveGradientNew;
+    delete [] forceVectorOld;
     delete [] forceVectorNew;
     delete [] forceVectorSum;
     delete [] forceVectorDiff;
@@ -43,8 +48,8 @@ MonteCarloMetropolisHastings::~MonteCarloMetropolisHastings()
 }
 
 void MonteCarloMetropolisHastings::quantumForce(double **rPosition, double *forceVector) {
-    double waveValue = wave->wave(rPosition);
-    wave->gradient(rPosition, forceVector);
+    double waveValue = m_config->wave()->wave(rPosition);
+    m_config->wave()->gradient(rPosition, forceVector);
     for(int j = 0; j < m_nDimensions; j++) {
         forceVector[j] = 2 * forceVector[j] / waveValue;
     }
@@ -95,9 +100,9 @@ void MonteCarloMetropolisHastings::sample(int nCycles, double *energies, double 
                 positionDiff[j] = rNew[i][j] - rOld[i][j];
                 argument += 0.5 * forceVectorSum[j] * (diffConstant * step_length / 2 * forceVectorDiff[j] - positionDiff[j]);
             }
-
+            double waveFrac = wfnew*wfnew/(wfold*wfold);
             // The Metropolis test is performed by moving one particle at the time
-            if(ran2(&idum) <= exp(argument) ) {
+            if(ran2(&idum) <= exp(argument) * waveFrac) {
                 for (int l=0; l < m_nDimensions; l++) {
                     rOld[i][l]=rNew[i][l];
                     waveGradientOld[l] = waveGradientNew[l];

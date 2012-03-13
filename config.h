@@ -3,22 +3,26 @@
 
 #include "wavefunction.h"
 #include "hamiltonian/hamiltonian.h"
+#include "montecarlo/montecarlo.h"
+
+#include <iostream>
+
+using namespace std;
 
 class Config
 {
-    Q_PROPERTY(double stepLength READ stepLength)
 public:
-    Config(int rank, int nProcesses, int nDimensions, int nParticles, double charge, double stepLength, WaveFunction* wave, Hamiltonian* hamiltonian);
+    Config(int rank, int nProcesses);
     int rank() {
         return m_rank;
     }
-    int nProcesses() {
+    int nProcesses() const  {
         return m_nProcesses;
     }
-    int nDimensions() {
+    int nDimensions() const {
         return m_nDimensions;
     }
-    int nParticles() {
+    int nParticles() const {
         return m_nParticles;
     }
 
@@ -32,6 +36,11 @@ public:
         return m_hamiltonian;
     }
 
+    MonteCarlo* monteCarlo() const
+    {
+        return m_monteCarlo;
+    }
+
     double charge() const
     {
         return m_charge;
@@ -42,15 +51,33 @@ public:
         return m_stepLength;
     }
 
+    void loadConfiguration(INIReader *settings);
+
+    void setWave(WaveFunction* arg)
+    {
+        m_wave = arg;
+    }
+
+    void setHamiltonian(Hamiltonian* arg)
+    {
+        m_hamiltonian = arg;
+    }
+
+    void setMonteCarlo(MonteCarlo* arg)
+    {
+        m_monteCarlo = arg;
+    }
+
 private:
     int m_rank;
     int m_nProcesses;
-    int m_nDimensions;
     int m_nParticles;
-    WaveFunction* m_wave;
-    Hamiltonian* m_hamiltonian;
+    int m_nDimensions;
     double m_charge;
     double m_stepLength;
+    WaveFunction* m_wave;
+    Hamiltonian* m_hamiltonian;
+    MonteCarlo* m_monteCarlo;
 };
 
 #endif // CONFIG_H

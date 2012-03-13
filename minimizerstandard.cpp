@@ -42,31 +42,9 @@ void MinimizerStandard::loadConfiguration(INIReader *settings)
     stepLength = atof(settings->Get("MinimizerStandard","stepLength", "1.0").c_str());
     m_nCycles = atoi(settings->Get("MinimizerStandard","nCycles", "1000").c_str());
     m_nVariations = settings->GetInteger("MinimizerStandard","nVariations", 11);    //  default number of variations
-
-    // Wave properties
-    string waveClass = settings->Get("Wave","class", "WaveSimple");
-    m_wave = WaveFunction::fromName(waveClass, m_config);
-    if(m_wave == 0) {
-        cerr << "Unknown wave class '" << waveClass << "'" << endl;
-        exit(99);
-    }
-    m_wave->loadConfiguration(m_settings);
-
-    // Hamiltonian
-    string hamiltonianClass = settings->Get("Hamiltonian","class", "HamiltonianSimple"), m_config, charge;
-    m_hamiltonian = Hamiltonian::fromName(hamiltonianClass, m_config, charge);
-    if(m_hamiltonian == 0) {
-        cerr << "Unknown hamiltonian class '" << hamiltonianClass << "'" << endl;
-        exit(98);
-    }
-
-    // Monte Carlo sampler
-    string monteCarloClass = settings->Get("MonteCarlo","class", "MonteCarloSimple");
-    m_monteCarlo = MonteCarlo::fromName(monteCarloClass, m_config, charge);
-    if(m_monteCarlo == 0) {
-        cerr << "Unknown Monte Carlo class '" << monteCarloClass << "'" << endl;
-        exit(98);
-    }
+    m_wave = m_config->wave();
+    m_hamiltonian = m_config->hamiltonian();
+    m_monteCarlo = m_config->monteCarlo();
 }
 
 void MinimizerStandard::runMinimizer()
@@ -121,7 +99,7 @@ void MinimizerStandard::runMinimizer()
     double *energies = new double[2];
 
     //  Do the mc sampling  and accumulate data with MPI_Reduce
-    m_monteCarlo = new MonteCarloStandard(m_wave, m_hamiltonian, m_config->nParticles(), m_config->nDimensions(), charge, m_config->rank(), stepLength);
+//    m_monteCarlo = new MonteCarloStandard(m_wave, m_hamiltonian, m_config->nParticles(), m_config->nDimensions(), charge, m_config->rank(), stepLength);
 
     double beta = 0.4;
     double alpha = 0.5*charge;

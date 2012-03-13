@@ -13,6 +13,7 @@ public:
     virtual void loadConfiguration(INIReader *settings) {
         (void)settings;
     }
+    static MonteCarlo *fromName(string monteCarloClass, Config *config);
 protected:
     Config *m_config;
 };

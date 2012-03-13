@@ -52,8 +52,6 @@ void MainApplication::loadConfiguration()
     if(m_settings->ParseError()) {
         cerr << "Warning: " << __PRETTY_FUNCTION__ << ": Could not load configuration file 'config.ini'. Does it exist?" << endl;
     }
-    m_nParticles = m_settings->GetInteger("General", "nParticles", 2);
-    m_nDimensions = m_settings->GetInteger("General", "nDimensions", 2);
 
     string modeString = m_settings->Get("General","mode","minimizer");
     if(modeString == "minimizer") {
@@ -69,7 +67,8 @@ void MainApplication::loadConfiguration()
     if(m_rank == 0) {
         cout << __PRETTY_FUNCTION__ << ": Config loaded. Mode is " << modeString << endl;
     }
-    m_config = new Config(m_rank, m_nProcesses, m_nDimensions, m_nParticles);
+    m_config = new Config(m_rank, m_nProcesses);
+    m_config->loadConfiguration(m_settings);
 }
 
 void MainApplication::runConfiguration()
