@@ -5,10 +5,10 @@
 #include "../random.h"
 #include "../utils.h"
 
-MonteCarloStandard::MonteCarloStandard(WaveFunction *wave, Hamiltonian* hamiltonian, int number_particles, int dimension, double charge, int rank, double step_length) :
+MonteCarloStandard::MonteCarloStandard(WaveFunction *wave, Hamiltonian* hamiltonian, int nParticles, int nDimensions, double charge, int rank, double step_length) :
     MonteCarlo(wave, hamiltonian),
-    number_particles(number_particles),
-    dimension(dimension),
+    number_particles(nParticles),
+    dimension(nDimensions),
     charge(charge),
     rank(rank),
     step_length(step_length)
@@ -16,10 +16,10 @@ MonteCarloStandard::MonteCarloStandard(WaveFunction *wave, Hamiltonian* hamilton
     // every node has its own seed for the random numbers
     idum = -1-rank;
     // allocate matrices which contain the position of the particles
-    r_old = (double **) matrix( number_particles, dimension, sizeof(double));
-    r_new = (double **) matrix( number_particles, dimension, sizeof(double));
-    for (int i = 0; i < number_particles; i++) {
-        for (int j=0; j < dimension; j++) {
+    r_old = (double **) matrix( nParticles, nDimensions, sizeof(double));
+    r_new = (double **) matrix( nParticles, nDimensions, sizeof(double));
+    for (int i = 0; i < nParticles; i++) {
+        for (int j=0; j < nDimensions; j++) {
             r_old[i][j] = r_new[i][j] = 0;
         }
     }
@@ -46,7 +46,7 @@ void MonteCarloStandard::sample(int nCycles, double *energies, double *allEnergi
             r_old[i][j] = step_length*(ran2(&idum)-0.5);
         }
     }
-    wfold = m_wave->wave(r_old);
+    wfold = wave->wave(r_old);
     // loop over monte carlo cycles
     for (int cycle = 1; cycle <= nCycles; cycle++){
         // new position
@@ -64,7 +64,7 @@ void MonteCarloStandard::sample(int nCycles, double *energies, double *allEnergi
                     }
                 }
             }
-            wfnew = m_wave->wave(r_new);
+            wfnew = wave->wave(r_new);
             // The Metropolis test is performed by moving one particle at the time
             if(ran2(&idum) <= wfnew*wfnew/wfold/wfold ) {
                 for (int l=0; l < dimension; l++) {
@@ -74,7 +74,7 @@ void MonteCarloStandard::sample(int nCycles, double *energies, double *allEnergi
             }
         }  //  end of loop over particles
         // compute local energy
-        delta_e = m_hamiltonian->energy(m_wave, r_old);
+        delta_e = hamiltonian->energy(wave, r_old);
         // save all energies on last variate
         //        if(variate==max_variations){
         allEnergies[cycle] = delta_e;

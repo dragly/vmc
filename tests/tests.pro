@@ -23,8 +23,6 @@ for(source, SOURCES):MY_SOURCES+=../$$source
 SOURCES = $$MY_SOURCES
 SOURCES -= ../main.cpp
 
-message($$SOURCES)
-
 SOURCES += tst_vmctests.cpp
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"

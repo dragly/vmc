@@ -2,5 +2,6 @@
 #define RANDOM_H
 
 double ran2(long *idum);
+double simpleGaussRandom(long *idum);
 
 #endif // RANDOM_H

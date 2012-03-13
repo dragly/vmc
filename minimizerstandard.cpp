@@ -53,9 +53,18 @@ void MinimizerStandard::loadConfiguration(INIReader *settings)
     m_wave->loadConfiguration(m_settings);
 
     // Hamiltonian
-    m_hamiltonian = Hamiltonian::fromName(settings->Get("Hamiltonian","class", "HamiltonianSimple"), m_config, charge);
+    string hamiltonianClass = settings->Get("Hamiltonian","class", "HamiltonianSimple"), m_config, charge;
+    m_hamiltonian = Hamiltonian::fromName(hamiltonianClass, m_config, charge);
     if(m_hamiltonian == 0) {
         cerr << "Unknown hamiltonian class '" << hamiltonianClass << "'" << endl;
+        exit(98);
+    }
+
+    // Monte Carlo sampler
+    string monteCarloClass = settings->Get("MonteCarlo","class", "MonteCarloSimple");
+    m_monteCarlo = MonteCarlo::fromName(monteCarloClass, m_config, charge);
+    if(m_monteCarlo == 0) {
+        cerr << "Unknown Monte Carlo class '" << monteCarloClass << "'" << endl;
         exit(98);
     }
 }
@@ -112,14 +121,14 @@ void MinimizerStandard::runMinimizer()
     double *energies = new double[2];
 
     //  Do the mc sampling  and accumulate data with MPI_Reduce
-    MonteCarloStandard *monteCarlo = new MonteCarloStandard(m_wave, m_hamiltonian, m_config->nParticles(), m_config->nDimensions(), charge, m_config->rank(), stepLength);
+    m_monteCarlo = new MonteCarloStandard(m_wave, m_hamiltonian, m_config->nParticles(), m_config->nDimensions(), charge, m_config->rank(), stepLength);
 
     double beta = 0.4;
     double alpha = 0.5*charge;
     // loop over variational parameters
     for (int variate=1; variate <= m_nVariations; variate++){
         m_wave->setParameters(alpha, beta);
-        monteCarlo->sample(m_nCycles, energies, m_allEnergies);
+        m_monteCarlo->sample(m_nCycles, energies, m_allEnergies);
         // update the energy average and its squared
         cumulative_e[variate] = energies[0];
         cumulative_e2[variate] = energies[1];

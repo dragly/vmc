@@ -8,18 +8,26 @@
 class MonteCarloMetropolisHastings : public MonteCarlo
 {
 public:
-    MonteCarloMetropolisHastings(WaveFunction* m_wave, Hamiltonian* m_hamiltonian, int number_particles, int dimension, double charge, int rank, double step_length);
+    MonteCarloMetropolisHastings(WaveFunction* wave, Hamiltonian* hamiltonian, int nParticles, int nDimensions, double charge, int rank, double step_length);
     void sample(int nCycles, double *energies, double *allEnergies);
 
     ~MonteCarloMetropolisHastings();
+    void quantumForce(double **rPosition, double *forceVectorNew);
 private:
-    int number_particles;
-    int dimension;
+    int m_nParticles;
+    int m_nDimensions;
     double charge;
     int rank;
     double step_length;
-    double **r_old;
-    double **r_new;
+    double **rOld;
+    double **rNew;
+    double *waveGradientOld;
+    double *waveGradientNew;
+    double* forceVectorNew;
+    double* forceVectorOld;
+    double* forceVectorSum;
+    double* forceVectorDiff ;
+    double* positionDiff ;
     long idum;
 };
 

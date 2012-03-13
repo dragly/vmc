@@ -91,15 +91,13 @@ void VmcTests::waveSimpleGradientTest()
     int nDimensions = 2;
     WaveSimple *waveSimpleNew = new WaveSimple(nParticles,nDimensions);
     double** rPositions = (double **) matrix( nParticles, nDimensions, sizeof(double));
-    for (int i = 0; i < nParticles; i++) {
-        for (int j=0; j < nDimensions; j++) {
-            rPositions[i][j] = 1.0 - j;
-        }
-    }
-    double rgrad[2];
-    waveSimpleNew->gradient(r_old, rgrad);
-    printf("Gradient: %.10f %.10f\n", rgrad[0], rgrad[1]);
-    QVERIFY(fabs(rgrad[0] - 2) < 0.001);
+    rPositions[0][0] = -1;
+    rPositions[0][1] = 0.0;
+    double rGradient[2];
+    waveSimpleNew->setParameters(2, 1);
+    waveSimpleNew->gradient(rPositions, rGradient);
+    QVERIFY(fabs(rGradient[0] - 0.735) < 0.001);
+    QVERIFY(fabs(rGradient[1] - 0.000) < 0.0000001);
 }
 
 void VmcTests::fullIdealTest()

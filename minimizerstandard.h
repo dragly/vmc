@@ -11,6 +11,7 @@
 class INIReader;
 class WaveFunction;
 class Hamiltonian;
+class MonteCarlo;
 
 using namespace std;
 
@@ -28,10 +29,10 @@ private:
     double charge;  //  we fix the charge to be that of the helium atom
     double stepLength;  //  we fix the brute force jump to 1 Bohr radius
     int m_nVariations;
-    string hamiltonianClass;
-    WaveFunction *m_wave;
-
     INIReader *m_settings;
+
+    WaveFunction *m_wave;
+    MonteCarlo *m_monteCarlo;
     Hamiltonian *m_hamiltonian;
 
 };

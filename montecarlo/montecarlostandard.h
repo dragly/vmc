@@ -4,11 +4,12 @@
 #include "montecarlo.h"
 #include "../hamiltonian/hamiltonian.h"
 #include "../wavefunction.h"
+#include "../config.h"
 
 class MonteCarloStandard : public MonteCarlo
 {
 public:
-    MonteCarloStandard(WaveFunction* m_wave, Hamiltonian* m_hamiltonian, int number_particles, int dimension, double charge, int rank, double step_length);
+    MonteCarloStandard(Config* config, double step_length);
     void sample(int nCycles, double *energies, double *allEnergies);
 
     ~MonteCarloStandard();

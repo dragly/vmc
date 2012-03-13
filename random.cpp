@@ -77,4 +77,8 @@ double ran2(long *idum)
 #undef EPS
 #undef RNMX
 
+double simpleGaussRandom(long *idum) {
+    return (-1 + 2 * ran2(idum)) + (-1 + 2 * ran2(idum)) + (-1 + 2 * ran2(idum));
+}
+
 // End: function ran2()
