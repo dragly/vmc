@@ -34,17 +34,14 @@ DensityPlotter::DensityPlotter(Config *config) :
     // every node has its own seed for the random numbers
     idum = -1;
     // allocate matrices which contain the position of the particles
-    r_old = new vec2[ config->nParticles()];
-    r_new = new vec2[config->nParticles()];;
-    for (int i = 0; i < config->nParticles(); i++) {
-        for (int j=0; j < config->nDimensions(); j++) {
-            r_old[i][j] = r_new[i][j] = 0;
-        }
-    }
+    r_old = new vec2[config->nParticles()];
+    r_new = new vec2[config->nParticles()];
 }
 
 DensityPlotter::~DensityPlotter()
 {
+    delete [] r_old;
+    delete [] r_new;
 }
 
 void DensityPlotter::loadConfiguration(INIReader *settings)

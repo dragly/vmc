@@ -38,7 +38,7 @@ private:
     WaveSimple *waveSimple;
     WaveIdeal *waveIdeal;
     HamiltonianIdeal *hamiltonianIdeal;
-    double **r_old;
+    vec2 *r_old;
     double charge;
 };
 
@@ -54,7 +54,7 @@ void VmcTests::initTestCase()
     cout << nParticles << endl;
     int nDimensions = config->nDimensions();
     charge = 1.0;
-    r_old = (double **) matrix( nParticles, nDimensions, sizeof(double));
+    r_old = new vec2[nDimensions];
     for (int i = 0; i < nParticles; i++) {
         for (int j=0; j < nDimensions; j++) {
             r_old[i][j] = 0.234 + i + 2*j;
@@ -97,10 +97,10 @@ void VmcTests::waveSimpleGradientTest()
     int nParticles = 1;
     int nDimensions = 2;
     WaveSimple *waveSimpleNew = new WaveSimple(nParticles,nDimensions);
-    double** rPositions = (double **) matrix( nParticles, nDimensions, sizeof(double));
+    vec2* rPositions = new vec2[nParticles];
     rPositions[0][0] = -1;
     rPositions[0][1] = 0.0;
-    double rGradient[2];
+    vec2 rGradient;
     waveSimpleNew->setParameters(2, 1);
     waveSimpleNew->gradient(rPositions, rGradient);
     QVERIFY(fabs(rGradient[0] - 0.735) < 0.001);
