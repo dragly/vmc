@@ -11,7 +11,7 @@ WaveSimple::WaveSimple(int nParticles, int dimensions)  :
 {
 }
 
-double WaveSimple::wave(double **r)
+double WaveSimple::wave(vec2 *r)
 {
     int i, j;
     double wf, argument, rSingleParticle;
@@ -28,7 +28,7 @@ double WaveSimple::wave(double **r)
     return wf;
 }
 
-double WaveSimple::laplace(double **r)
+double WaveSimple::laplace(vec2 *r)
 {
     if(useAnalytical) {
         double eKinetic = 0;

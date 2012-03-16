@@ -1,5 +1,7 @@
 #ifndef MONTECARLOSTANDARD_H
 #define MONTECARLOSTANDARD_H
+#include <armadillo>
+using namespace arma;
 
 #include "montecarlo.h"
 #include "../hamiltonian/hamiltonian.h"
@@ -19,8 +21,8 @@ private:
     double charge;
     int rank;
     double step_length;
-    double **r_old;
-    double **r_new;
+    vec2 *r_old;
+    vec2 *r_new;
     long idum;
 };
 

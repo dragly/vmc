@@ -7,7 +7,7 @@ WaveIdeal::WaveIdeal(int nParticles, int dimensions) :
 {
 }
 
-double WaveIdeal::wave(double **r)
+double WaveIdeal::wave(vec2 *r)
 {
     int i, j;
     double wf, argument, r_single_particle;
@@ -31,7 +31,7 @@ double WaveIdeal::wave(double **r)
     return wf;
 }
 
-double WaveIdeal::laplace(double **r)
+double WaveIdeal::laplace(vec2 *r)
 {
     if(useAnalytical) {
         double omega = 1;

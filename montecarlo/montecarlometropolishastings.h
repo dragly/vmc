@@ -1,5 +1,7 @@
 #ifndef MONTECARLOMETROPOLISHASTINGS_H
 #define MONTECARLOMETROPOLISHASTINGS_H
+#include <armadillo>
+using namespace arma;
 
 #include "montecarlo.h"
 #include "../hamiltonian/hamiltonian.h"
@@ -12,15 +14,15 @@ public:
     void sample(int nCycles, double *energies, double *allEnergies);
 
     ~MonteCarloMetropolisHastings();
-    void quantumForce(double **rPosition, double *forceVectorNew);
+    void quantumForce(vec2 *rPosition, double *forceVectorNew);
 private:
     int m_nParticles;
     int m_nDimensions;
     double charge;
     int rank;
     double step_length;
-    double **rOld;
-    double **rNew;
+    vec2 *rOld;
+    vec2 *rNew;
     double *waveGradientOld;
     double *waveGradientNew;
     double* forceVectorNew;

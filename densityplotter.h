@@ -1,6 +1,8 @@
 #ifndef DENSITYPLOTTER_H
 #define DENSITYPLOTTER_H
 #include <fstream>
+#include <armadillo>
+using namespace arma;
 
 class WaveFunction;
 class INIReader;
@@ -44,8 +46,8 @@ private:
     WaveFunction *m_wave;
     INIReader *m_settings;
     long idum;
-    double **r_old;
-    double **r_new;
+    vec2 *r_old;
+    vec2 *r_new;
     double m_charge;
     double m_stepLength;
     double aMin;

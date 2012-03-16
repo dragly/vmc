@@ -15,7 +15,7 @@ HamiltonianSimple::HamiltonianSimple(int number_particles, int dimension, double
 {
 }
 
-double HamiltonianSimple::energy(WaveFunction *wave, double **r)
+double HamiltonianSimple::energy(WaveFunction *wave, vec2 *r)
 {
     int i, j;
     double eLocal;

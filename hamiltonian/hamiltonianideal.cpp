@@ -11,7 +11,7 @@ HamiltonianIdeal::HamiltonianIdeal(int number_particles, int dimension, double c
 {
 }
 
-double HamiltonianIdeal::energy(WaveFunction *wave, double **r)
+double HamiltonianIdeal::energy(WaveFunction *wave, vec2 *r)
 {
     double eLocal, eKinetic, ePotential,
             rSingleParticle;
@@ -44,14 +44,15 @@ double HamiltonianIdeal::energy(WaveFunction *wave, double **r)
     return eLocal;
 }
 
-double HamiltonianIdeal::kineticEnergy(WaveFunction *wave, double **r, double wfold)
+double HamiltonianIdeal::kineticEnergy(WaveFunction *wave, vec2 *r, double wfold)
 {
-    double **r_plus, **r_minus;
+    vec2 *r_plus;
+    vec2 *r_minus;
 
     // allocate matrices which contain the position of the particles
     // the function matrix is defined in the progam library
-    r_plus = (double **) matrix( number_particles, dimension, sizeof(double));
-    r_minus = (double **) matrix( number_particles, dimension, sizeof(double));
+    r_plus = new vec2[ number_particles];
+    r_minus = new vec2[ number_particles];
     for (int i = 0; i < number_particles; i++) {
         for (int j=0; j < dimension; j++) {
             r_plus[i][j] = r_minus[i][j] = r[i][j];

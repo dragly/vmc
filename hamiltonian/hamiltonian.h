@@ -2,6 +2,8 @@
 #define HAMILTONIAN_H
 
 #include <string>
+#include <armadillo>
+using namespace arma;
 
 using namespace std;
 
@@ -12,7 +14,7 @@ class Hamiltonian
 {
 public:
     Hamiltonian();
-    virtual double energy(WaveFunction *wave, double **r) = 0;
+    virtual double energy(WaveFunction *wave, vec2 *r) = 0;
     static Hamiltonian *fromName(string hamiltonianClass, Config *config, double charge);
 
 };

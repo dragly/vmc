@@ -1,5 +1,7 @@
 #ifndef WAVEFUNCTION_H
 #define WAVEFUNCTION_H
+#include <armadillo>
+using namespace arma;
 
 #include <string>
 
@@ -12,16 +14,16 @@ class WaveFunction
 {
 public:
     WaveFunction(int nParticles, int nDimensions);
-    virtual double wave(double **r) = 0;
-    virtual void gradient(double **r, double *rGradient) {
+    virtual double wave(vec2 *r) = 0;
+    virtual void gradient(vec2 *r, double *rGradient) {
         gradientNumerical(r, rGradient);
     }
-    virtual double laplace(double **r) = 0;
+    virtual double laplace(vec2 *r) = 0;
     virtual void loadConfiguration(INIReader *settings) {
         (void)settings;
     }
-    double laplaceNumerical(double **r);
-    void gradientNumerical(double **r, double *rGradient);
+    double laplaceNumerical(vec2 *r);
+    void gradientNumerical(vec2 *r, double *rGradient);
     void setParameters(double alpha, double beta);
     static WaveFunction* fromName(string waveClass, Config *config);
     ~WaveFunction();
@@ -30,8 +32,8 @@ protected:
     int m_nDimensions;
     double alpha;
     double beta;
-    double **rPlus;
-    double **rMinus;
+    vec2 *rPlus;
+    vec2 *rMinus;
 };
 
 #endif // WAVEFUNCTION_H

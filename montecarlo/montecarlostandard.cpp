@@ -16,8 +16,8 @@ MonteCarloStandard::MonteCarloStandard(Config *config) :
     // every node has its own seed for the random numbers
     idum = -1-rank;
     // allocate matrices which contain the position of the particles
-    r_old = (double **) matrix( m_nParticles, m_nDimensions, sizeof(double));
-    r_new = (double **) matrix( m_nParticles, m_nDimensions, sizeof(double));
+    r_old = new vec2[ m_nParticles];
+    r_new = new vec2[ m_nParticles];
     for (int i = 0; i < m_nParticles; i++) {
         for (int j=0; j < m_nDimensions; j++) {
             r_old[i][j] = r_new[i][j] = 0;

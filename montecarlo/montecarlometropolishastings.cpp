@@ -18,8 +18,8 @@ MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(Config *config) :
     // every node has its own seed for the random numbers
     idum = -1-rank;
     // allocate matrices which contain the position of the particles
-    rOld = (double **) matrix( m_nParticles, m_nDimensions, sizeof(double));
-    rNew = (double **) matrix( m_nParticles, m_nDimensions, sizeof(double));
+    rOld = new vec2[ m_nParticles];
+    rNew = new vec2[ m_nParticles];
     waveGradientOld = new double[m_nDimensions];
     waveGradientNew = new double[m_nDimensions];
     forceVectorOld = new double[m_nDimensions];
@@ -47,7 +47,7 @@ MonteCarloMetropolisHastings::~MonteCarloMetropolisHastings()
     delete [] positionDiff;
 }
 
-void MonteCarloMetropolisHastings::quantumForce(double **rPosition, double *forceVector) {
+void MonteCarloMetropolisHastings::quantumForce(vec2 *rPosition, double *forceVector) {
     double waveValue = m_config->wave()->wave(rPosition);
     m_config->wave()->gradient(rPosition, forceVector);
     for(int j = 0; j < m_nDimensions; j++) {

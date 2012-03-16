@@ -12,13 +12,13 @@ class WaveSimple : public WaveFunction
 {
 public:
     WaveSimple(int m_nParticles, int m_nDimensions);
-    double wave(double **r);
+    double wave(vec2 *r);
     double laplace(vec2 *r);
     void setUseAnalyticalLaplace(bool val);
 private:
     bool useAnalytical;
-    double **rPlus;
-    double **rMinus;
+    vec2 *rPlus;
+    vec2 *rMinus;
 };
 
 #endif // WAVESIMPLE_H
