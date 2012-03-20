@@ -90,6 +90,6 @@ WaveFunction* WaveFunction::fromName(std::string waveClass, Config* config) {
 
 WaveFunction::~WaveFunction()
 {
-    free_matrix((void **) rPlus); // free memory
-    free_matrix((void **) rMinus);
+    delete [] rPlus;
+    delete [] rMinus;
 }
