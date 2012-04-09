@@ -66,3 +66,9 @@ export(first.depends)
 export(copyFiles.commands)
 export(todoStuff.commands)
 QMAKE_EXTRA_TARGETS += first copyFiles todoStuff
+
+HEADERS += \
+    slater/slater.h
+
+SOURCES += \
+    slater/slater.cpp

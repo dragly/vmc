@@ -31,7 +31,6 @@ private slots:
     void fullIdealTest();
     void fullIdealHastingsTest();
     void waveSimpleGradientTest();
-    void armadilloTest();
 
 private:
     Config *config;
@@ -105,18 +104,6 @@ void VmcTests::waveSimpleGradientTest()
     waveSimpleNew->gradient(rPositions, rGradient);
     QVERIFY(fabs(rGradient[0] - 0.735) < 0.001);
     QVERIFY(fabs(rGradient[1] - 0.000) < 0.0000001);
-}
-
-double testfunc(vec2* list) {
-    cout << list[0][1] << endl;
-}
-
-void VmcTests::armadilloTest()
-{
-    vec2 *arr = new vec2[10];
-    arr[0][1] = 10;
-    cout << arr[0] << endl;
-    testfunc(arr);
 }
 
 void VmcTests::fullIdealTest()
