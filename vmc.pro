@@ -68,7 +68,7 @@ export(todoStuff.commands)
 QMAKE_EXTRA_TARGETS += first copyFiles todoStuff
 
 HEADERS += \
-    slater/slater.h
+    hermite.h
 
 SOURCES += \
-    slater/slater.cpp
+    hermite.cpp

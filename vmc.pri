@@ -20,7 +20,9 @@ SOURCES += main.cpp \
     blocker.cpp \
     densityplotter.cpp \
     config.cpp \
-    montecarlo/montecarlometropolishastings.cpp
+    montecarlo/montecarlometropolishastings.cpp\
+    slater/slater.cpp \
+    minimizer/minimizerevolutionary.cpp
 
 HEADERS += \
     matrix.h \
@@ -44,5 +46,6 @@ HEADERS += \
     blocker.h \
     densityplotter.h \
     config.h \
-    montecarlo/montecarlometropolishastings.h
-
+    montecarlo/montecarlometropolishastings.h\
+    slater/slater.h \
+    minimizer/minimizerevolutionary.h
