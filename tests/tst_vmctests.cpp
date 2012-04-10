@@ -12,6 +12,7 @@
 #include "../hamiltonian/hamiltonianideal.h"
 #include "../montecarlo/montecarlostandard.h"
 #include "../montecarlo/montecarlometropolishastings.h"
+#include "../hermite.h"
 
 using namespace std;
 using namespace arma;
@@ -31,6 +32,7 @@ private slots:
     void fullIdealTest();
     void fullIdealHastingsTest();
     void waveSimpleGradientTest();
+    void hermiteTest();
 
 private:
     Config *config;
@@ -140,6 +142,17 @@ void VmcTests::fullIdealHastingsTest()
     //  Do the mc sampling
     monteCarlo->sample(nCycles, energies, allEnergies);
     QVERIFY(fabs(energies[0] / nTotalCycles - 3.000) < 1e-2);
+}
+
+void VmcTests::hermiteTest() {
+    Hermite* hermite2 = new Hermite(2);
+    Hermite* hermite3 = new Hermite(3);
+    Hermite* hermite4 = new Hermite(4);
+//    Hermite* hermite5 = new Hermite(5);
+
+    QVERIFY(hermite2->evaluate(4) - (4*4*4 - 2) < 1e-20);
+    QVERIFY(hermite3->evaluate(5) - (8*5*5*5 - 12) < 1e-20);
+    QVERIFY(hermite4->evaluate(3) - (16*3*3*3*3 - 48*3*3 + 12) < 1e-20);
 }
 
 QTEST_APPLESS_MAIN(VmcTests)

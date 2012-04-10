@@ -5,6 +5,8 @@
 #include <armadillo>
 using namespace arma;
 
+#include "../minimizer.h"
+
 /*!
     An evolutionary approach to minimizing the energy by selection of
     the parameters. This class is written with the intention to be as

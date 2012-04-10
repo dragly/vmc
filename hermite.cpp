@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 
 using namespace std;
 
@@ -27,7 +28,7 @@ Hermite::Hermite(int degree) :
   @returns Value of the polynomial at the given x
   */
 double Hermite::evaluate(double x) {
-    switch(degree) {
+    switch(m_degree) {
     case 0:
         return 1;
         break;
@@ -46,6 +47,6 @@ double Hermite::evaluate(double x) {
     default:
         cerr << __PRETTY_FUNCTION__ << ": Hermite polynomial of unknown degree called. Degree was: " << m_degree << endl;
         exit(1);
-        return;
+        return 0;
     }
 }

@@ -1,28 +1,6 @@
 myHome = $$system(echo $HOME)
+message(Assuming Armadillo is installed under $$myHome/apps/armadillo-2.4.4/include)
 INCLUDEPATH+=$$myHome/apps/armadillo-2.4.4/include
-
-SOURCES += main.cpp \
-    matrix.cpp \
-    wavefunction/wavefunction.cpp \
-    montecarlo/montecarlo.cpp \
-    montecarlo/montecarlostandard.cpp \
-    random.cpp \
-    wavefunction/wavesimple.cpp \
-    minimizer.cpp \
-    minimizerstandard.cpp \
-    mainapplication.cpp \
-    inih/ini.c \
-    inih/cpp/INIReader.cpp \
-    wavefunction/waveideal.cpp \
-    hamiltonian/hamiltonianideal.cpp \
-    hamiltonian/hamiltoniansimple.cpp \
-    hamiltonian/hamiltonian.cpp \
-    blocker.cpp \
-    densityplotter.cpp \
-    config.cpp \
-    montecarlo/montecarlometropolishastings.cpp\
-    slater/slater.cpp \
-    minimizer/minimizerevolutionary.cpp
 
 HEADERS += \
     matrix.h \
@@ -48,4 +26,29 @@ HEADERS += \
     config.h \
     montecarlo/montecarlometropolishastings.h\
     slater/slater.h \
-    minimizer/minimizerevolutionary.h
+    minimizer/minimizerevolutionary.h \
+    hermite.h
+
+SOURCES += main.cpp \
+    matrix.cpp \
+    wavefunction/wavefunction.cpp \
+    montecarlo/montecarlo.cpp \
+    montecarlo/montecarlostandard.cpp \
+    random.cpp \
+    wavefunction/wavesimple.cpp \
+    minimizer.cpp \
+    minimizerstandard.cpp \
+    mainapplication.cpp \
+    inih/ini.c \
+    inih/cpp/INIReader.cpp \
+    wavefunction/waveideal.cpp \
+    hamiltonian/hamiltonianideal.cpp \
+    hamiltonian/hamiltoniansimple.cpp \
+    hamiltonian/hamiltonian.cpp \
+    blocker.cpp \
+    densityplotter.cpp \
+    config.cpp \
+    montecarlo/montecarlometropolishastings.cpp\
+    slater/slater.cpp \
+    minimizer/minimizerevolutionary.cpp \
+    hermite.cpp
