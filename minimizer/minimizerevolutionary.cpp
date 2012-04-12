@@ -1,13 +1,22 @@
 #include "minimizerevolutionary.h"
+#include "../inih/cpp/INIReader.h"
 
 MinimizerEvolutionary::MinimizerEvolutionary(Config *config) :
     Minimizer(config)
 {
+
 }
 
 void MinimizerEvolutionary::runMinimizer()
 {
     startEvolution();
+}
+
+void MinimizerEvolutionary::loadConfiguration(INIReader *settings)
+{
+    nIndividuals = settings->GetInteger("MinimizerEvolutionary","nIndividuals",64);
+    nPopulations = settings->GetInteger("MinimizerEvolutionary","nPopulations",2);
+    nGenes = settings->GetInteger("MinimizerEvolutionary","nGenes",32)
 }
 
 void MinimizerEvolutionary::startEvolution()

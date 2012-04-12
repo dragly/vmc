@@ -12,7 +12,10 @@
 #include "../hamiltonian/hamiltonianideal.h"
 #include "../montecarlo/montecarlostandard.h"
 #include "../montecarlo/montecarlometropolishastings.h"
+#include "../minimizer/minimizerevolutionary.h"
 #include "../hermite.h"
+
+#include "minimizerevolutionarytest.h";
 
 using namespace std;
 using namespace arma;
@@ -23,7 +26,7 @@ class VmcTests : public QObject
     
 public:
     VmcTests();
-    
+
 private slots:
     void initTestCase();
     void cleanupTestCase();
@@ -33,6 +36,7 @@ private slots:
     void fullIdealHastingsTest();
     void waveSimpleGradientTest();
     void hermiteTest();
+    void minimizerEvolutionaryTest();
 
 private:
     Config *config;
@@ -153,6 +157,10 @@ void VmcTests::hermiteTest() {
     QVERIFY(hermite2->evaluate(4) - (4*4*4 - 2) < 1e-20);
     QVERIFY(hermite3->evaluate(5) - (8*5*5*5 - 12) < 1e-20);
     QVERIFY(hermite4->evaluate(3) - (16*3*3*3*3 - 48*3*3 + 12) < 1e-20);
+}
+
+void VmcTests::minimizerEvolutionaryTest() {
+    cout <<
 }
 
 QTEST_APPLESS_MAIN(VmcTests)
