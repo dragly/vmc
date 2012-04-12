@@ -20,8 +20,13 @@ MY_SOURCES =
 
 for(source, SOURCES):MY_SOURCES+=../$$source
 
-SOURCES = $$MY_SOURCES \
-    minimizerevolutionarytest.cpp
+MY_HEADERS =
+
+for(header, SOURCES):MY_HEADERS+=../$$header
+
+HEADERS = $$MY_HEADERS
+
+SOURCES = $$MY_SOURCES
 SOURCES -= ../main.cpp
 
 SOURCES += tst_vmctests.cpp
@@ -39,6 +44,3 @@ DEFINES += SRCDIR=\\\"$$PWD/\\\"
 #QMAKE_CXXFLAGS = $$system(mpicxx --showme:compile) -DMPICH_IGNORE_CXX_SEEK
 #QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS
 #message($$QMAKE_CXXFLAGS_RELEASE)
-
-HEADERS += \
-    minimizerevolutionarytest.h

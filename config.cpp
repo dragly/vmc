@@ -17,13 +17,14 @@ Config::Config(int rank, int nProcesses) :
     m_stepLength(1.0),
     m_wave(0),
     m_hamiltonian(0),
-    m_monteCarlo(0)
+    m_monteCarlo(0),
+    m_omega(1)
 {
 }
 
 void Config::loadConfiguration(INIReader* settings) {
-    m_nParticles = settings->GetInteger("General", "nParticles", 2);
-    m_nDimensions = settings->GetInteger("General", "nDimensions", 2);
+    m_nParticles = settings->GetInteger("General", "nParticles", m_nParticles);
+    m_nDimensions = settings->GetInteger("General", "nDimensions", m_nDimensions);
     m_charge = atof(settings->Get("General", "charge", "1.0").c_str());
     m_stepLength = atof(settings->Get("General", "stepLength", "1.0").c_str());
     m_omega = atof(settings->Get("General", "omega", "1.0").c_str());

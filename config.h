@@ -22,8 +22,16 @@ public:
     int nDimensions() const {
         return m_nDimensions;
     }
+    void setNDimensions(int n) {
+        m_nDimensions = n;
+    }
+
     int nParticles() const {
         return m_nParticles;
+    }
+
+    void setNParticles(int n) {
+        m_nDimensions = n;
     }
 
     WaveFunction* wave() const

@@ -22,7 +22,7 @@ Hermite::Hermite()
   @param x Value at which to evaluate the polynomial.
   @returns Value of the polynomial at the given x
   */
-static double Hermite::evaluate(double x, int degree) {
+double Hermite::evaluate(int degree, double x) {
     switch(degree) {
     case 0:
         return 1;
@@ -40,7 +40,7 @@ static double Hermite::evaluate(double x, int degree) {
         return 16*x*x*x*x - 48*x*x + 12;
         break;
     default:
-        cerr << __PRETTY_FUNCTION__ << ": Hermite polynomial of unknown degree called. Degree was: " << m_degree << endl;
+        cerr << __PRETTY_FUNCTION__ << ": Hermite polynomial of unknown degree called. Degree was: " << degree << endl;
         exit(1);
         return 0;
     }

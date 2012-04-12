@@ -14,6 +14,7 @@
 #include "../montecarlo/montecarlometropolishastings.h"
 #include "../minimizer/minimizerevolutionary.h"
 #include "../hermite.h"
+#include "../orbital/orbital.h"
 
 #include "minimizerevolutionarytest.h"
 
@@ -37,6 +38,7 @@ private slots:
     void waveSimpleGradientTest();
     void hermiteTest();
     void minimizerEvolutionaryTest();
+    void twoOrbitalsOneWavefunction();
 
 private:
     Config *config;
@@ -59,7 +61,7 @@ void VmcTests::initTestCase()
     cout << nParticles << endl;
     int nDimensions = config->nDimensions();
     charge = 1.0;
-    r_old = new vec2[nDimensions];
+    r_old = new vec2[nParticles];
     for (int i = 0; i < nParticles; i++) {
         for (int j=0; j < nDimensions; j++) {
             r_old[i][j] = 0.234 + i + 2*j;
@@ -149,18 +151,37 @@ void VmcTests::fullIdealHastingsTest()
 }
 
 void VmcTests::hermiteTest() {
-    Hermite* hermite2 = new Hermite(2);
-    Hermite* hermite3 = new Hermite(3);
-    Hermite* hermite4 = new Hermite(4);
 //    Hermite* hermite5 = new Hermite(5);
 
-    QVERIFY(hermite2->evaluate(4) - (4*4*4 - 2) < 1e-20);
-    QVERIFY(hermite3->evaluate(5) - (8*5*5*5 - 12) < 1e-20);
-    QVERIFY(hermite4->evaluate(3) - (16*3*3*3*3 - 48*3*3 + 12) < 1e-20);
+    QVERIFY(Hermite::evaluate(2,4) - (4*4*4 - 2) < 1e-20);
+    QVERIFY(Hermite::evaluate(3,5) - (8*5*5*5 - 12) < 1e-20);
+    QVERIFY(Hermite::evaluate(4,3) - (16*3*3*3*3 - 48*3*3 + 12) < 1e-20);
 }
 
 void VmcTests::minimizerEvolutionaryTest() {
-    cout <<
+    cout << "test" << endl;
+}
+
+void VmcTests::twoOrbitalsOneWavefunction() {
+    vec2 *rpos = new vec2[config->nParticles()];
+    rpos[0][0] = 0.4;
+    rpos[0][1] = 0.9;
+    rpos[1][0] = 0.1;
+    rpos[1][1] = 0.8;
+
+    WaveSimple *waveSimple1 = new WaveSimple(config->nParticles(), config->nDimensions());
+    waveSimple1->setParameters(1,1);
+
+    Orbital *orbital1 = new Orbital(0,0,config);
+    Orbital *orbital2 = new Orbital(0,0,config);
+    orbital1->setParameters(1,1);
+    orbital2->setParameters(1,1);
+
+    double val1 = waveSimple1->wave(rpos);
+
+    double val2 = orbital1->evaluate(rpos[0]) * orbital2->evaluate(rpos[1]);
+
+    QCOMPARE(val1,val2);
 }
 
 QTEST_APPLESS_MAIN(VmcTests)

@@ -16,10 +16,9 @@
 #include <stdlib.h>
 
 // local stuff
-#include "minimizerstandard.h"
+#include "minimizer/minimizerstandard.h"
 #include "inih/cpp/INIReader.h"
 
-#include "wavefunction/wavestandard.h"
 #include "wavefunction/wavesimple.h"
 #include "montecarlo/montecarlostandard.h"
 #include "matrix.h"

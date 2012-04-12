@@ -29,6 +29,8 @@ void MinimizerEvolutionary::startEvolution()
   */
 double MinimizerEvolutionary::value(vec *coefficients)
 {
+    (void)coefficients;
     // TODO do the monte carlo integral to find the energy for the set coefficients
+    return 0.0;
 }
 

@@ -5,7 +5,7 @@ class Hermite
 {
 public:
     Hermite();
-    static double evaluate(double x, int degree);
+    static double evaluate(int degree, double x);
 };
 
 #endif // HERMITE_H

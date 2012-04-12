@@ -5,14 +5,11 @@ INCLUDEPATH+=$$myHome/apps/armadillo-2.4.4/include
 HEADERS += \
     matrix.h \
     wavefunction/wavefunction.h \
-    wavefunction/wavestandard.h \
     montecarlo/montecarlo.h \
     montecarlo/montecarlostandard.h \
     random.h \
     wavefunction/wavesimple.h \
     utils.h \
-    minimizer.h \
-    minimizerstandard.h \
     mainapplication.h \
     inih/ini.h \
     inih/cpp/INIReader.h \
@@ -27,7 +24,10 @@ HEADERS += \
     montecarlo/montecarlometropolishastings.h\
     slater/slater.h \
     minimizer/minimizerevolutionary.h \
-    hermite.h
+    hermite.h \
+    orbital/orbital.h \
+    minimizer/minimizerstandard.h \
+    minimizer/minimizer.h
 
 SOURCES += main.cpp \
     matrix.cpp \
@@ -36,8 +36,6 @@ SOURCES += main.cpp \
     montecarlo/montecarlostandard.cpp \
     random.cpp \
     wavefunction/wavesimple.cpp \
-    minimizer.cpp \
-    minimizerstandard.cpp \
     mainapplication.cpp \
     inih/ini.c \
     inih/cpp/INIReader.cpp \
@@ -51,10 +49,7 @@ SOURCES += main.cpp \
     montecarlo/montecarlometropolishastings.cpp\
     slater/slater.cpp \
     minimizer/minimizerevolutionary.cpp \
-    hermite.cpp
-
-HEADERS += \
-    orbital/orbital.h
-
-SOURCES += \
-    orbital/orbital.cpp
+    hermite.cpp \
+    orbital/orbital.cpp \
+    minimizer/minimizer.cpp \
+    minimizer/minimizerstandard.cpp

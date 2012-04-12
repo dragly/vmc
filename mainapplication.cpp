@@ -20,12 +20,11 @@
 
 #include "mainapplication.h"
 
-#include "wavefunction/wavestandard.h"
 #include "wavefunction/wavesimple.h"
 #include "montecarlo/montecarlostandard.h"
 #include "matrix.h"
-#include "minimizerstandard.h"
-#include "minimizer.h"
+#include "minimizer/minimizerstandard.h"
+#include "minimizer/minimizer.h"
 #include "blocker.h"
 #include "densityplotter.h"
 #include "config.h"

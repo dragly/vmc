@@ -4,6 +4,6 @@ MinimizerEvolutionaryTest::MinimizerEvolutionaryTest(Config *config) : Minimizer
 {
 }
 
-double MinimizerEvolutionaryTest::value(vec *coefficients) {
+double MinimizerEvolutionaryTest::value() {
     return 2;
 }
