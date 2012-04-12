@@ -27,7 +27,8 @@ HEADERS += \
     hermite.h \
     orbital/orbital.h \
     minimizer/minimizerstandard.h \
-    minimizer/minimizer.h
+    minimizer/minimizer.h \
+    wavefunction/waveslater.h
 
 SOURCES += main.cpp \
     matrix.cpp \
@@ -52,4 +53,5 @@ SOURCES += main.cpp \
     hermite.cpp \
     orbital/orbital.cpp \
     minimizer/minimizer.cpp \
-    minimizer/minimizerstandard.cpp
+    minimizer/minimizerstandard.cpp \
+    wavefunction/waveslater.cpp

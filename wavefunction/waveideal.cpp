@@ -1,8 +1,8 @@
 #include "waveideal.h"
 #include <math.h>
 
-WaveIdeal::WaveIdeal(int nParticles, int dimensions) :
-    WaveFunction(nParticles, dimensions),
+WaveIdeal::WaveIdeal(Config *config) :
+    WaveFunction(config),
     useAnalytical(false)
 {
 }

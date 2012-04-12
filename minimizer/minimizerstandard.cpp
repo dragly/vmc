@@ -1,4 +1,4 @@
-//#include <QSettings>
+#include "minimizerstandard.h"
 
 #include <cmath>
 #include <iostream>
@@ -16,16 +16,15 @@
 #include <stdlib.h>
 
 // local stuff
-#include "minimizer/minimizerstandard.h"
-#include "inih/cpp/INIReader.h"
+#include "../inih/cpp/INIReader.h"
 
-#include "wavefunction/wavesimple.h"
-#include "montecarlo/montecarlostandard.h"
-#include "matrix.h"
-#include "hamiltonian/hamiltonianstandard.h"
-#include "hamiltonian/hamiltoniansimple.h"
-#include "hamiltonian/hamiltonianideal.h"
-#include "wavefunction/waveideal.h"
+#include "../wavefunction/wavesimple.h"
+#include "../montecarlo/montecarlostandard.h"
+#include "../matrix.h"
+#include "../hamiltonian/hamiltonianstandard.h"
+#include "../hamiltonian/hamiltoniansimple.h"
+#include "../hamiltonian/hamiltonianideal.h"
+#include "../wavefunction/waveideal.h"
 
 using namespace std;
 

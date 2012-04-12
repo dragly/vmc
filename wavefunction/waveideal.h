@@ -8,7 +8,7 @@ using namespace arma;
 class WaveIdeal : public WaveFunction
 {
 public:
-    WaveIdeal(int number_particles, int dimension);
+    WaveIdeal(Config *config);
     double wave(vec2 *r);
     double laplace(vec2 *r);
     void setUseAnalyticalLaplace(bool val){

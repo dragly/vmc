@@ -11,7 +11,7 @@ using namespace arma;
 class WaveSimple : public WaveFunction
 {
 public:
-    WaveSimple(int m_nParticles, int m_nDimensions);
+    WaveSimple(Config *config);
     double wave(vec2 *r);
     double laplace(vec2 *r);
     void setUseAnalyticalLaplace(bool val);

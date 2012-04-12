@@ -5,8 +5,8 @@
 #include <iostream>
 using namespace std;
 
-WaveSimple::WaveSimple(int nParticles, int dimensions)  :
-    WaveFunction(nParticles, dimensions),
+WaveSimple::WaveSimple(Config *config)  :
+    WaveFunction(config),
     useAnalytical(false)
 {
 }

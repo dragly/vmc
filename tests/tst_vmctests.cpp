@@ -67,10 +67,10 @@ void VmcTests::initTestCase()
             r_old[i][j] = 0.234 + i + 2*j;
         }
     }
-    waveSimple = new WaveSimple(nParticles,nDimensions);
+    waveSimple = new WaveSimple(config);
     waveSimple->setParameters(2, 1);
     // Set up waveIdeal
-    waveIdeal = new WaveIdeal(nParticles,nDimensions);
+    waveIdeal = new WaveIdeal(config);
     waveIdeal->setParameters(2, 1);
     // Set up hamiltonianIdeal
     hamiltonianIdeal = new HamiltonianIdeal(nParticles, nDimensions, charge);

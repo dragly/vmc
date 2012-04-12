@@ -10,16 +10,18 @@
 
 #include "wavesimple.h"
 #include "waveideal.h"
+#include "waveslater.h"
 #include "../config.h"
 
-WaveFunction::WaveFunction(int nParticles, int nDimensions) :
-    m_nParticles(nParticles),
-    m_nDimensions(nDimensions)
+WaveFunction::WaveFunction(Config *config) :
+    m_config(config),
+    m_nParticles(config->nParticles()),
+    m_nDimensions(config->nDimensions())
 {
     // allocate matrices which contain the position of the particles
     // the function matrix is defined in the progam library
-    rPlus = new vec2[ nParticles];
-    rMinus = new vec2[ nParticles];
+    rPlus = new vec2[ m_nParticles];
+    rMinus = new vec2[ m_nDimensions];
 }
 
 double WaveFunction::laplaceNumerical(vec2 *r)
@@ -77,10 +79,13 @@ void WaveFunction::setParameters(double alpha, double beta)
   */
 WaveFunction* WaveFunction::fromName(std::string waveClass, Config* config) {
     if(waveClass == "WaveSimple") {
-        WaveSimple *waveSimple = new WaveSimple(config->nParticles(), config->nDimensions());
+        WaveSimple *waveSimple = new WaveSimple(config);
         return waveSimple;
     } else if(waveClass == "WaveIdeal") {
-        WaveIdeal *waveIdeal = new WaveIdeal(config->nParticles(), config->nDimensions());
+        WaveIdeal *waveIdeal = new WaveIdeal(config);
+        return waveIdeal;
+    } else if(waveClass == "WaveSlater") {
+        WaveSlater *waveIdeal = new WaveSlater(config);
         return waveIdeal;
     } else {
         return 0;
