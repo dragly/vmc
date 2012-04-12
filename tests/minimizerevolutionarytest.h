@@ -1,13 +1,10 @@
 #ifndef MINIMIZEREVOLUTIONARYTEST_H
 #define MINIMIZEREVOLUTIONARYTEST_H
 
-#include "../minimizer/minimizerevolutionary.h"
-
-class MinimizerEvolutionaryTest : MinimizerEvolutionary
+class MinimizerEvolutionaryTest
 {
 public:
     MinimizerEvolutionaryTest(Config *config);
-    double value(vec *coefficients);
 };
 
 #endif // MINIMIZEREVOLUTIONARYTEST_H

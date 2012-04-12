@@ -15,7 +15,7 @@
 #include "../minimizer/minimizerevolutionary.h"
 #include "../hermite.h"
 
-#include "minimizerevolutionarytest.h";
+#include "minimizerevolutionarytest.h"
 
 using namespace std;
 using namespace arma;
@@ -160,7 +160,7 @@ void VmcTests::hermiteTest() {
 }
 
 void VmcTests::minimizerEvolutionaryTest() {
-    cout << "Test not implemented" << endl;
+    cout <<
 }
 
 QTEST_APPLESS_MAIN(VmcTests)
