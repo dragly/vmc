@@ -68,6 +68,16 @@ public:
         m_monteCarlo = arg;
     }
 
+    double omega() const
+    {
+        return m_omega;
+    }
+
+    void setOmega(double arg)
+    {
+        m_omega = arg;
+    }
+
 private:
     int m_rank;
     int m_nProcesses;
@@ -78,6 +88,7 @@ private:
     WaveFunction* m_wave;
     Hamiltonian* m_hamiltonian;
     MonteCarlo* m_monteCarlo;
+    double m_omega;
 };
 
 #endif // CONFIG_H

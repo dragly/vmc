@@ -160,7 +160,7 @@ void VmcTests::hermiteTest() {
 }
 
 void VmcTests::minimizerEvolutionaryTest() {
-    cout <<
+    cout << "Test not implemented" << endl;
 }
 
 QTEST_APPLESS_MAIN(VmcTests)

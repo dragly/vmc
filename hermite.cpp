@@ -12,13 +12,8 @@ using namespace std;
   @param degree Degree of the polynomial.
   */
 
-Hermite::Hermite(int degree) :
-    m_degree(degree)
+Hermite::Hermite()
 {
-    if(degree > 4 || degree < 0) {
-        cerr << __PRETTY_FUNCTION__ << ": Hermite polynomial of unknown degree called. Degree was: " << m_degree << endl;
-        exit(1);
-    }
 }
 
 /*!
@@ -27,8 +22,8 @@ Hermite::Hermite(int degree) :
   @param x Value at which to evaluate the polynomial.
   @returns Value of the polynomial at the given x
   */
-double Hermite::evaluate(double x) {
-    switch(m_degree) {
+static double Hermite::evaluate(double x, int degree) {
+    switch(degree) {
     case 0:
         return 1;
         break;

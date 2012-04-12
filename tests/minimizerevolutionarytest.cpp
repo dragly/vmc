@@ -1,11 +1,9 @@
 #include "minimizerevolutionarytest.h"
 
-#include "../minimizer/minimizerevolutionary.h"
-
 MinimizerEvolutionaryTest::MinimizerEvolutionaryTest(Config *config) : MinimizerEvolutionary(config)
 {
 }
 
-double MinimizerEvolutionaryTest::value() {
+double MinimizerEvolutionaryTest::value(vec *coefficients) {
     return 2;
 }

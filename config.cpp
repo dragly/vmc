@@ -26,6 +26,7 @@ void Config::loadConfiguration(INIReader* settings) {
     m_nDimensions = settings->GetInteger("General", "nDimensions", 2);
     m_charge = atof(settings->Get("General", "charge", "1.0").c_str());
     m_stepLength = atof(settings->Get("General", "stepLength", "1.0").c_str());
+    m_omega = atof(settings->Get("General", "omega", "1.0").c_str());
 
     // Wave properties
     string waveClass = settings->Get("Wave","class", "WaveSimple");

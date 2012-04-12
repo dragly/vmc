@@ -52,3 +52,9 @@ SOURCES += main.cpp \
     slater/slater.cpp \
     minimizer/minimizerevolutionary.cpp \
     hermite.cpp
+
+HEADERS += \
+    orbital/orbital.h
+
+SOURCES += \
+    orbital/orbital.cpp

@@ -4,10 +4,8 @@
 class Hermite
 {
 public:
-    Hermite(int degree);
-    double evaluate(double x);
-private:
-    int m_degree;
+    Hermite();
+    static double evaluate(double x, int degree);
 };
 
 #endif // HERMITE_H
