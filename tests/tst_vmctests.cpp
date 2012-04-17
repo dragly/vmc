@@ -15,6 +15,7 @@
 #include "../minimizer/minimizerevolutionary.h"
 #include "../hermite.h"
 #include "../orbital/orbital.h"
+#include "../slater/slater.h"
 
 #include "minimizerevolutionarytest.h"
 
@@ -28,6 +29,7 @@ class VmcTests : public QObject
 public:
     VmcTests();
 
+    void waveSimpleGradientTest(); // TODO - consider implementing this again
 private slots:
     void initTestCase();
     void cleanupTestCase();
@@ -35,10 +37,10 @@ private slots:
     void waveIdealLaplaceTest();
     void fullIdealTest();
     void fullIdealHastingsTest();
-    void waveSimpleGradientTest();
     void hermiteTest();
     void minimizerEvolutionaryTest();
-    void twoOrbitalsOneWavefunction();
+    void twoOrbitalsOneWavefunctionTest();
+    void slaterTest();
 
 private:
     Config *config;
@@ -100,10 +102,9 @@ void VmcTests::waveIdealLaplaceTest()
 
 void VmcTests::waveSimpleGradientTest()
 {
-
+    cout << "Particles..." << endl;
     int nParticles = 1;
-    int nDimensions = 2;
-    WaveSimple *waveSimpleNew = new WaveSimple(nParticles,nDimensions);
+    WaveSimple *waveSimpleNew = new WaveSimple(config);
     vec2* rPositions = new vec2[nParticles];
     rPositions[0][0] = -1;
     rPositions[0][1] = 0.0;
@@ -112,6 +113,7 @@ void VmcTests::waveSimpleGradientTest()
     waveSimpleNew->gradient(rPositions, rGradient);
     QVERIFY(fabs(rGradient[0] - 0.735) < 0.001);
     QVERIFY(fabs(rGradient[1] - 0.000) < 0.0000001);
+    cout << "Particles..." << endl;
 }
 
 void VmcTests::fullIdealTest()
@@ -162,24 +164,57 @@ void VmcTests::minimizerEvolutionaryTest() {
     cout << "test" << endl;
 }
 
-void VmcTests::twoOrbitalsOneWavefunction() {
-    vec2 *rpos = new vec2[config->nParticles()];
+/*!
+  Testing that two orbitals multiplied returns the same as the simple wave function class.
+  */
+void VmcTests::twoOrbitalsOneWavefunctionTest() {
+    // two particles
+    Config *config1 = new Config(0,1);
+    config1->setNDimensions(2);
+    config1->setNParticles(2);
+    vec2 *rpos = new vec2[config1->nParticles()];
     rpos[0][0] = 0.4;
     rpos[0][1] = 0.9;
     rpos[1][0] = 0.1;
     rpos[1][1] = 0.8;
 
-    WaveSimple *waveSimple1 = new WaveSimple(config->nParticles(), config->nDimensions());
+    WaveSimple *waveSimple1 = new WaveSimple(config1);
     waveSimple1->setParameters(1,1);
 
-    Orbital *orbital1 = new Orbital(0,0,config);
-    Orbital *orbital2 = new Orbital(0,0,config);
+    Orbital *orbital1 = new Orbital(0,0,config1);
+    Orbital *orbital2 = new Orbital(0,0,config1);
     orbital1->setParameters(1,1);
     orbital2->setParameters(1,1);
 
     double val1 = waveSimple1->wave(rpos);
 
     double val2 = orbital1->evaluate(rpos[0]) * orbital2->evaluate(rpos[1]);
+
+    QCOMPARE(val1,val2);
+}
+
+/*!
+  Testing multiple aspects of the slater class.
+  */
+void VmcTests::slaterTest() {
+    // two particles
+    Config *config1 = new Config(0,1);
+    config1->setNDimensions(2);
+    config1->setNParticles(2);
+    vec2 *rpos = new vec2[config1->nParticles()];
+    rpos[0][0] = 0.4;
+    rpos[0][1] = 0.9;
+    rpos[1][0] = 0.1;
+    rpos[1][1] = 0.8;
+
+    Slater *slater1 = new Slater(config1);
+
+    WaveSimple *waveSimple1 = new WaveSimple(config1);
+    waveSimple1->setParameters(1,1);
+
+    double val1 = waveSimple1->wave(rpos);
+
+    double val2 = slater1->determinant(rpos);
 
     QCOMPARE(val1,val2);
 }

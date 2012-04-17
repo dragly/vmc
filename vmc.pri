@@ -2,6 +2,8 @@ myHome = $$system(echo $HOME)
 message(Assuming Armadillo is installed under $$myHome/apps/armadillo-2.4.4/include)
 INCLUDEPATH+=$$myHome/apps/armadillo-2.4.4/include
 
+LIBS += -lblas -llapack
+
 HEADERS += \
     matrix.h \
     wavefunction/wavefunction.h \

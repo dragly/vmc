@@ -5,7 +5,7 @@
 #include <iomanip>
 using namespace std;
 
-#include "config.h"
+#include "../config.h"
 
 /*!
   Runs with multiple parameters and attempts to find the lowest possible value of the energy by adjusting the parameters.
