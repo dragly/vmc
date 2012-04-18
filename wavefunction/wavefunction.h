@@ -14,18 +14,18 @@ class WaveFunction
 {
 public:
     WaveFunction(Config *config);
-    virtual double wave(vec2 *r) = 0;
-    virtual void gradient(vec2 *r, vec2 &rGradient) {
+    virtual double wave(const vec2 r[]) = 0;
+    virtual void gradient(const vec2 r[], vec2 &rGradient) {
         gradientNumerical(r, rGradient);
     }
-    virtual double laplace(vec2 *r) {
+    virtual double laplace(const vec2 r[]) {
         return laplaceNumerical(r);
     }
     virtual void loadConfiguration(INIReader *settings) {
         (void)settings;
     }
-    double laplaceNumerical(vec2 *r);
-    void gradientNumerical(vec2 *r, vec2 &rGradient);
+    double laplaceNumerical(const vec2 r[]);
+    void gradientNumerical(const vec2 r[], vec2 &rGradient);
     void setParameters(double *m_parameters);
     static WaveFunction* fromName(string waveClass, Config *config);
     ~WaveFunction();

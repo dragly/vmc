@@ -26,7 +26,7 @@ MonteCarloMetropolisHastings::~MonteCarloMetropolisHastings()
 {
 }
 
-void MonteCarloMetropolisHastings::quantumForce(vec2 *rPosition, vec2 &forceVector) {
+void MonteCarloMetropolisHastings::quantumForce(const vec2 rPosition[], vec2 &forceVector) {
     double waveValue = m_config->wave()->wave(rPosition);
     m_config->wave()->gradient(rPosition, forceVector);
     forceVector = 2 * forceVector / waveValue;

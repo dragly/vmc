@@ -21,8 +21,8 @@ private:
     double charge;
     int rank;
     double step_length;
-    vec2 *r_old;
-    vec2 *r_new;
+    vec2 *rOld;
+    vec2 *rNew;
     long idum;
 };
 

@@ -24,7 +24,7 @@ WaveFunction::WaveFunction(Config *config) :
     rMinus = new vec2[ m_nDimensions];
 }
 
-double WaveFunction::laplaceNumerical(vec2 *r)
+double WaveFunction::laplaceNumerical(const vec2 r[])
 {
     double eKinetic = 0;
     double wfold = wave(r);
@@ -49,7 +49,7 @@ double WaveFunction::laplaceNumerical(vec2 *r)
     return eKinetic;
 }
 
-void WaveFunction::gradientNumerical(vec2 *r, vec2 &rGradient)
+void WaveFunction::gradientNumerical(const vec2 r[], vec2 &rGradient)
 {
     for (int i = 0; i < m_nParticles; i++) {
         rPlus[i] = rMinus[i] = r[i];

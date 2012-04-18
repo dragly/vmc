@@ -41,7 +41,7 @@ void WaveSlater::setParameters(double *parameters) {
     jastrow->setParameters(m_parameters);
 }
 
-double WaveSlater::wave(vec2 *r)
+double WaveSlater::wave(const vec2 r[])
 {
     // TODO implement Jastrow-factor
     return slater->determinant(r, orbitals) * jastrow->evaluate(r);

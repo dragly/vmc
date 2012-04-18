@@ -7,7 +7,7 @@ class HamiltonianStandard : public Hamiltonian
 {
 public:
     HamiltonianStandard(int number_particles, int dimension, double charge);
-    double energy(WaveFunction *wave, vec2 *r, double wfold);
+    double energy(WaveFunction *wave, const vec2 r[], double wfold);
 private:
     int number_particles;
     int dimension;

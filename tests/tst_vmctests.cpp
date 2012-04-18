@@ -130,8 +130,8 @@ void VmcTests::fullIdealTest()
     config->setHamiltonian(hamiltonianIdeal);
     waveIdeal->setUseAnalyticalLaplace(true);
     double parameters[2];
-    parameters[0] = 2;
-    parameters[1] = 1;
+    parameters[0] = 1;
+    parameters[1] = 0.4;
     waveIdeal->setParameters(parameters);
     MonteCarloStandard *monteCarlo = new MonteCarloStandard(config);
     double *allEnergies = new double[nCycles+1];
@@ -169,7 +169,7 @@ void VmcTests::hermiteTest() {
 }
 
 void VmcTests::minimizerEvolutionaryTest() {
-    cout << "test" << endl;
+    cout << "minimizerEvolutionaryTest not implemented" << endl;
 }
 
 /*!

@@ -14,7 +14,7 @@ class Hamiltonian
 {
 public:
     Hamiltonian();
-    virtual double energy(WaveFunction *wave, vec2 *r) = 0;
+    virtual double energy(WaveFunction *wave, const vec2 r[]) = 0;
     static Hamiltonian *fromName(string hamiltonianClass, Config *config, double charge);
 
 };

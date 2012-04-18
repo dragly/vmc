@@ -16,7 +16,7 @@ Orbital::Orbital(double nx, double ny, Config *config) :
   @param r Position to evaluate
   @returns Value of the orbital at the given position
   */
-double Orbital::evaluate(vec2 &r)
+double Orbital::evaluate(const vec2 r)
 {
     double sqrtomega = sqrt(m_omega);
     double Hx = Hermite::evaluate(r[0], sqrtomega*m_nx);

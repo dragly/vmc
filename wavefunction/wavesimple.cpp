@@ -11,7 +11,7 @@ WaveSimple::WaveSimple(Config *config)  :
 {
 }
 
-double WaveSimple::wave(vec2 *r)
+double WaveSimple::wave(const vec2 r[])
 {
     double alpha = m_parameters[0];
     int i, j;
@@ -29,7 +29,7 @@ double WaveSimple::wave(vec2 *r)
     return wf;
 }
 
-double WaveSimple::laplace(vec2 *r)
+double WaveSimple::laplace(const vec2 r[])
 {
     double alpha = m_parameters[0];
     if(useAnalytical) {

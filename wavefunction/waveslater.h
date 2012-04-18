@@ -21,7 +21,7 @@ class WaveSlater : public WaveFunction
 {
 public:
     WaveSlater(Config *config);
-    double wave(vec2 *r);
+    double wave(const vec2 r[]);
     void setParameters(double *parameters);
 private:
     Slater *slater;

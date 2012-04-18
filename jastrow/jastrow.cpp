@@ -7,7 +7,7 @@ Jastrow::Jastrow(Config *config) :
 {
 }
 
-double Jastrow::evaluate(vec2* r) {
+double Jastrow::evaluate(const vec2 r[]) {
     double wf = 1;
     double a = 1; // TODO Should be set to something with regards to spin!
     // TODO Does this need a factor in front of it to account for counting only half of the particles?

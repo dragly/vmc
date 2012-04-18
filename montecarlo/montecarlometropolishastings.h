@@ -14,7 +14,7 @@ public:
     void sample(int nCycles, double *energies, double *allEnergies);
 
     ~MonteCarloMetropolisHastings();
-    void quantumForce(vec2 *rPosition, vec2 &forceVector);
+    void quantumForce(const vec2 rPosition[], vec2 &forceVector);
 private:
     int m_nParticles;
     int m_nDimensions;

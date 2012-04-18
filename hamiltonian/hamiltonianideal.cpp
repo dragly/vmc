@@ -11,7 +11,7 @@ HamiltonianIdeal::HamiltonianIdeal(int number_particles, int dimension, double c
 {
 }
 
-double HamiltonianIdeal::energy(WaveFunction *wave, vec2 *r)
+double HamiltonianIdeal::energy(WaveFunction *wave, const vec2 r[])
 {
     double eLocal, eKinetic, ePotential,
             rSingleParticle;
@@ -44,7 +44,7 @@ double HamiltonianIdeal::energy(WaveFunction *wave, vec2 *r)
     return eLocal;
 }
 
-double HamiltonianIdeal::kineticEnergy(WaveFunction *wave, vec2 *r, double wfold)
+double HamiltonianIdeal::kineticEnergy(WaveFunction *wave, const vec2 r[], double wfold)
 {
     vec2 *r_plus;
     vec2 *r_minus;

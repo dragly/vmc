@@ -7,7 +7,7 @@ WaveIdeal::WaveIdeal(Config *config) :
 {
 }
 
-double WaveIdeal::wave(vec2 *r)
+double WaveIdeal::wave(const vec2 r[])
 {
     double alpha = m_parameters[0];
     double beta = m_parameters[1];
@@ -33,7 +33,7 @@ double WaveIdeal::wave(vec2 *r)
     return wf;
 }
 
-double WaveIdeal::laplace(vec2 *r)
+double WaveIdeal::laplace(const vec2 r[])
 {
     double alpha = m_parameters[0];
     double beta = m_parameters[1];
