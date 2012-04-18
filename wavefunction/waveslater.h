@@ -9,6 +9,8 @@ using namespace arma;
 
 #include "../config.h"
 
+class Slater;
+
 /*!
   Wavefunction class that uses the Slater determinant to handle a general
   number of particles.
@@ -19,6 +21,7 @@ public:
     WaveSlater(Config *config);
     double wave(vec2 *r);
 private:
+    Slater *slater;
 };
 
 #endif // WAVESLATER_H
