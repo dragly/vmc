@@ -16,8 +16,8 @@ class Orbital
 public:
     Orbital(double nx, double ny, Config *config);
 
-    double evaluate(vec2 r);
-    void setParameters(double alpha, double beta);
+    double evaluate(vec2 &r);
+    void setParameters(double* parameters);
 private:
     // the quantum numbers, one for each dimension in this problem
     double m_nx;

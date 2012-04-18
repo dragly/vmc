@@ -98,16 +98,17 @@ void MinimizerStandard::runMinimizer()
     //  Do the mc sampling  and accumulate data with MPI_Reduce
 //    m_monteCarlo = new MonteCarloStandard(m_wave, m_hamiltonian, m_config->nParticles(), m_config->nDimensions(), charge, m_config->rank(), stepLength);
 
-    double beta = 0.4;
-    double alpha = 0.5*charge;
+    double parameters[2];
+    parameters[0] = 0.4;
+    parameters[1] = 0.5*charge;
     // loop over variational parameters
     for (int variate=1; variate <= m_nVariations; variate++){
-        m_wave->setParameters(alpha, beta);
+        m_wave->setParameters(parameters);
         m_monteCarlo->sample(m_nCycles, energies, m_allEnergies);
         // update the energy average and its squared
         cumulative_e[variate] = energies[0];
         cumulative_e2[variate] = energies[1];
-        alpha += 0.1;
+        parameters[0] += 0.1;
     }
 #ifdef USE_MPI
     //  Collect data in total averages
@@ -127,17 +128,17 @@ void MinimizerStandard::runMinimizer()
     // Print out results
     if ( m_config->rank() == 0) {
         cout << "Time = " <<  totalTime  << " on number of processors: "  << m_config->nProcesses()  << endl;
-        alpha = 0.5*charge;
+        parameters[0] = 0.5*charge;
         for( i=1; i <= m_nVariations; i++){
             energy = total_cumulative_e[i]/total_number_cycles;
             variance = total_cumulative_e2[i]/total_number_cycles-energy*energy;
             error=sqrt(variance/(total_number_cycles-1));
             ofile << setiosflags(ios::showpoint | ios::uppercase);
-            ofile << setw(15) << setprecision(8) << alpha;
+            ofile << setw(15) << setprecision(8) << parameters[0];
             ofile << setw(15) << setprecision(8) << energy;
             ofile << setw(15) << setprecision(8) << variance;
             ofile << setw(15) << setprecision(8) << error << endl;
-            alpha += 0.1;
+            parameters[0] += 0.1;
         }
         ofile.close();  // close output file
     }

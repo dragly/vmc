@@ -30,7 +30,8 @@ HEADERS += \
     orbital/orbital.h \
     minimizer/minimizerstandard.h \
     minimizer/minimizer.h \
-    wavefunction/waveslater.h
+    wavefunction/waveslater.h \
+    jastrow/jastrow.h
 
 SOURCES += main.cpp \
     matrix.cpp \
@@ -56,4 +57,5 @@ SOURCES += main.cpp \
     orbital/orbital.cpp \
     minimizer/minimizer.cpp \
     minimizer/minimizerstandard.cpp \
-    wavefunction/waveslater.cpp
+    wavefunction/waveslater.cpp \
+    jastrow/jastrow.cpp

@@ -70,10 +70,13 @@ void VmcTests::initTestCase()
         }
     }
     waveSimple = new WaveSimple(config);
-    waveSimple->setParameters(2, 1);
+    double parameters[2];
+    parameters[0] = 2;
+    parameters[1] = 1;
+    waveSimple->setParameters(parameters);
     // Set up waveIdeal
     waveIdeal = new WaveIdeal(config);
-    waveIdeal->setParameters(2, 1);
+    waveIdeal->setParameters(parameters);
     // Set up hamiltonianIdeal
     hamiltonianIdeal = new HamiltonianIdeal(nParticles, nDimensions, charge);
 }
@@ -109,7 +112,10 @@ void VmcTests::waveSimpleGradientTest()
     rPositions[0][0] = -1;
     rPositions[0][1] = 0.0;
     vec2 rGradient;
-    waveSimpleNew->setParameters(2, 1);
+    double parameters[2];
+    parameters[0] = 2;
+    parameters[1] = 1;
+    waveSimpleNew->setParameters(parameters);
     waveSimpleNew->gradient(rPositions, rGradient);
     QVERIFY(fabs(rGradient[0] - 0.735) < 0.001);
     QVERIFY(fabs(rGradient[1] - 0.000) < 0.0000001);
@@ -118,14 +124,15 @@ void VmcTests::waveSimpleGradientTest()
 
 void VmcTests::fullIdealTest()
 {
-    double alpha = 1.0;
-    double beta = 0.4;
     int nCycles = 500000;
     int nTotalCycles = nCycles;
     config->setWave(waveIdeal);
     config->setHamiltonian(hamiltonianIdeal);
     waveIdeal->setUseAnalyticalLaplace(true);
-    waveIdeal->setParameters(alpha, beta);
+    double parameters[2];
+    parameters[0] = 2;
+    parameters[1] = 1;
+    waveIdeal->setParameters(parameters);
     MonteCarloStandard *monteCarlo = new MonteCarloStandard(config);
     double *allEnergies = new double[nCycles+1];
     double *energies = new double[2];
@@ -136,14 +143,15 @@ void VmcTests::fullIdealTest()
 
 void VmcTests::fullIdealHastingsTest()
 {
-    double alpha = 1.0;
-    double beta = 0.4;
+    double parameters[2];
+    parameters[0] = 1.0;
+    parameters[1] = 0.4;
     int nCycles = 100000;
     int nTotalCycles = nCycles;
     config->setWave(waveIdeal);
     config->setHamiltonian(hamiltonianIdeal);
     waveIdeal->setUseAnalyticalLaplace(true);
-    waveIdeal->setParameters(alpha, beta);
+    waveIdeal->setParameters(parameters);
     MonteCarloMetropolisHastings *monteCarlo = new MonteCarloMetropolisHastings(config);
     double *allEnergies = new double[nCycles+1];
     double *energies = new double[2];
@@ -179,12 +187,15 @@ void VmcTests::twoOrbitalsOneWavefunctionTest() {
     rpos[1][1] = 0.8;
 
     WaveSimple *waveSimple1 = new WaveSimple(config1);
-    waveSimple1->setParameters(1,1);
+    double parameters[2];
+    parameters[0] = 2.0;
+    parameters[1] = 1.0;
+    waveSimple1->setParameters(parameters);
 
     Orbital *orbital1 = new Orbital(0,0,config1);
     Orbital *orbital2 = new Orbital(0,0,config1);
-    orbital1->setParameters(1,1);
-    orbital2->setParameters(1,1);
+    orbital1->setParameters(parameters);
+    orbital2->setParameters(parameters);
 
     double val1 = waveSimple1->wave(rpos);
 
@@ -210,11 +221,18 @@ void VmcTests::slaterTest() {
     Slater *slater1 = new Slater(config1);
 
     WaveSimple *waveSimple1 = new WaveSimple(config1);
-    waveSimple1->setParameters(1,1);
+    double parameters[2];
+    parameters[0] = 2.0;
+    parameters[1] = 1.0;
+    waveSimple1->setParameters(parameters);
 
     double val1 = waveSimple1->wave(rpos);
 
-    double val2 = slater1->determinant(rpos);
+    Orbital *orbitals[1];
+    orbitals[0] = new Orbital(0,0,config1);
+    orbitals[0]->setParameters(parameters);
+
+    double val2 = slater1->determinant(rpos, orbitals);
 
     QCOMPARE(val1,val2);
 }

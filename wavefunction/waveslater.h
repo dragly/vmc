@@ -10,6 +10,8 @@ using namespace arma;
 #include "../config.h"
 
 class Slater;
+class Jastrow;
+class Orbital;
 
 /*!
   Wavefunction class that uses the Slater determinant to handle a general
@@ -20,8 +22,12 @@ class WaveSlater : public WaveFunction
 public:
     WaveSlater(Config *config);
     double wave(vec2 *r);
+    void setParameters(double *parameters);
 private:
     Slater *slater;
+    Jastrow *jastrow;
+
+    Orbital **orbitals;
 };
 
 #endif // WAVESLATER_H

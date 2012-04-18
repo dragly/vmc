@@ -13,16 +13,14 @@ public:
     Slater(Config *config);
 
     ~Slater();
-    double determinant(vec2 *r);
-    void constructMatrix(vec2 *r);
+    double determinant(vec2 *&r, Orbital *orbitals[]);
+    void constructMatrix(vec2 *&r, Orbital *orbitals[]);
 private:
     mat matrixUp;
     mat matrixDown;
 
     int m_nDimensions;
     int m_nParticles;
-
-    Orbital **orbitals;
 };
 
 #endif // SLATER_H

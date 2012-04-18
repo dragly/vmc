@@ -26,15 +26,14 @@ public:
     }
     double laplaceNumerical(vec2 *r);
     void gradientNumerical(vec2 *r, vec2 &rGradient);
-    void setParameters(double alpha, double beta);
+    void setParameters(double *m_parameters);
     static WaveFunction* fromName(string waveClass, Config *config);
     ~WaveFunction();
 protected:
     Config *m_config;
     int m_nParticles;
     int m_nDimensions;
-    double alpha;
-    double beta;
+    double *m_parameters;
     vec2 *rPlus;
     vec2 *rMinus;
 };

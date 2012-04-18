@@ -9,6 +9,8 @@ WaveIdeal::WaveIdeal(Config *config) :
 
 double WaveIdeal::wave(vec2 *r)
 {
+    double alpha = m_parameters[0];
+    double beta = m_parameters[1];
     int i, j;
     double wf, argument, r_single_particle;
 
@@ -33,6 +35,8 @@ double WaveIdeal::wave(vec2 *r)
 
 double WaveIdeal::laplace(vec2 *r)
 {
+    double alpha = m_parameters[0];
+    double beta = m_parameters[1];
     if(useAnalytical) {
         double omega = 1;
         double aconst = 1;

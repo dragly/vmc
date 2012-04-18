@@ -68,10 +68,9 @@ void WaveFunction::gradientNumerical(vec2 *r, vec2 &rGradient)
     }
 }
 
-void WaveFunction::setParameters(double alpha, double beta)
+void WaveFunction::setParameters(double* parameters)
 {
-    this->alpha = alpha;
-    this->beta = beta;
+    this->m_parameters = parameters;
 }
 
 /*!
