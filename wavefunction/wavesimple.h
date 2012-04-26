@@ -12,8 +12,8 @@ class WaveSimple : public WaveFunction
 {
 public:
     WaveSimple(Config *config);
-    double wave(const vec2 r[]);
-    double laplace(const vec2 r[]);
+    double wave(vec2 r[]);
+    double laplace(vec2 r[]);
     void setUseAnalyticalLaplace(bool val);
 private:
     bool useAnalytical;

@@ -27,8 +27,8 @@ MonteCarloStandard::MonteCarloStandard(Config *config) :
 
 MonteCarloStandard::~MonteCarloStandard()
 {
-    free_matrix((void **) rOld); // free memory
-    free_matrix((void **) rNew); // free memory
+    delete [] rOld;
+    delete [] rNew;
 }
 
 void MonteCarloStandard::sample(int nCycles, double *energies, double *allEnergies)

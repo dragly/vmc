@@ -16,11 +16,11 @@ Orbital::Orbital(double nx, double ny, Config *config) :
   @param r Position to evaluate
   @returns Value of the orbital at the given position
   */
-double Orbital::evaluate(const vec2 r)
+double Orbital::evaluate(vec2 r)
 {
     double sqrtomega = sqrt(m_omega);
-    double Hx = Hermite::evaluate(r[0], sqrtomega*m_nx);
-    double Hy = Hermite::evaluate(r[0], sqrtomega*m_ny);
+    double Hx = Hermite::evaluate(m_nx, sqrtomega*r[0]);
+    double Hy = Hermite::evaluate(m_ny, sqrtomega*r[1]);
     return Hx*Hy* exp(-m_alpha*m_omega*(r[0]*r[0] + r[1]*r[1])/2);
 }
 

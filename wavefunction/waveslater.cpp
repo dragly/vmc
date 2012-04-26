@@ -9,7 +9,8 @@
 using namespace arma;
 
 WaveSlater::WaveSlater(Config *config) :
-    WaveFunction(config)
+    WaveFunction(config),
+    m_interactionEnabled(config->interactionEnabled())
 {
     slater = new Slater(config);
     jastrow = new Jastrow(config);
@@ -18,31 +19,43 @@ WaveSlater::WaveSlater(Config *config) :
 
     // generate the orbitals
     int orbital = 0;
-    int nInOrbital = 0;
     for(int i = 0; i < m_nParticles / 2; i++) {
-        int nx;
-        int ny;
-        nx = nInOrbital;
-        ny = orbital - nInOrbital;
-        orbitals[i] = new Orbital(nx, ny, config);
-        nInOrbital++;
-        if(nInOrbital >= orbital) {
-            nInOrbital = 0;
-            orbital++;
+        for(int j = 0; j < m_nParticles / 2; j++) {
+            int nx = i;
+            int ny = j;
+            if(nx + ny < m_nParticles / 2) {
+                orbitals[orbital] = new Orbital(nx, ny, config);
+                orbital++;
+                if(orbital > m_nParticles / 2 + 1) {
+                    break;
+                }
+            }
         }
     }
 }
 
+/*!
+  Sets the alpha and beta parameters. This could also point to more parameters
+  if needed at a later time.
+
+  This function is specific for WaveSlater and also sets the paramters for the
+  underlying orbitals
+
+  @param parameters A pointer to an array of parameters to set.
+*/
 void WaveSlater::setParameters(double *parameters) {
     WaveFunction::setParameters(parameters);
     for(int i = 0; i < m_nParticles / 2; i++) {
-        orbitals[i]->setParameters(m_parameters);
+        orbitals[i]->setParameters(parameters);
     }
-    jastrow->setParameters(m_parameters);
+    jastrow->setParameters(parameters);
 }
 
-double WaveSlater::wave(const vec2 r[])
+double WaveSlater::wave(vec2 r[])
 {
-    // TODO implement Jastrow-factor
-    return slater->determinant(r, orbitals) * jastrow->evaluate(r);
+    if(m_interactionEnabled) {
+        return slater->determinant(r, orbitals) * jastrow->evaluate(r);
+    } else {
+        return slater->determinant(r, orbitals);
+    }
 }

@@ -19,7 +19,6 @@ HEADERS += \
     hamiltonian/hamiltonianideal.h \
     hamiltonian/hamiltonian.h \
     hamiltonian/hamiltoniansimple.h \
-    hamiltonian/hamiltonianstandard.h \
     blocker.h \
     densityplotter.h \
     config.h \

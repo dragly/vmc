@@ -31,7 +31,7 @@ public:
     }
 
     void setNParticles(int n) {
-        m_nDimensions = n;
+        m_nParticles = n;
     }
 
     WaveFunction* wave() const
@@ -86,6 +86,16 @@ public:
         m_omega = arg;
     }
 
+    bool interactionEnabled() const
+    {
+        return m_interactionEnabled;
+    }
+
+    void setInteractionEnabled(bool arg)
+    {
+        m_interactionEnabled = arg;
+    }
+
 private:
     int m_rank;
     int m_nProcesses;
@@ -97,6 +107,7 @@ private:
     Hamiltonian* m_hamiltonian;
     MonteCarlo* m_monteCarlo;
     double m_omega;
+    bool m_interactionEnabled;
 };
 
 #endif // CONFIG_H

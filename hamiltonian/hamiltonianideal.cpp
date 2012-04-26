@@ -9,12 +9,22 @@ HamiltonianIdeal::HamiltonianIdeal(int number_particles, int dimension, double c
     dimension(dimension),
     charge(charge)
 {
+    // allocate matrices which contain the position of the particles
+    // the function matrix is defined in the progam library
+    r_plus = new vec2[ number_particles];
+    r_minus = new vec2[ number_particles];
 }
 
-double HamiltonianIdeal::energy(WaveFunction *wave, const vec2 r[])
+HamiltonianIdeal::~HamiltonianIdeal() {
+    delete [] r_plus;
+    delete [] r_minus;
+}
+
+double HamiltonianIdeal::energy(WaveFunction *wave, vec2 r[])
 {
     double eLocal, eKinetic, ePotential,
             rSingleParticle;
+    double omega = 1;
     // compute the kinetic energy
     // TODO: Use the exact derivative
     // TODO: Create a derivative-finder function that uses interpolation to approximate the derivative
@@ -28,7 +38,7 @@ double HamiltonianIdeal::energy(WaveFunction *wave, const vec2 r[])
         for (int j = 0; j < dimension; j++) {
             rSingleParticle += r[i][j]*r[i][j];
         }
-        ePotential += 0.5 * rSingleParticle;
+        ePotential += 0.5 * omega * omega * rSingleParticle;
     }
     //     contribution from electron-electron potential
     for (int i = 0; i < number_particles-1; i++) {
@@ -44,36 +54,29 @@ double HamiltonianIdeal::energy(WaveFunction *wave, const vec2 r[])
     return eLocal;
 }
 
-double HamiltonianIdeal::kineticEnergy(WaveFunction *wave, const vec2 r[], double wfold)
-{
-    vec2 *r_plus;
-    vec2 *r_minus;
+//double HamiltonianIdeal::kineticEnergy(WaveFunction *wave, vec2 r[], double wfold)
+//{
 
-    // allocate matrices which contain the position of the particles
-    // the function matrix is defined in the progam library
-    r_plus = new vec2[ number_particles];
-    r_minus = new vec2[ number_particles];
-    for (int i = 0; i < number_particles; i++) {
-        for (int j=0; j < dimension; j++) {
-            r_plus[i][j] = r_minus[i][j] = r[i][j];
-        }
-    }
-    double e_kinetic = 0;
-    for (int i = 0; i < number_particles; i++) {
-        for (int j = 0; j < dimension; j++) {
-            r_plus[i][j] = r[i][j]+h;
-            r_minus[i][j] = r[i][j]-h;
-            double wfminus = wave->wave(r_minus);
-            double wfplus  = wave->wave(r_plus);
-            e_kinetic -= (wfminus+wfplus-2*wfold);
-            r_plus[i][j] = r[i][j];
-            r_minus[i][j] = r[i][j];
-        }
-    }
-    // include electron mass and hbar squared and divide by wave function
-    e_kinetic = 0.5*h2*e_kinetic/wfold;
+//    for (int i = 0; i < number_particles; i++) {
+//        for (int j=0; j < dimension; j++) {
+//            r_plus[i][j] = r_minus[i][j] = r[i][j];
+//        }
+//    }
+//    double e_kinetic = 0;
+//    for (int i = 0; i < number_particles; i++) {
+//        for (int j = 0; j < dimension; j++) {
+//            r_plus[i][j] = r[i][j]+h;
+//            r_minus[i][j] = r[i][j]-h;
+//            double wfminus = wave->wave(r_minus);
+//            double wfplus  = wave->wave(r_plus);
+//            e_kinetic -= (wfminus+wfplus-2*wfold);
+//            r_plus[i][j] = r[i][j];
+//            r_minus[i][j] = r[i][j];
+//        }
+//    }
+//    // include electron mass and hbar squared and divide by wave function
+//    e_kinetic = 0.5*h2*e_kinetic/wfold;
 
-    free_matrix((void **) r_plus); // free memory
-    free_matrix((void **) r_minus);
-    return e_kinetic;
-}
+//    return e_kinetic;
+//}
+

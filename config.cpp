@@ -18,13 +18,15 @@ Config::Config(int rank, int nProcesses) :
     m_wave(0),
     m_hamiltonian(0),
     m_monteCarlo(0),
-    m_omega(1)
+    m_omega(1),
+    m_interactionEnabled(true)
 {
 }
 
 void Config::loadConfiguration(INIReader* settings) {
     m_nParticles = settings->GetInteger("General", "nParticles", m_nParticles);
     m_nDimensions = settings->GetInteger("General", "nDimensions", m_nDimensions);
+    m_interactionEnabled = settings->GetBoolean("General", "interactionEnabled", m_interactionEnabled);
     m_charge = atof(settings->Get("General", "charge", "1.0").c_str());
     m_stepLength = atof(settings->Get("General", "stepLength", "1.0").c_str());
     m_omega = atof(settings->Get("General", "omega", "1.0").c_str());

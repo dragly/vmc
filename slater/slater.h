@@ -13,8 +13,8 @@ public:
     Slater(Config *config);
 
     ~Slater();
-    double determinant(const vec2 r[], Orbital *orbitals[]);
-    void constructMatrix(const vec2 r[], Orbital *orbitals[]);
+    double determinant(vec2 r[], Orbital *orbitals[]);
+    void constructMatrix(vec2 r[], Orbital *orbitals[]);
 private:
     mat matrixUp;
     mat matrixDown;

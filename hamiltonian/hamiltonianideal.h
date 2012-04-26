@@ -10,12 +10,16 @@ class HamiltonianIdeal : public Hamiltonian
 {
 public:
     HamiltonianIdeal(int number_particles, int dimension, double charge);
-    double energy(WaveFunction *wave, const vec2 r[]);
+    double energy(WaveFunction *wave, vec2 r[]);
+    ~HamiltonianIdeal();
 private:
     int number_particles;
     int dimension;
     double charge;
-    double kineticEnergy(WaveFunction *wave, const vec2 r[], double wfold);
+//    double kineticEnergy(WaveFunction *wave, vec2 r[], double wfold);
+
+    vec2 *r_plus;
+    vec2 *r_minus;
 };
 
 #endif // HAMILTONIANIDEAL_H

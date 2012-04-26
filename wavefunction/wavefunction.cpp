@@ -21,10 +21,10 @@ WaveFunction::WaveFunction(Config *config) :
     // allocate matrices which contain the position of the particles
     // the function matrix is defined in the progam library
     rPlus = new vec2[ m_nParticles];
-    rMinus = new vec2[ m_nDimensions];
+    rMinus = new vec2[ m_nParticles];
 }
 
-double WaveFunction::laplaceNumerical(const vec2 r[])
+double WaveFunction::laplaceNumerical(vec2 r[])
 {
     double eKinetic = 0;
     double wfold = wave(r);
@@ -49,10 +49,13 @@ double WaveFunction::laplaceNumerical(const vec2 r[])
     return eKinetic;
 }
 
-void WaveFunction::gradientNumerical(const vec2 r[], vec2 &rGradient)
+void WaveFunction::gradientNumerical(vec2 r[], vec2 &rGradient)
 {
-    for (int i = 0; i < m_nParticles; i++) {
-        rPlus[i] = rMinus[i] = r[i];
+    for (int j = 0; j < m_nDimensions; j++) {
+        for (int i = 0; i < m_nParticles; i++) {
+            rPlus[i][j] = rMinus[i][j] = r[i][j];
+            rPlus[i][j] = rMinus[i][j] = r[i][j];
+        }
     }
     for (int j = 0; j < m_nDimensions; j++) {
         rGradient[j] = 0;
