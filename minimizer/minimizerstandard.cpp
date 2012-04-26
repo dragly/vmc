@@ -98,8 +98,8 @@ void MinimizerStandard::runMinimizer()
 //    m_monteCarlo = new MonteCarloStandard(m_wave, m_hamiltonian, m_config->nParticles(), m_config->nDimensions(), charge, m_config->rank(), stepLength);
 
     double parameters[2];
-    parameters[0] = 0.4;
-    parameters[1] = 0.5*charge;
+    parameters[0] = 0.42;
+    parameters[1] = 0.565;
     // loop over variational parameters
     for (int variate=1; variate <= m_nVariations; variate++){
         m_wave->setParameters(parameters);

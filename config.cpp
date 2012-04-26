@@ -47,10 +47,10 @@ void Config::loadConfiguration(INIReader* settings) {
     }
 
     // Monte Carlo sampler
-    string monteCarloClass = settings->Get("MonteCarlo","class", "MonteCarloSimple");
+    string monteCarloClass = settings->Get("MonteCarlo","class", "MonteCarloStandard");
     m_monteCarlo = MonteCarlo::fromName(monteCarloClass, this);
     if(m_monteCarlo == 0) {
         cerr << "Unknown Monte Carlo class '" << monteCarloClass << "'" << endl;
-        exit(98);
+        exit(97);
     }
 }
