@@ -7,16 +7,10 @@ using namespace arma;
 class HamiltonianSimple : public Hamiltonian
 {
 public:
-    HamiltonianSimple(int number_particles, int dimension, double charge);
+    HamiltonianSimple(Config *config);
     double energy(WaveFunction *wave, vec2 r[]);
     void setAnalyticalKineticEnergy(bool val);
 private:
-    int number_particles;
-    int dimension;
-    double charge;
-    double kineticEnergy(WaveFunction *wave, vec2 r[], double wfold);
-    double analyticalKineticEnergy(WaveFunction *wave, vec2 r[], double wfold);
-    bool useAnalyticalKineticEnergy;
 };
 
 #endif // HAMILTONIANSTANDARD_H

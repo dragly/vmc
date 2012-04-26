@@ -49,11 +49,6 @@ public:
         return m_monteCarlo;
     }
 
-    double charge() const
-    {
-        return m_charge;
-    }
-
     double stepLength() const
     {
         return m_stepLength;
@@ -101,7 +96,6 @@ private:
     int m_nProcesses;
     int m_nParticles;
     int m_nDimensions;
-    double m_charge;
     double m_stepLength;
     WaveFunction* m_wave;
     Hamiltonian* m_hamiltonian;

@@ -87,7 +87,7 @@ void VmcTests::initTestCase()
     waveIdeal = new WaveIdeal(config);
     waveIdeal->setParameters(parameters);
     // Set up hamiltonianIdeal
-    hamiltonianIdeal = new HamiltonianIdeal(nParticles, nDimensions, charge);
+    hamiltonianIdeal = new HamiltonianIdeal(config);
 }
 
 void VmcTests::cleanupTestCase()
@@ -419,8 +419,9 @@ void VmcTests::fullSlaterSixNoInteractionTest()
     Config *config1 = new Config(0,1);
     config1->setNDimensions(2);
     config1->setNParticles(6);
-    config1->setHamiltonian(hamiltonianIdeal);
     config1->setInteractionEnabled(false);
+    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
+    config1->setHamiltonian(hamiltonian);
     WaveSlater *waveSlater1 = new WaveSlater(config1);
     config1->setWave(waveSlater1);
     double parameters[2];
@@ -450,7 +451,8 @@ void VmcTests::fullSlaterSixInteractionTest()
     Config *config1 = new Config(0,1);
     config1->setNDimensions(2);
     config1->setNParticles(6);
-    config1->setHamiltonian(hamiltonianIdeal);
+    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
+    config1->setHamiltonian(hamiltonian);
     config1->setInteractionEnabled(true);
     int nCycles = 100000;
     int nTotalCycles = nCycles;

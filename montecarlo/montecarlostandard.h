@@ -18,7 +18,6 @@ public:
 private:
     int m_nParticles;
     int m_nDimensions;
-    double charge;
     int rank;
     double step_length;
     vec2 *rOld;

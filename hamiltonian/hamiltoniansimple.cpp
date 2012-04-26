@@ -7,11 +7,8 @@
 #include "../matrix.h"
 #include "../utils.h"
 
-HamiltonianSimple::HamiltonianSimple(int number_particles, int dimension, double charge) :
-    number_particles(number_particles),
-    dimension(dimension),
-    charge(charge),
-    useAnalyticalKineticEnergy(false)
+HamiltonianSimple::HamiltonianSimple(Config *config) :
+    Hamiltonian(config)
 {
 }
 
@@ -30,9 +27,9 @@ double HamiltonianSimple::energy(WaveFunction *wave, vec2 r[])
     // compute the potential energy
     ePotential = 0;
     // contribution from electron-proton potential
-    for (i = 0; i < number_particles; i++) {
+    for (i = 0; i < m_nParticles; i++) {
         rSingleParticle = 0;
-        for (j = 0; j < dimension; j++) {
+        for (j = 0; j < m_nDimensions; j++) {
             rSingleParticle += r[i][j]*r[i][j];
         }
         ePotential += 0.5 * rSingleParticle;

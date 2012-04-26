@@ -9,7 +9,6 @@ MonteCarloStandard::MonteCarloStandard(Config *config) :
     MonteCarlo(config),
     m_nParticles(config->nParticles()),
     m_nDimensions(config->nDimensions()),
-    charge(config->charge()),
     rank(config->rank()),
     step_length(config->stepLength())
 {

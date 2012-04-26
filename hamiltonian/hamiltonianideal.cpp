@@ -4,20 +4,9 @@
 #include "../wavefunction/wavefunction.h"
 #include <math.h>
 
-HamiltonianIdeal::HamiltonianIdeal(int number_particles, int dimension, double charge) :
-    number_particles(number_particles),
-    dimension(dimension),
-    charge(charge)
+HamiltonianIdeal::HamiltonianIdeal(Config *config) :
+    Hamiltonian(config)
 {
-    // allocate matrices which contain the position of the particles
-    // the function matrix is defined in the progam library
-    r_plus = new vec2[ number_particles];
-    r_minus = new vec2[ number_particles];
-}
-
-HamiltonianIdeal::~HamiltonianIdeal() {
-    delete [] r_plus;
-    delete [] r_minus;
 }
 
 double HamiltonianIdeal::energy(WaveFunction *wave, vec2 r[])
@@ -33,50 +22,25 @@ double HamiltonianIdeal::energy(WaveFunction *wave, vec2 r[])
     // compute the potential energy
     ePotential = 0;
     // contribution from harmonic oscillator potential
-    for (int i = 0; i < number_particles; i++) {
+    for (int i = 0; i < m_nParticles; i++) {
         rSingleParticle = 0;
-        for (int j = 0; j < dimension; j++) {
+        for (int j = 0; j < m_nDimensions; j++) {
             rSingleParticle += r[i][j]*r[i][j];
         }
         ePotential += 0.5 * omega * omega * rSingleParticle;
     }
-    //     contribution from electron-electron potential
-    for (int i = 0; i < number_particles-1; i++) {
-        for (int j = i+1; j < number_particles; j++) {
-            double r_12 = 0;
-            for (int k = 0; k < dimension; k++) {
-                r_12 += (r[i][k]-r[j][k])*(r[i][k]-r[j][k]);
+    if(m_interactionEnabled) {
+        //     contribution from electron-electron potential
+        for (int i = 0; i < m_nParticles-1; i++) {
+            for (int j = i+1; j < m_nParticles; j++) {
+                double r_12 = 0;
+                for (int k = 0; k < m_nDimensions; k++) {
+                    r_12 += (r[i][k]-r[j][k])*(r[i][k]-r[j][k]);
+                }
+                ePotential += 1/sqrt(r_12);
             }
-            ePotential += 1/sqrt(r_12);
         }
     }
     eLocal = ePotential+eKinetic;
     return eLocal;
 }
-
-//double HamiltonianIdeal::kineticEnergy(WaveFunction *wave, vec2 r[], double wfold)
-//{
-
-//    for (int i = 0; i < number_particles; i++) {
-//        for (int j=0; j < dimension; j++) {
-//            r_plus[i][j] = r_minus[i][j] = r[i][j];
-//        }
-//    }
-//    double e_kinetic = 0;
-//    for (int i = 0; i < number_particles; i++) {
-//        for (int j = 0; j < dimension; j++) {
-//            r_plus[i][j] = r[i][j]+h;
-//            r_minus[i][j] = r[i][j]-h;
-//            double wfminus = wave->wave(r_minus);
-//            double wfplus  = wave->wave(r_plus);
-//            e_kinetic -= (wfminus+wfplus-2*wfold);
-//            r_plus[i][j] = r[i][j];
-//            r_minus[i][j] = r[i][j];
-//        }
-//    }
-//    // include electron mass and hbar squared and divide by wave function
-//    e_kinetic = 0.5*h2*e_kinetic/wfold;
-
-//    return e_kinetic;
-//}
-
