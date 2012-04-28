@@ -19,8 +19,8 @@ private:
     mat matrixUp;
     mat matrixDown;
 
-    int m_nDimensions;
-    int m_nParticles;
+    int nDimensions;
+    int nParticles;
 
     Orbital **orbitals;
 };

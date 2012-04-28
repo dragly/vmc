@@ -8,19 +8,19 @@
 using namespace arma;
 
 Slater::Slater(Config *config) :
-    m_nDimensions(config->nDimensions()),
-    m_nParticles(config->nParticles())
+    nDimensions(config->nDimensions()),
+    nParticles(config->nParticles())
 {
     // the slater determinant can de separated into two parts, one for spin up and the other for spin down
-    matrixUp = zeros<mat>(m_nParticles / 2, m_nParticles / 2);
-    matrixDown = zeros<mat>(m_nParticles / 2, m_nParticles / 2);
+    matrixUp = zeros<mat>(nParticles / 2, nParticles / 2);
+    matrixDown = zeros<mat>(nParticles / 2, nParticles / 2);
 
-    orbitals = new Orbital*[m_nParticles/2];
+    orbitals = new Orbital*[nParticles/2];
 
     // generate the orbitals
     int orbital = 0;
     int nInOrbital = 0;
-    for(int i = 0; i < m_nParticles / 2; i++) {
+    for(int i = 0; i < nParticles / 2; i++) {
         int nx;
         int ny;
         nx = nInOrbital;
@@ -35,10 +35,10 @@ Slater::Slater(Config *config) :
 }
 
 void Slater::constructMatrix(vec2 *r) {
-    for(int i = 0; i < m_nParticles / 2; i++) {
-        for(int j = 0; j < m_nParticles / 2; j++) {
+    for(int i = 0; i < nParticles / 2; i++) {
+        for(int j = 0; j < nParticles / 2; j++) {
             matrixUp(i,j) = orbitals[j]->evaluate(r[i]);
-            matrixDown(i,j) = orbitals[j]->evaluate(r[i + m_nParticles / 2]);
+            matrixDown(i,j) = orbitals[j]->evaluate(r[i + nParticles / 2]);
         }
     }
 }
