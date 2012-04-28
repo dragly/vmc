@@ -19,14 +19,14 @@ Orbital::Orbital(double nx, double ny, Config *config) :
 double Orbital::evaluate(vec2 r)
 {
     double sqrtomega = sqrt(m_omega);
-    double Hx = Hermite::evaluate(r[0], sqrtomega*m_nx);
-    double Hy = Hermite::evaluate(r[0], sqrtomega*m_ny);
+    double Hx = Hermite::evaluate(m_nx, sqrtomega*r[0]);
+    double Hy = Hermite::evaluate(m_ny, sqrtomega*r[1]);
     return Hx*Hy* exp(-m_alpha*m_omega*(r[0]*r[0] + r[1]*r[1])/2);
 }
 
-void Orbital::setParameters(double alpha, double beta)
+void Orbital::setParameters(double *parameters)
 {
-    m_alpha = alpha;
-    m_beta = beta;
+    m_alpha = parameters[0];
+    m_beta = parameters[1];
 }
 

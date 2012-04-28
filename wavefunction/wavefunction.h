@@ -14,27 +14,26 @@ class WaveFunction
 {
 public:
     WaveFunction(Config *config);
-    virtual double wave(vec2 *r) = 0;
-    virtual void gradient(vec2 *r, vec2 &rGradient) {
+    virtual double wave(vec2 r[]) = 0;
+    virtual void gradient(vec2 r[], vec2 &rGradient) {
         gradientNumerical(r, rGradient);
     }
-    virtual double laplace(vec2 *r) {
+    virtual double laplace(vec2 r[]) {
         return laplaceNumerical(r);
     }
     virtual void loadConfiguration(INIReader *settings) {
         (void)settings;
     }
-    double laplaceNumerical(vec2 *r);
-    void gradientNumerical(vec2 *r, vec2 &rGradient);
-    void setParameters(double alpha, double beta);
+    double laplaceNumerical(vec2 r[]);
+    void gradientNumerical(vec2 r[], vec2 &rGradient);
+    void setParameters(double *m_parameters);
     static WaveFunction* fromName(string waveClass, Config *config);
     ~WaveFunction();
 protected:
     Config *m_config;
     int m_nParticles;
     int m_nDimensions;
-    double alpha;
-    double beta;
+    double *m_parameters;
     vec2 *rPlus;
     vec2 *rMinus;
 };

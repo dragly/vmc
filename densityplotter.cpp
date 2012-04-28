@@ -54,7 +54,11 @@ void DensityPlotter::loadConfiguration(INIReader *settings)
     m_nCycles = settings->GetInteger("DensityPlotter", "nCycles", 1000);
     double alpha = atof(settings->Get("DensityPlotter", "alpha", "1.0").c_str());
     double beta = atof(settings->Get("DensityPlotter", "beta", "1.0").c_str());
-    m_wave->setParameters(alpha, beta);
+    double parameters[2];
+    parameters[0] = alpha;
+    parameters[1] = beta;
+
+    m_wave->setParameters(parameters);
     aMax = atof(settings->Get("DensityPlotter", "aMax", "6.0").c_str());
     bMax = atof(settings->Get("DensityPlotter", "bMax", "6.0").c_str());
     aMin = atof(settings->Get("DensityPlotter", "aMin", "-6.0").c_str());

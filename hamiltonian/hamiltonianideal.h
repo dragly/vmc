@@ -9,13 +9,8 @@ using namespace arma;
 class HamiltonianIdeal : public Hamiltonian
 {
 public:
-    HamiltonianIdeal(int number_particles, int dimension, double charge);
-    double energy(WaveFunction *wave, vec2 *r);
-private:
-    int number_particles;
-    int dimension;
-    double charge;
-    double kineticEnergy(WaveFunction *wave, vec2 *r, double wfold);
+    HamiltonianIdeal(Config *config);
+    double energy(WaveFunction *wave, vec2 r[]);
 };
 
 #endif // HAMILTONIANIDEAL_H

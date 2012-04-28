@@ -12,43 +12,32 @@ Slater::Slater(Config *config) :
     nParticles(config->nParticles())
 {
     // the slater determinant can de separated into two parts, one for spin up and the other for spin down
-    matrixUp = zeros<mat>(nParticles / 2, nParticles / 2);
-    matrixDown = zeros<mat>(nParticles / 2, nParticles / 2);
-
-    orbitals = new Orbital*[nParticles/2];
-
-    // generate the orbitals
-    int orbital = 0;
-    int nInOrbital = 0;
-    for(int i = 0; i < nParticles / 2; i++) {
-        int nx;
-        int ny;
-        nx = nInOrbital;
-        ny = orbital - nInOrbital;
-        orbitals[i] = new Orbital(nx, ny, config);
-        nInOrbital++;
-        if(nInOrbital >= orbital) {
-            nInOrbital = 0;
-            orbital++;
-        }
-    }
+    matrixUp = zeros<mat>(m_nParticles / 2, m_nParticles / 2);
+    matrixDown = zeros<mat>(m_nParticles / 2, m_nParticles / 2);
 }
 
-void Slater::constructMatrix(vec2 *r) {
-    for(int i = 0; i < nParticles / 2; i++) {
-        for(int j = 0; j < nParticles / 2; j++) {
+/*!
+  Note: The first half of the particles have spin up, while the others are spin down.
+  */
+void Slater::constructMatrix(vec2 r[], Orbital* orbitals[]) {
+    for(int i = 0; i < m_nParticles / 2; i++) {
+        for(int j = 0; j < m_nParticles / 2; j++) {
             matrixUp(i,j) = orbitals[j]->evaluate(r[i]);
             matrixDown(i,j) = orbitals[j]->evaluate(r[i + nParticles / 2]);
         }
     }
 }
 
-double Slater::determinant(vec2 *r) {
-    constructMatrix(r);
+double Slater::determinant(vec2 r[], Orbital* orbitals[]) {
+    constructMatrix(r, orbitals);
     // the slater determinant can be divided into two parts multiplied together
     double detUp = det(matrixUp);
     double detDown = det(matrixDown);
-    return detUp * detDown;
+    double normFactorial = 1;
+    for(int i = 2; i < m_nParticles / 2; i++) {
+        normFactorial *= i;
+    }
+    return 1 / sqrt(normFactorial) * detUp * detDown;
 }
 
 Slater::~Slater() {

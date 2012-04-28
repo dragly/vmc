@@ -9,8 +9,8 @@ class WaveIdeal : public WaveFunction
 {
 public:
     WaveIdeal(Config *config);
-    double wave(vec2 *r);
-    double laplace(vec2 *r);
+    double wave(vec2 r[]);
+    double laplace(vec2 r[]);
     void setUseAnalyticalLaplace(bool val){
         useAnalytical = val;
     }

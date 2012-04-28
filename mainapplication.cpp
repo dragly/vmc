@@ -64,7 +64,9 @@ void MainApplication::loadConfiguration()
         exit(460);
     }
     if(m_rank == 0) {
-        cout << __PRETTY_FUNCTION__ << ": Config loaded. Mode is " << modeString << endl;
+        cout << __PRETTY_FUNCTION__ << ": Config loaded. Mode is " << modeString << "." << endl;
+        cout << __PRETTY_FUNCTION__ << ": Running with " << m_nProcesses << " process(es)." << endl;
+        flush(cout);
     }
     m_config = new Config(m_rank, m_nProcesses);
     m_config->loadConfiguration(m_settings);

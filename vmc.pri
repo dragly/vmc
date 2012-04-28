@@ -2,7 +2,7 @@ myHome = $$system(echo $HOME)
 message(Assuming Armadillo is installed under $$myHome/apps/armadillo-2.4.4/include)
 INCLUDEPATH+=$$myHome/apps/armadillo-2.4.4/include
 
-LIBS += -lblas -llapack
+#LIBS += -llapack
 
 HEADERS += \
     matrix.h \
@@ -19,7 +19,6 @@ HEADERS += \
     hamiltonian/hamiltonianideal.h \
     hamiltonian/hamiltonian.h \
     hamiltonian/hamiltoniansimple.h \
-    hamiltonian/hamiltonianstandard.h \
     blocker.h \
     densityplotter.h \
     config.h \
@@ -30,7 +29,8 @@ HEADERS += \
     orbital/orbital.h \
     minimizer/minimizerstandard.h \
     minimizer/minimizer.h \
-    wavefunction/waveslater.h
+    wavefunction/waveslater.h \
+    jastrow/jastrow.h
 
 SOURCES += main.cpp \
     matrix.cpp \
@@ -56,4 +56,5 @@ SOURCES += main.cpp \
     orbital/orbital.cpp \
     minimizer/minimizer.cpp \
     minimizer/minimizerstandard.cpp \
-    wavefunction/waveslater.cpp
+    wavefunction/waveslater.cpp \
+    jastrow/jastrow.cpp

@@ -14,11 +14,10 @@ public:
     void sample(int nCycles, double *energies, double *allEnergies);
 
     ~MonteCarloMetropolisHastings();
-    void quantumForce(vec2 *rPosition, vec2 &forceVector);
+    void quantumForce(vec2 rPosition[], vec2 &forceVector);
 private:
     int m_nParticles;
     int m_nDimensions;
-    double charge;
     int rank;
     double step_length;
     vec2 *rOld;

@@ -9,7 +9,6 @@ MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(Config *config) :
     MonteCarlo(config),
     m_nParticles(config->nParticles()),
     m_nDimensions(config->nDimensions()),
-    charge(config->charge()),
     rank(config->rank()),
     step_length(config->stepLength()),
     wave(config->wave()),
@@ -26,7 +25,7 @@ MonteCarloMetropolisHastings::~MonteCarloMetropolisHastings()
 {
 }
 
-void MonteCarloMetropolisHastings::quantumForce(vec2 *rPosition, vec2 &forceVector) {
+void MonteCarloMetropolisHastings::quantumForce(vec2 rPosition[], vec2 &forceVector) {
     double waveValue = m_config->wave()->wave(rPosition);
     m_config->wave()->gradient(rPosition, forceVector);
     forceVector = 2 * forceVector / waveValue;

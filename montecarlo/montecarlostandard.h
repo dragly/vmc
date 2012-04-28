@@ -18,11 +18,10 @@ public:
 private:
     int m_nParticles;
     int m_nDimensions;
-    double charge;
     int rank;
     double step_length;
-    vec2 *r_old;
-    vec2 *r_new;
+    vec2 *rOld;
+    vec2 *rNew;
     long idum;
 };
 

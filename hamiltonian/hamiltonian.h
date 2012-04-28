@@ -13,10 +13,13 @@ class Config;
 class Hamiltonian
 {
 public:
-    Hamiltonian();
-    virtual double energy(WaveFunction *wave, vec2 *r) = 0;
-    static Hamiltonian *fromName(string hamiltonianClass, Config *config, double charge);
-
+    Hamiltonian(Config *config);
+    virtual double energy(WaveFunction *wave, vec2 r[]) = 0;
+    static Hamiltonian *fromName(string hamiltonianClass, Config *config);
+protected:
+    int m_nParticles;
+    int m_nDimensions;
+    bool m_interactionEnabled;
 };
 
 #endif // HAMILTONIAN_H
