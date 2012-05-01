@@ -28,7 +28,9 @@ public:
     double mean(double *values, double nValues);
 protected:
     // output file as global variable
-    ofstream ofile;
+    ofstream energyFile;
+    ofstream parameters0File;
+    ofstream parameters1File;
     ofstream blockofile;
     int m_rank;
     int m_nProcesses;

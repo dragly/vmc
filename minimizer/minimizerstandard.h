@@ -28,7 +28,11 @@ private:
     int dimension; // three-dimensional system
     double charge;  //  we fix the charge to be that of the helium atom
     double stepLength;  //  we fix the brute force jump to 1 Bohr radius
-    int m_nVariations;
+    int nVariations;
+    double alphaStart;
+    double alphaEnd;
+    double betaStart;
+    double betaEnd;
     INIReader *m_settings;
 
     WaveFunction *m_wave;

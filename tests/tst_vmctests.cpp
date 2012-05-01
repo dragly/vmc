@@ -32,7 +32,6 @@ public:
     VmcTests();
 
     void waveSimpleGradientTest(); // TODO - consider implementing this again
-private slots:
     void initTestCase();
     void orbitalTest();
     void jastrowTest();
@@ -49,6 +48,7 @@ private slots:
     void slaterFourParticleTest();
     void slaterSixParticleTest();
     void fullSlaterSixNoInteractionTest();
+private slots:
     void fullSlaterSixInteractionTest();
 
 private:
@@ -448,27 +448,29 @@ void VmcTests::fullSlaterSixNoInteractionTest()
   */
 void VmcTests::fullSlaterSixInteractionTest()
 {
-    Config *config1 = new Config(0,1);
-    config1->setNDimensions(2);
-    config1->setNParticles(6);
-    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
-    config1->setHamiltonian(hamiltonian);
-    config1->setInteractionEnabled(true);
-    int nCycles = 100000;
-    int nTotalCycles = nCycles;
+    QBENCHMARK{
+        Config *config1 = new Config(0,1);
+        config1->setNDimensions(2);
+        config1->setNParticles(6);
+        HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
+        config1->setHamiltonian(hamiltonian);
+        config1->setInteractionEnabled(true);
+        int nCycles = 5000;
+        int nTotalCycles = nCycles;
 
-    WaveSlater *waveSlater2 = new WaveSlater(config1);
-    double parameters[2];
-    parameters[0] = 0.92;
-    parameters[1] = 0.565;
-    waveSlater2->setParameters(parameters);
-    config1->setWave(waveSlater2);
-    MonteCarloStandard *monteCarlo2 = new MonteCarloStandard(config1);
-    double *allEnergies = new double[nCycles+1];
-    double *energies = new double[2];
-    monteCarlo2->sample(nCycles, energies, allEnergies);
-    cout << "Six interacting energy was " << fabs(energies[0] / nTotalCycles) << endl;
-    QVERIFY(fabs(energies[0] / nTotalCycles - 20.190) < 1e-2);
+        WaveSlater *waveSlater2 = new WaveSlater(config1);
+        double parameters[2];
+        parameters[0] = 0.92;
+        parameters[1] = 0.565;
+        waveSlater2->setParameters(parameters);
+        config1->setWave(waveSlater2);
+        MonteCarloStandard *monteCarlo2 = new MonteCarloStandard(config1);
+        double *allEnergies = new double[nCycles+1];
+        double *energies = new double[2];
+        monteCarlo2->sample(nCycles, energies, allEnergies);
+        cout << "Six interacting energy was " << fabs(energies[0] / nTotalCycles) << endl;
+//        QVERIFY(fabs(energies[0] / nTotalCycles - 20.190) < 1e-2);
+    }
 }
 
 QTEST_APPLESS_MAIN(VmcTests)

@@ -11,7 +11,7 @@ class MonteCarloMetropolisHastings : public MonteCarlo
 {
 public:
     MonteCarloMetropolisHastings(Config *config);
-    void sample(int nCycles, double *energies, double *allEnergies);
+    void sample(int nCycles, bool storeEnergies);
 
     ~MonteCarloMetropolisHastings();
     void quantumForce(vec2 rPosition[], vec2 &forceVector);
@@ -29,7 +29,6 @@ private:
     vec2 forceVectorSum;
     vec2 forceVectorDiff ;
     vec2 positionDiff ;
-    long idum;
     WaveFunction* wave;
     Hamiltonian* hamiltonian;
 };

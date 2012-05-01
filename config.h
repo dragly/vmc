@@ -44,9 +44,9 @@ public:
         return m_hamiltonian;
     }
 
-    MonteCarlo* monteCarlo() const
+    string monteCarloClass() const
     {
-        return m_monteCarlo;
+        return m_monteCarloClass;
     }
 
     double stepLength() const
@@ -66,9 +66,9 @@ public:
         m_hamiltonian = arg;
     }
 
-    void setMonteCarlo(MonteCarlo* arg)
+    void setMonteCarloClass(string arg)
     {
-        m_monteCarlo = arg;
+        m_monteCarloClass = arg;
     }
 
     double omega() const
@@ -91,6 +91,10 @@ public:
         m_interactionEnabled = arg;
     }
 
+    long *idum() {
+        return &m_idum;
+    }
+
 private:
     int m_rank;
     int m_nProcesses;
@@ -99,9 +103,10 @@ private:
     double m_stepLength;
     WaveFunction* m_wave;
     Hamiltonian* m_hamiltonian;
-    MonteCarlo* m_monteCarlo;
+    string m_monteCarloClass;
     double m_omega;
     bool m_interactionEnabled;
+    long m_idum;
 };
 
 #endif // CONFIG_H

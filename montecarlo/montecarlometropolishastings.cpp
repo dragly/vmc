@@ -14,8 +14,6 @@ MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(Config *config) :
     wave(config->wave()),
     hamiltonian(config->hamiltonian())
 {
-    // every node has its own seed for the random numbers
-    idum = -1-rank;
     // allocate matrices which contain the position of the particles
     rOld = new vec2[ m_nParticles];
     rNew = new vec2[ m_nParticles];
@@ -31,20 +29,20 @@ void MonteCarloMetropolisHastings::quantumForce(vec2 rPosition[], vec2 &forceVec
     forceVector = 2 * forceVector / waveValue;
 }
 
-void MonteCarloMetropolisHastings::sample(int nCycles, double *energies, double *allEnergies)
+void MonteCarloMetropolisHastings::sample(int nCycles, bool storeEnergies)
 {
     double wfnew = 0;
     double wfold = 0;
-    double energy = 0;
-    double energy2 = 0;
+    m_energy = 0;
+    m_energySquared = 0;
     double delta_e = 0;
     double diffConstant = 1;
     // initialisations of variational parameters and energies
-    energy = energy2 = 0; delta_e=0;
+    m_energy = m_energySquared = 0; delta_e=0;
     //  initial trial position, note calling with alpha
     for (int i = 0; i < m_nParticles; i++) {
         for (int j=0; j < m_nDimensions; j++) {
-            rOld[i][j] = step_length*(ran2(&idum)-0.5);
+            rOld[i][j] = step_length*(ran2(idum)-0.5);
         }
     }
     wfold = wave->wave(rOld);
@@ -57,7 +55,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles, double *energies, double 
             quantumForce(rOld, forceVectorNew);
             rNew[i] = rOld[i] + diffConstant*forceVectorNew*step_length;
             for (int j=0; j < m_nDimensions; j++) {
-                rNew[i][j] += simpleGaussRandom(&idum);
+                rNew[i][j] += simpleGaussRandom(idum);
             }
             //  for the other particles we need to set the position to the old position since
             //  we move only one particle at the time
@@ -77,7 +75,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles, double *energies, double 
             }
             double waveFrac = wfnew*wfnew/(wfold*wfold);
             // The Metropolis test is performed by moving one particle at the time
-            if(ran2(&idum) <= exp(argument) * waveFrac) {
+            if(ran2(idum) <= exp(argument) * waveFrac) {
                 rOld[i]=rNew[i];
                 waveGradientOld = waveGradientNew;
                 wfold = wfnew;
@@ -87,13 +85,12 @@ void MonteCarloMetropolisHastings::sample(int nCycles, double *energies, double 
         delta_e = hamiltonian->energy(wave, rOld);
         // save all energies on last variate
         //        if(variate==max_variations){
-        allEnergies[cycle] = delta_e;
+        if(storeEnergies) {
+        m_allEnergies[cycle] = delta_e;
+        }
         //        }
         // update energies
-        energy += delta_e;
-        energy2 += delta_e*delta_e;
+        m_energy += delta_e;
+        m_energySquared += delta_e*delta_e;
     }   // end of loop over MC trials
-    // return the energy and the energy squared
-    energies[0] = energy;
-    energies[1] = energy2;
 }

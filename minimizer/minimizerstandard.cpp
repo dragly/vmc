@@ -14,6 +14,7 @@
 #endif
 #include <stdio.h>
 #include <stdlib.h>
+#include <typeinfo>
 
 // local stuff
 #include "../inih/cpp/INIReader.h"
@@ -24,6 +25,7 @@
 #include "../hamiltonian/hamiltoniansimple.h"
 #include "../hamiltonian/hamiltonianideal.h"
 #include "../wavefunction/waveideal.h"
+#include "../wavefunction/waveslater.h"
 
 using namespace std;
 
@@ -38,26 +40,29 @@ void MinimizerStandard::loadConfiguration(INIReader *settings)
     charge = atof(settings->Get("MinimizerStandard","charge", "1.0").c_str());
     stepLength = atof(settings->Get("MinimizerStandard","stepLength", "1.0").c_str());
     m_nCycles = atoi(settings->Get("MinimizerStandard","nCycles", "1000").c_str());
-    m_nVariations = settings->GetInteger("MinimizerStandard","nVariations", 11);    //  default number of variations
+    nVariations = settings->GetInteger("MinimizerStandard","nVariations", 11);    //  default number of variations
+    alphaStart = settings->GetDouble("MinimizerStandard","alphaStart", 0);    //  default number of variations
+    alphaEnd= settings->GetDouble("MinimizerStandard","alphaEnd", 1);    //  default number of variations
+    betaStart = settings->GetDouble("MinimizerStandard","betaStart", 0);    //  default number of variations
+    betaEnd = settings->GetDouble("MinimizerStandard","betaEnd", 1);    //  default number of variations
     m_wave = m_config->wave();
     m_hamiltonian = m_config->hamiltonian();
-    m_monteCarlo = m_config->monteCarlo();
 }
 
 void MinimizerStandard::runMinimizer()
 {
-    int total_number_cycles, i;
-    double *cumulative_e, *cumulative_e2;
-    double *total_cumulative_e, *total_cumulative_e2;
+    int total_number_cycles;
+    mat cumulativeEnergy, cumulativeEnergySquared;
+    mat totalCumulativeEnergy, totalCumulativeEnergySquared;
+
+    mat parameter0Map;
+    mat parameter1Map;
     double timeStart;
     double timeEnd;
 #ifndef USE_MPI
     timeStart = timeEnd = -1;
 #endif
     double totalTime;
-    double variance;
-    double energy;
-    double error;
 
     //    WaveIdeal *wave = new WaveIdeal(nParticles, m_config->nDimensions());
     //    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(nParticles, m_config->nDimensions(), charge);
@@ -67,83 +72,112 @@ void MinimizerStandard::runMinimizer()
     timeStart = MPI_Wtime();
 #endif
 
-    string outfilename;
-    if (m_config->rank() == 0) {
-        outfilename = "output.dat";
-        ofile.open(outfilename.c_str());
-    }
-
-    total_cumulative_e = new double[m_nVariations+1];
-    total_cumulative_e2 = new double[m_nVariations+1];
-    cumulative_e = new double[m_nVariations+1];
-    cumulative_e2 = new double[m_nVariations+1];
-
-    //  initialize the arrays  by zeroing them
-    for( i=1; i <= m_nVariations; i++){
-        cumulative_e[i] = cumulative_e2[i]  = total_cumulative_e[i] = total_cumulative_e2[i]  = 0.0;
-    }
 #ifdef USE_MPI
     // broadcast the total number of  variations
-    MPI_Bcast (&m_nVariations, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast (&nVariations, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast (&m_nCycles, 1, MPI_INT, 0, MPI_COMM_WORLD);
 #endif
+    //  initialize the arrays  by zeroing them
+    totalCumulativeEnergy = zeros<mat>(nVariations,nVariations);
+    totalCumulativeEnergySquared = zeros<mat>(nVariations,nVariations);
+    cumulativeEnergy = zeros<mat>(nVariations,nVariations);
+    cumulativeEnergySquared = zeros<mat>(nVariations,nVariations);
+
+    parameter0Map = zeros<mat>(nVariations, nVariations);
+    parameter1Map = zeros<mat>(nVariations, nVariations);
+
     total_number_cycles = m_nCycles*m_config->nProcesses();
 
     // array to store all energies for last variation of alpha
-    m_allEnergies = new double[m_nCycles+1];
 
-    double *energies = new double[2];
 
-    //  Do the mc sampling  and accumulate data with MPI_Reduce
-//    m_monteCarlo = new MonteCarloStandard(m_wave, m_hamiltonian, m_config->nParticles(), m_config->nDimensions(), charge, m_config->rank(), stepLength);
-
+    //    double *energies = new double[2];
     double parameters[2];
-    parameters[0] = 0.42;
-    parameters[1] = 0.565;
+
     // loop over variational parameters
-    for (int variate=1; variate <= m_nVariations; variate++){
-        m_wave->setParameters(parameters);
-        m_monteCarlo->sample(m_nCycles, energies, m_allEnergies);
-        // update the energy average and its squared
-        cumulative_e[variate] = energies[0];
-        cumulative_e2[variate] = energies[1];
-        parameters[0] += 0.1;
+    double alphaStep = (alphaEnd - alphaStart) / (nVariations - 1);
+    double betaStep = (betaEnd - betaStart) / (nVariations - 1);
+    parameters[0] = alphaStart;
+    for (int i=0; i < nVariations; i++){
+        parameters[1] = betaStart;
+        for (int j=0; j < nVariations; j++){
+            m_monteCarlo = MonteCarlo::fromName(m_config->monteCarloClass(), m_config);
+            std::cout << "Testing parameters " << parameters[0] << " " << parameters[1] << std::endl;
+            std::cout << "with " << m_nCycles << " cycles" << std::endl;
+            m_wave->setParameters(parameters);
+            m_monteCarlo->sample(m_nCycles, false);
+            // update the energy average and its squared
+            cumulativeEnergy(i,j) = m_monteCarlo->energy();
+            cumulativeEnergySquared(i,j) = m_monteCarlo->energySquared();
+            std::cout << "Got energy of " << cumulativeEnergy(i,j) / m_nCycles << std::endl;
+            parameter0Map(i,j) = parameters[0];
+            parameter1Map(i,j) = parameters[1];
+            parameters[1] += betaStep;
+        }
+        parameters[0] += alphaStep;
     }
-#ifdef USE_MPI
     //  Collect data in total averages
-    for( i=1; i <= m_nVariations; i++){
-        MPI_Reduce(&cumulative_e[i], &total_cumulative_e[i], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-        MPI_Reduce(&cumulative_e2[i], &total_cumulative_e2[i], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    for(int i=0; i < nVariations; i++){
+        for(int j=0; j < nVariations; j++){
+            double cumulativeEnergyDummy = cumulativeEnergy(i,j);
+            double totalCumulativeEnergyDummy = totalCumulativeEnergy(i,j);
+            MPI_Reduce(&cumulativeEnergyDummy, &totalCumulativeEnergyDummy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+            double cumulativeEnergySquaredDummy = cumulativeEnergySquared(i,j);
+            double totalCumulativeEnergySquaredDummy = totalCumulativeEnergySquared(i,j);
+            MPI_Reduce(&cumulativeEnergySquaredDummy, &totalCumulativeEnergySquaredDummy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+            totalCumulativeEnergy(i,j) = totalCumulativeEnergyDummy;
+            totalCumulativeEnergySquared(i,j) = totalCumulativeEnergySquaredDummy;
+        }
     }
     timeEnd = MPI_Wtime();
     totalTime = timeEnd-timeStart;
-#else
-    for( i=1; i <= m_nVariations; i++){
-        total_cumulative_e[i] = cumulative_e[i];
-        total_cumulative_e2[i] = cumulative_e2[i];
-    }
-    totalTime = -1;
-#endif
+    // Print out results
+    //    if ( m_config->rank() == 0) {
+    //        cout << "Time = " <<  totalTime  << " on number of processors: "  << m_config->nProcesses()  << endl;
+    //        parameters[0] = 0.5*charge;
+    //        for( i=1; i <= m_nVariations; i++){
+    //            energy = totalCumulativeEnergy[i]/total_number_cycles;
+    //            variance = totalCumulativeEnergySquared[i]/total_number_cycles-energy*energy;
+    //            error=sqrt(variance/(total_number_cycles-1));
+    //            ofile << setiosflags(ios::showpoint | ios::uppercase);
+    //            ofile << setw(15) << setprecision(8) << parameters[0];
+    //            ofile << setw(15) << setprecision(8) << energy;
+    //            ofile << setw(15) << setprecision(8) << variance;
+    //            ofile << setw(15) << setprecision(8) << error << endl;
+    //            parameters[0] += 0.1;
+    //        }
+    //        ofile.close();  // close output file
+    //    }
     // Print out results
     if ( m_config->rank() == 0) {
+
+        string outfilename;
+        outfilename = "energies.dat";
+        energyFile.open(outfilename.c_str());
+        outfilename = "parameters0.dat";
+        parameters0File.open(outfilename.c_str());
+        outfilename = "parameters1.dat";
+        parameters1File.open(outfilename.c_str());
         cout << "Time = " <<  totalTime  << " on number of processors: "  << m_config->nProcesses()  << endl;
-        parameters[0] = 0.5*charge;
-        for( i=1; i <= m_nVariations; i++){
-            energy = total_cumulative_e[i]/total_number_cycles;
-            variance = total_cumulative_e2[i]/total_number_cycles-energy*energy;
-            error=sqrt(variance/(total_number_cycles-1));
-            ofile << setiosflags(ios::showpoint | ios::uppercase);
-            ofile << setw(15) << setprecision(8) << parameters[0];
-            ofile << setw(15) << setprecision(8) << energy;
-            ofile << setw(15) << setprecision(8) << variance;
-            ofile << setw(15) << setprecision(8) << error << endl;
-            parameters[0] += 0.1;
+        for(int i=0; i < nVariations; i++){
+            for(int j=0; j < nVariations; j++){
+                double energy = totalCumulativeEnergy(i,j) / total_number_cycles;
+                double variance = totalCumulativeEnergySquared(i,j) / total_number_cycles-energy*energy;
+                double error=sqrt(variance/(total_number_cycles-1));
+                energyFile << setiosflags(ios::showpoint | ios::uppercase);
+                energyFile << setw(15) << setprecision(8) << energy;
+                parameters0File << setw(15) << setprecision(8) << parameter0Map(i,j);
+                parameters1File << setw(15) << setprecision(8) << parameter1Map(i,j);
+            }
+            energyFile << std::endl;
+            parameters0File << std::endl;
+            parameters1File << std::endl;
         }
-        ofile.close();  // close output file
+        energyFile.close();  // close output file
     }
+    // TODO Fix blocking!
     writeBlockData();
-    delete [] total_cumulative_e; delete [] total_cumulative_e2;
-    delete [] cumulative_e;
-    delete [] cumulative_e2;
     delete [] m_allEnergies;
 }

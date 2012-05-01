@@ -4,7 +4,10 @@
 #include "montecarlometropolishastings.h"
 
 MonteCarlo::MonteCarlo(Config *config) :
-    m_config(config)
+    m_config(config),
+    m_energy(0),
+    m_energySquared(0),
+    idum(config->idum())
 {
 }
 

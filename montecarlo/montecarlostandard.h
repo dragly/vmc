@@ -12,7 +12,7 @@ class MonteCarloStandard : public MonteCarlo
 {
 public:
     MonteCarloStandard(Config* config);
-    void sample(int nCycles, double *energies, double *allEnergies);
+    void sample(int nCycles, bool storeEnergies);
 
     ~MonteCarloStandard();
 private:
@@ -22,7 +22,6 @@ private:
     double step_length;
     vec2 *rOld;
     vec2 *rNew;
-    long idum;
 };
 
 #endif // MONTECARLOSTANDARD_H

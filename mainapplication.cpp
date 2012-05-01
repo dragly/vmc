@@ -52,6 +52,9 @@ void MainApplication::loadConfiguration()
         cerr << "Warning: " << __PRETTY_FUNCTION__ << ": Could not load configuration file 'config.ini'. Does it exist?" << endl;
     }
 
+    m_config = new Config(m_rank, m_nProcesses);
+    m_config->loadConfiguration(m_settings);
+
     string modeString = m_settings->Get("General","mode","minimizer");
     if(modeString == "minimizer") {
         m_mode = MinimizerMode;
@@ -68,12 +71,11 @@ void MainApplication::loadConfiguration()
         cout << __PRETTY_FUNCTION__ << ": Running with " << m_nProcesses << " process(es)." << endl;
         flush(cout);
     }
-    m_config = new Config(m_rank, m_nProcesses);
-    m_config->loadConfiguration(m_settings);
 }
 
 void MainApplication::runConfiguration()
 {
+    loadConfiguration();
     if(m_mode == MinimizerMode) {
         runMinimizer();
     } else if(m_mode== DensityMode) {

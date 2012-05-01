@@ -5,6 +5,9 @@
 #include <iostream>
 
 #include "inih/cpp/INIReader.h"
+#include "wavefunction/waveslater.h"
+#include "hamiltonian/hamiltonianideal.h"
+#include "montecarlo/montecarlostandard.h"
 
 using namespace std;
 
@@ -16,9 +19,10 @@ Config::Config(int rank, int nProcesses) :
     m_stepLength(1.0),
     m_wave(0),
     m_hamiltonian(0),
-    m_monteCarlo(0),
+    m_monteCarloClass("MonteCarloStandard"),
     m_omega(1),
-    m_interactionEnabled(true)
+    m_interactionEnabled(true),
+    m_idum(-rank-1)
 {
 }
 
@@ -31,7 +35,9 @@ void Config::loadConfiguration(INIReader* settings) {
 
     // Wave properties
     string waveClass = settings->Get("Wave","class", "WaveSimple");
+    std::cout << waveClass << std::endl;
     m_wave = WaveFunction::fromName(waveClass, this);
+//    m_wave = new WaveSlater(this);
     if(m_wave == 0) {
         cerr << "Unknown wave class '" << waveClass << "'" << endl;
         exit(99);
@@ -40,17 +46,22 @@ void Config::loadConfiguration(INIReader* settings) {
 
     // Hamiltonian
     string hamiltonianClass = settings->Get("Hamiltonian","class", "HamiltonianSimple");
+    std::cout << hamiltonianClass << std::endl;
     m_hamiltonian = Hamiltonian::fromName(hamiltonianClass, this);
+//    m_hamiltonian = new HamiltonianIdeal(this);
     if(m_hamiltonian == 0) {
         cerr << "Unknown hamiltonian class '" << hamiltonianClass << "'" << endl;
         exit(98);
     }
 
     // Monte Carlo sampler
-    string monteCarloClass = settings->Get("MonteCarlo","class", "MonteCarloStandard");
-    m_monteCarlo = MonteCarlo::fromName(monteCarloClass, this);
-    if(m_monteCarlo == 0) {
-        cerr << "Unknown Monte Carlo class '" << monteCarloClass << "'" << endl;
+    m_monteCarloClass = settings->Get("MonteCarlo","class", "MonteCarloStandard");
+    std::cout << m_monteCarloClass << std::endl;
+    MonteCarlo *monteCarlo = MonteCarlo::fromName(m_monteCarloClass, this);
+//    m_monteCarlo = new MonteCarloStandard(this);
+    if(monteCarlo == 0) {
+        cerr << "Unknown Monte Carlo class '" << m_monteCarloClass << "'" << endl;
         exit(97);
     }
+    delete monteCarlo;
 }

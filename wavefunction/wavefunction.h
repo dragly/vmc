@@ -1,10 +1,10 @@
 #ifndef WAVEFUNCTION_H
 #define WAVEFUNCTION_H
+
 #include <armadillo>
 using namespace arma;
 
 #include <string>
-
 using namespace std;
 
 class INIReader;
@@ -26,8 +26,9 @@ public:
     }
     double laplaceNumerical(vec2 r[]);
     void gradientNumerical(vec2 r[], vec2 &rGradient);
-    void setParameters(double *m_parameters);
+    virtual void setParameters(double *m_parameters);
     static WaveFunction* fromName(string waveClass, Config *config);
+
     ~WaveFunction();
 protected:
     Config *m_config;

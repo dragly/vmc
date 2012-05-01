@@ -37,6 +37,7 @@ public:
     // and valid false values are "false", "no", "off", "0" (not case sensitive).
     bool GetBoolean(std::string section, std::string name, bool default_value);
 
+    double GetDouble(std::string section, std::string name, double default_value);
 private:
     int _error;
     std::map<std::string, std::string> _values;
