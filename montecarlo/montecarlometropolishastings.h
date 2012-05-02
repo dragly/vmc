@@ -11,13 +11,11 @@ class MonteCarloMetropolisHastings : public MonteCarlo
 {
 public:
     MonteCarloMetropolisHastings(Config *config);
-    void sample(int nCycles, bool storeEnergies);
+    void sample(int nCycles);
 
     ~MonteCarloMetropolisHastings();
     void quantumForce(vec2 rPosition[], vec2 &forceVector);
 private:
-    int m_nParticles;
-    int m_nDimensions;
     int rank;
     double step_length;
     vec2 *rOld;

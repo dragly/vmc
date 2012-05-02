@@ -20,6 +20,8 @@ OTHER_FILES += config.ini \
 
 FORMS +=
 
+CONFIG += mpi
+
 # MPI Settings
 
 contains(CONFIG,mpi) {
@@ -45,7 +47,9 @@ contains(CONFIG,debug) {
     message(Debug mode. Disabling optimization)
     QMAKE_CXXFLAGS = -O0
 } else {
-    message(Release mode. Optimization kept at default.)
+    message(Release mode. Optimization at O3.)
+    QMAKE_CXXFLAGS -= -O2
+    QMAKE_CXXFLAGS = -O3
 }
 QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS
 

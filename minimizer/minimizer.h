@@ -27,11 +27,6 @@ public:
     void blocking(double *values, int nValues, int blockSize, double *result);
     double mean(double *values, double nValues);
 protected:
-    // output file as global variable
-    ofstream energyFile;
-    ofstream parameters0File;
-    ofstream parameters1File;
-    ofstream blockofile;
     int m_rank;
     int m_nProcesses;
     int m_nParticles;

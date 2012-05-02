@@ -105,11 +105,11 @@ void MinimizerStandard::runMinimizer()
             std::cout << "Testing parameters " << parameters[0] << " " << parameters[1] << std::endl;
             std::cout << "with " << m_nCycles << " cycles" << std::endl;
             m_wave->setParameters(parameters);
-            m_monteCarlo->sample(m_nCycles, false);
+            m_monteCarlo->sample(m_nCycles);
             // update the energy average and its squared
             cumulativeEnergy(i,j) = m_monteCarlo->energy();
             cumulativeEnergySquared(i,j) = m_monteCarlo->energySquared();
-            std::cout << "Got energy of " << cumulativeEnergy(i,j) / m_nCycles << std::endl;
+            std::cout << "Got energy of " << cumulativeEnergy(i,j) << std::endl;
             parameter0Map(i,j) = parameters[0];
             parameter1Map(i,j) = parameters[1];
             parameters[1] += betaStep;
@@ -123,12 +123,16 @@ void MinimizerStandard::runMinimizer()
             double totalCumulativeEnergyDummy = totalCumulativeEnergy(i,j);
             MPI_Reduce(&cumulativeEnergyDummy, &totalCumulativeEnergyDummy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
+            if(m_rank == 0) {
+                std::cout << totalCumulativeEnergyDummy << std::endl;
+            }
+            totalCumulativeEnergy(i,j) = totalCumulativeEnergyDummy / m_nProcesses;
+
             double cumulativeEnergySquaredDummy = cumulativeEnergySquared(i,j);
             double totalCumulativeEnergySquaredDummy = totalCumulativeEnergySquared(i,j);
             MPI_Reduce(&cumulativeEnergySquaredDummy, &totalCumulativeEnergySquaredDummy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
-            totalCumulativeEnergy(i,j) = totalCumulativeEnergyDummy;
-            totalCumulativeEnergySquared(i,j) = totalCumulativeEnergySquaredDummy;
+            totalCumulativeEnergySquared(i,j) = totalCumulativeEnergySquaredDummy / m_nProcesses;
         }
     }
     timeEnd = MPI_Wtime();
@@ -151,8 +155,14 @@ void MinimizerStandard::runMinimizer()
     //        ofile.close();  // close output file
     //    }
     // Print out results
-    if ( m_config->rank() == 0) {
+    if ( m_rank == 0) {
 
+        // output file as global variable
+        ofstream energyFile;
+        ofstream parameters0File;
+        ofstream parameters1File;
+        ofstream errorFile;
+        ofstream varianceFile;
         string outfilename;
         outfilename = "energies.dat";
         energyFile.open(outfilename.c_str());
@@ -160,18 +170,28 @@ void MinimizerStandard::runMinimizer()
         parameters0File.open(outfilename.c_str());
         outfilename = "parameters1.dat";
         parameters1File.open(outfilename.c_str());
+        outfilename = "variances.dat";
+        varianceFile.open(outfilename.c_str());
+        outfilename = "errors.dat";
+        errorFile.open(outfilename.c_str());
         cout << "Time = " <<  totalTime  << " on number of processors: "  << m_config->nProcesses()  << endl;
         for(int i=0; i < nVariations; i++){
             for(int j=0; j < nVariations; j++){
-                double energy = totalCumulativeEnergy(i,j) / total_number_cycles;
-                double variance = totalCumulativeEnergySquared(i,j) / total_number_cycles-energy*energy;
-                double error=sqrt(variance/(total_number_cycles-1));
+                double energy = totalCumulativeEnergy(i,j) ;
+                double variance = totalCumulativeEnergySquared(i,j) - energy*energy;
+                double error = sqrt(variance/(total_number_cycles-1));
                 energyFile << setiosflags(ios::showpoint | ios::uppercase);
                 energyFile << setw(15) << setprecision(8) << energy;
                 parameters0File << setw(15) << setprecision(8) << parameter0Map(i,j);
                 parameters1File << setw(15) << setprecision(8) << parameter1Map(i,j);
+                varianceFile << setiosflags(ios::showpoint | ios::uppercase);
+                varianceFile << setw(15) << setprecision(8) << variance;
+                errorFile << setiosflags(ios::showpoint | ios::uppercase);
+                errorFile << setw(15) << setprecision(8) << error;
             }
             energyFile << std::endl;
+            varianceFile << std::endl;
+            errorFile << std::endl;
             parameters0File << std::endl;
             parameters1File << std::endl;
         }
@@ -179,5 +199,5 @@ void MinimizerStandard::runMinimizer()
     }
     // TODO Fix blocking!
     writeBlockData();
-    delete [] m_allEnergies;
+//    delete [] m_allEnergies;l
 }

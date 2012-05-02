@@ -11,7 +11,7 @@ class MonteCarlo
 public:
     MonteCarlo(Config *config);
 
-    virtual void sample(int numberCycles, bool storeEnergies) = 0;
+    virtual void sample(int numberCycles) = 0;
     virtual void loadConfiguration(INIReader *settings) {
         (void)settings;
     }
@@ -24,12 +24,29 @@ public:
         return m_energySquared;
     }
 
+    void checkTerminalization(double localEnergy);
 protected:
-    Config *m_config;
+    Config *config;
+    int nParticles;
+    int nDimensions;
     double m_energy;
     double m_energySquared;
     double *m_allEnergies;
     long *idum;
+
+    double terminalizationSum;
+    int terminalizationNum;
+    bool terminalized;
+    double diffAverage;
+
+    double prevTerminalizationAverage;
+
+    int terminalizationTrials;
+
+
+    int cycle;
+
+    bool storeEnergies;
 };
 
 #endif // MONTECARLO_H

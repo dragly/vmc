@@ -7,16 +7,14 @@
 
 MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(Config *config) :
     MonteCarlo(config),
-    m_nParticles(config->nParticles()),
-    m_nDimensions(config->nDimensions()),
     rank(config->rank()),
     step_length(config->stepLength()),
     wave(config->wave()),
     hamiltonian(config->hamiltonian())
 {
     // allocate matrices which contain the position of the particles
-    rOld = new vec2[ m_nParticles];
-    rNew = new vec2[ m_nParticles];
+    rOld = new vec2[ nParticles];
+    rNew = new vec2[ nParticles];
 }
 
 MonteCarloMetropolisHastings::~MonteCarloMetropolisHastings()
@@ -24,24 +22,26 @@ MonteCarloMetropolisHastings::~MonteCarloMetropolisHastings()
 }
 
 void MonteCarloMetropolisHastings::quantumForce(vec2 rPosition[], vec2 &forceVector) {
-    double waveValue = m_config->wave()->wave(rPosition);
-    m_config->wave()->gradient(rPosition, forceVector);
+    double waveValue = config->wave()->wave(rPosition);
+    config->wave()->gradient(rPosition, forceVector);
     forceVector = 2 * forceVector / waveValue;
 }
 
-void MonteCarloMetropolisHastings::sample(int nCycles, bool storeEnergies)
+void MonteCarloMetropolisHastings::sample(int nCycles)
 {
     double wfnew = 0;
     double wfold = 0;
     m_energy = 0;
     m_energySquared = 0;
-    double delta_e = 0;
+    terminalizationSum = 0;
+    terminalizationNum = 1;
+    double localEnergy = 0;
     double diffConstant = 1;
     // initialisations of variational parameters and energies
-    m_energy = m_energySquared = 0; delta_e=0;
+    m_energy = m_energySquared = 0; localEnergy=0;
     //  initial trial position, note calling with alpha
-    for (int i = 0; i < m_nParticles; i++) {
-        for (int j=0; j < m_nDimensions; j++) {
+    for (int i = 0; i < nParticles; i++) {
+        for (int j=0; j < nDimensions; j++) {
             rOld[i][j] = step_length*(ran2(idum)-0.5);
         }
     }
@@ -51,15 +51,15 @@ void MonteCarloMetropolisHastings::sample(int nCycles, bool storeEnergies)
     // loop over monte carlo cycles
     for (int cycle = 1; cycle <= nCycles; cycle++){
         // new trial position
-        for (int i = 0; i < m_nParticles; i++) {
+        for (int i = 0; i < nParticles; i++) {
             quantumForce(rOld, forceVectorNew);
             rNew[i] = rOld[i] + diffConstant*forceVectorNew*step_length;
-            for (int j=0; j < m_nDimensions; j++) {
+            for (int j=0; j < nDimensions; j++) {
                 rNew[i][j] += simpleGaussRandom(idum);
             }
             //  for the other particles we need to set the position to the old position since
             //  we move only one particle at the time
-            for (int k = 0; k < m_nParticles; k++) {
+            for (int k = 0; k < nParticles; k++) {
                 if ( k != i) {
                     rNew[k] = rOld[k];
                 }
@@ -67,7 +67,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles, bool storeEnergies)
             wfnew = wave->wave(rNew);
             wave->gradient(rNew, waveGradientNew);
             double argument = 0;
-            for( int j = 0; j < m_nDimensions; j++) {
+            for( int j = 0; j < nDimensions; j++) {
                 forceVectorSum[j] = forceVectorNew[j] + forceVectorOld[j];
                 forceVectorDiff[j] = forceVectorOld[j] - forceVectorNew[j];
                 positionDiff[j] = rNew[i][j] - rOld[i][j];
@@ -80,17 +80,20 @@ void MonteCarloMetropolisHastings::sample(int nCycles, bool storeEnergies)
                 waveGradientOld = waveGradientNew;
                 wfold = wfnew;
             }
+            localEnergy = hamiltonian->energy(wave, rOld);
+            if(terminalized) {
+                if(storeEnergies) {
+                    m_allEnergies[cycle] = localEnergy;
+                }
+                //        }
+                // update energies
+                m_energy += localEnergy;
+                m_energySquared += localEnergy*localEnergy;
+            } else {
+                checkTerminalization(localEnergy);
+            }
         }  //  end of loop over particles
-        // compute local energy
-        delta_e = hamiltonian->energy(wave, rOld);
-        // save all energies on last variate
-        //        if(variate==max_variations){
-        if(storeEnergies) {
-        m_allEnergies[cycle] = delta_e;
-        }
-        //        }
-        // update energies
-        m_energy += delta_e;
-        m_energySquared += delta_e*delta_e;
-    }   // end of loop over MC trials
+    }
+    m_energy /= (nCycles * nParticles);
+    m_energySquared /= (nCycles * nParticles);
 }

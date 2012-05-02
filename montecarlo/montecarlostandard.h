@@ -12,12 +12,10 @@ class MonteCarloStandard : public MonteCarlo
 {
 public:
     MonteCarloStandard(Config* config);
-    void sample(int nCycles, bool storeEnergies);
+    void sample(int nCycles);
 
     ~MonteCarloStandard();
 private:
-    int m_nParticles;
-    int m_nDimensions;
     int rank;
     double step_length;
     vec2 *rOld;

@@ -21,11 +21,14 @@ using namespace std;
 
 
 Minimizer::Minimizer(Config *config) :
-    m_config(config)
+    m_config(config),
+    m_rank(config->rank()),
+    m_nProcesses(config->nProcesses())
 {
 }
 
 void Minimizer::writeBlockData() {
+    ofstream blockofile;
     // Setting output file name for this rank:
     ostringstream ost;
     ost << "blocks_rank" << m_rank << ".dat";
