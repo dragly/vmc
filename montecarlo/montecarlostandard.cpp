@@ -8,7 +8,8 @@
 MonteCarloStandard::MonteCarloStandard(Config *config) :
     MonteCarlo(config),
     rank(config->rank()),
-    step_length(config->stepLength())
+    step_length(config->stepLength()),
+    wave(config->wave())
 {
     // allocate matrices which contain the position of the particles
     rOld = new vec2[ nParticles];
@@ -29,8 +30,6 @@ MonteCarloStandard::~MonteCarloStandard()
 
 void MonteCarloStandard::sample(int nCycles)
 {
-    double wfnew = 0;
-    double wfold = 0;
     m_energy = 0;
     m_energySquared = 0;
     terminalizationSum = 0;
@@ -48,7 +47,8 @@ void MonteCarloStandard::sample(int nCycles)
             rOld[i][j] = step_length*(ran2(idum)-0.5);
         }
     }
-    wfold = config->wave()->wave(rOld);
+    wave->init(rOld);
+    // TODO Optimize step length by Newton's method
     // loop over monte carlo cycles
     for (cycle = 0; cycle < nCycles; cycle++){
         // new position
@@ -56,26 +56,16 @@ void MonteCarloStandard::sample(int nCycles)
             for (int j=0; j < nDimensions; j++) {
                 rNew[i][j] = rOld[i][j]+step_length*(ran2(idum)-0.5);
             }
-            // TODO Optimize MonteCarloStandard by removing the if-test. Profile first!
-            //  for the other particles we need to set the position to the old position since
-            //  we move only one particle at the time
-            for (int k = 0; k < nParticles; k++) {
-                if ( k != i) {
-                    for (int l=0; l < nDimensions; l++) {
-                        rNew[k][l] = rOld[k][l];
-                    }
-                }
-            }
-            wfnew = config->wave()->wave(rNew);
+            double ratio = wave->ratio(rNew);
             // The Metropolis test is performed by moving one particle at the time
-            if(ran2(idum) <= wfnew*wfnew/(wfold*wfold)) {
-                for (int l=0; l < nDimensions; l++) {
-                    rOld[i][l]=rNew[i][l];
-                }
-                wfold = wfnew;
+            if(ran2(idum) <= (ratio*ratio)) {
+                rOld = rNew;
+                wave->acceptEvaluation();
+            } else {
+                rNew = rOld; // Move the particle back
             }
             // compute local energy
-            localEnergy = config->hamiltonian()->energy(config->wave(), rOld);
+            localEnergy = config->hamiltonian()->energy(wave, rOld);
             // save all energies on last variate
             //        if(variate==max_variations){
             if(terminalized) {

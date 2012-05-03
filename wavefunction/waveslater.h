@@ -21,10 +21,12 @@ class WaveSlater : public WaveFunction
 {
 public:
     WaveSlater(Config *config);
-    double wave(vec2 r[]);
+    double evaluate(vec2 r[]);
     void setParameters(double *parameters);
+    void setPreviousMovedParticle(int particleNumber);
 private:
-    Slater *slater;
+    Slater *slaterDown;
+    Slater *slaterUp;
     Jastrow *jastrow;
 
     Orbital **orbitals;

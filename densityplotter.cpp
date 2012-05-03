@@ -114,7 +114,7 @@ void DensityPlotter::makePlot()
                     r_new[i][1] = bMin + (bMax - bMin) * ran2(&idum);
                 }  //  end of loop over particles
                 // compute probability
-                prob += m_wave->wave(r_new) * m_wave->wave(r_new) * (r_new[0][0] * r_new[0][0]  + r_new[0][1] * r_new[0][1]);
+                prob += m_wave->evaluate(r_new) * m_wave->evaluate(r_new) * (r_new[0][0] * r_new[0][0]  + r_new[0][1] * r_new[0][1]);
             }   // end of loop over MC trials
             myProbability[aStep][bStep] = prob / m_nCycles;
         }

@@ -20,6 +20,7 @@ private:
     double step_length;
     vec2 *rOld;
     vec2 *rNew;
+    WaveFunction* wave;
 };
 
 #endif // MONTECARLOSTANDARD_H

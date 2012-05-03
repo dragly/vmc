@@ -6,12 +6,10 @@
 #include <sstream>
 #include <iomanip>
 // disable annoying unused parameter warnings from the MPI library which we don't have any control over
-#ifdef USE_MPI
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <mpi.h>
 // Enable warnings again
 #pragma GCC diagnostic warning "-Wunused-parameter"
-#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <typeinfo>

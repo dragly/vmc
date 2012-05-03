@@ -10,14 +10,16 @@ class Orbital;
 class Slater
 {
 public:
-    Slater(Config *config);
+    Slater(Config *config, Orbital *orbitals[]);
 
     ~Slater();
-    double determinant(vec2 r[], Orbital *orbitals[]);
-    void constructMatrix(vec2 r[], Orbital *orbitals[]);
+    double determinant(vec2 r[]);
+    void constructMatrix(vec2 r[]);
 private:
-    mat matrixUp;
-    mat matrixDown;
+    mat matrixUpNew;
+    mat matrixDownNew;
+    mat matrixUpOld;
+    mat matrixDownOld;
 
     int nDimensions;
     int nParticles;

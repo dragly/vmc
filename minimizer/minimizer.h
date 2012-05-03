@@ -27,6 +27,7 @@ public:
     void blocking(double *values, int nValues, int blockSize, double *result);
     double mean(double *values, double nValues);
 protected:
+    Config *m_config;
     int m_rank;
     int m_nProcesses;
     int m_nParticles;
@@ -35,7 +36,6 @@ protected:
     int m_nCycles;
     // energies to store in block files
     double *m_allEnergies;
-    Config *m_config;
 private:
 };
 

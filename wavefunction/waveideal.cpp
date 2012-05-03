@@ -7,17 +7,17 @@ WaveIdeal::WaveIdeal(Config *config) :
 {
 }
 
-double WaveIdeal::wave(vec2 r[])
+double WaveIdeal::evaluate(vec2 r[])
 {
-    double alpha = m_parameters[0];
-    double beta = m_parameters[1];
+    double alpha = parameters[0];
+    double beta = parameters[1];
     int i, j;
     double wf, argument, r_single_particle;
 
     argument = wf = 0;
-    for (i = 0; i < m_nParticles; i++) {
+    for (i = 0; i < nParticles; i++) {
         r_single_particle = 0;
-        for (j = 0; j < m_nDimensions; j++) {
+        for (j = 0; j < nDimensions; j++) {
             r_single_particle  += r[i][j]*r[i][j];
         }
         argument += r_single_particle;
@@ -35,8 +35,8 @@ double WaveIdeal::wave(vec2 r[])
 
 double WaveIdeal::laplace(vec2 r[])
 {
-    double alpha = m_parameters[0];
-    double beta = m_parameters[1];
+    double alpha = parameters[0];
+    double beta = parameters[1];
     if(useAnalytical) {
         double omega = 1;
         double aconst = 1;
@@ -50,9 +50,9 @@ double WaveIdeal::laplace(vec2 r[])
 
         double crossProd = 0;
         double laplaceE = 0;
-        for (int i = 0; i < m_nParticles; i++) {
+        for (int i = 0; i < nParticles; i++) {
             double rSquared = 0;
-            for (int j = 0; j < m_nDimensions; j++) {
+            for (int j = 0; j < nDimensions; j++) {
                 rSquared  += r[i][j]*r[i][j];
             }
             laplaceE += - 2*omega*alpha + omega*omega*alpha*alpha * rSquared;

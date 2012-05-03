@@ -134,7 +134,6 @@ void VmcTests::waveSimpleGradientTest()
 void VmcTests::fullIdealTest()
 {
     int nCycles = 500000;
-    int nTotalCycles = nCycles;
     config->setWave(waveIdeal);
     config->setHamiltonian(hamiltonianIdeal);
     waveIdeal->setUseAnalyticalLaplace(true);
@@ -143,11 +142,11 @@ void VmcTests::fullIdealTest()
     parameters[1] = 0.4;
     waveIdeal->setParameters(parameters);
     MonteCarloStandard *monteCarlo = new MonteCarloStandard(config);
-    double *allEnergies = new double[nCycles+1];
-    double *energies = new double[2];
+    double energy;
     //  Do the mc sampling
-    monteCarlo->sample(nCycles, energies, allEnergies);
-    QVERIFY(fabs(energies[0] / nTotalCycles - 3.00034530284643397025) < 1e-20);
+    monteCarlo->sample(nCycles);
+    energy = monteCarlo->energy();
+    QVERIFY(fabs(energy - 3.00034530284643397025) < 1e-20);
 }
 
 void VmcTests::fullIdealHastingsTest()
@@ -156,17 +155,16 @@ void VmcTests::fullIdealHastingsTest()
     parameters[0] = 1.0;
     parameters[1] = 0.4;
     int nCycles = 100000;
-    int nTotalCycles = nCycles;
     config->setWave(waveIdeal);
     config->setHamiltonian(hamiltonianIdeal);
     waveIdeal->setUseAnalyticalLaplace(true);
     waveIdeal->setParameters(parameters);
     MonteCarloMetropolisHastings *monteCarlo = new MonteCarloMetropolisHastings(config);
-    double *allEnergies = new double[nCycles+1];
-    double *energies = new double[2];
+    double energy;
     //  Do the mc sampling
-    monteCarlo->sample(nCycles, energies, allEnergies);
-    QVERIFY(fabs(energies[0] / nTotalCycles - 3.000) < 1e-2);
+    monteCarlo->sample(nCycles);
+    energy = monteCarlo->energy();
+    QVERIFY(fabs(energy - 3.000) < 1e-2);
 }
 
 void VmcTests::hermiteTest() {
@@ -206,7 +204,7 @@ void VmcTests::twoOrbitalsOneWavefunctionTest() {
     orbital1->setParameters(parameters);
     orbital2->setParameters(parameters);
 
-    double val1 = waveSimple1->wave(rpos);
+    double val1 = waveSimple1->evaluate(rpos);
 
     double val2 = orbital1->evaluate(rpos[0]) * orbital2->evaluate(rpos[1]);
 
@@ -234,15 +232,15 @@ void VmcTests::slaterTest() {
     parameters[1] = 1.0;
     waveSimple1->setParameters(parameters);
 
-    double val1 = waveSimple1->wave(rpos);
-
-    Slater *slater1 = new Slater(config1);
+    double val1 = waveSimple1->evaluate(rpos);
 
     Orbital *orbitals[1];
     orbitals[0] = new Orbital(0,0,config1);
     orbitals[0]->setParameters(parameters);
 
-    double val2 = slater1->determinant(rpos, orbitals);
+    Slater *slater1 = new Slater(config1, orbitals);
+
+    double val2 = slater1->determinant(rpos);
 
     QCOMPARE(val1,val2);
 }
@@ -264,15 +262,15 @@ void VmcTests::fullIdealHastingsSlaterTest()
     parameters[1] = 0.4;
     waveSlater1->setParameters(parameters);
     int nCycles = 100000;
-    int nTotalCycles = nCycles;
 //    waveSlater1->setUseAnalyticalLaplace(false);
     MonteCarloMetropolisHastings *monteCarlo = new MonteCarloMetropolisHastings(config1);
-    double *allEnergies = new double[nCycles+1];
-    double *energies = new double[2];
+//    double *allEnergies = new double[nCycles+1];
+    double energy;
     //  Do the mc sampling
-    monteCarlo->sample(nCycles, energies, allEnergies);
-    cout << "Two particle energy is " << fabs(energies[0] / nTotalCycles) << endl;
-    QVERIFY(fabs(energies[0] / nTotalCycles - 3.000) < 1e-2);
+    monteCarlo->sample(nCycles);
+    energy = monteCarlo->energy();
+    cout << "Two particle energy is " << fabs(energy) << endl;
+    QVERIFY(fabs(energy - 3.000) < 1e-2);
 }
 
 /*!
@@ -372,7 +370,7 @@ void VmcTests::slaterFourParticleTest()
     double waveValue = (orbital00->evaluate(r[0]) * orbital01->evaluate(r[1]) - orbital01->evaluate(r[0]) * orbital00->evaluate(r[1]))
             * (orbital00->evaluate(r[2]) * orbital01->evaluate(r[3]) - orbital01->evaluate(r[2]) * orbital00->evaluate(r[3]))
             * jastrow->evaluate(r);
-    QCOMPARE(waveSlater1->wave(r), waveValue);
+    QCOMPARE(waveSlater1->evaluate(r), waveValue);
 }
 // TODO: Test slater wave for four particles
 
@@ -405,7 +403,7 @@ void VmcTests::slaterSixParticleTest()
     parameters[0] = 1.0;
     parameters[1] = 0.4;
     waveSlater1->setParameters(parameters);
-    cout << "Value for slaterSixParticleTest: " << waveSlater1->wave(rpos) << endl;
+    cout << "Value for slaterSixParticleTest: " << waveSlater1->evaluate(rpos) << endl;
 }
 
 /*!
@@ -429,15 +427,13 @@ void VmcTests::fullSlaterSixNoInteractionTest()
     parameters[1] = 1.0;
     waveSlater1->setParameters(parameters);
     int nCycles = 100000;
-    int nTotalCycles = nCycles;
 //    waveSlater1->setUseAnalyticalLaplace(false);
     MonteCarloStandard *monteCarlo1 = new MonteCarloStandard(config1);
-    double *allEnergies = new double[nCycles+1];
-    double *energies = new double[2];
     //  Do the mc sampling
-    monteCarlo1->sample(nCycles, energies, allEnergies);
-    cout << "Six non-interacting energy was " << fabs(energies[0] / nTotalCycles) << endl;
-    QVERIFY(fabs(energies[0] / nTotalCycles - 10) < 1e-2);
+    monteCarlo1->sample(nCycles);
+    double energy = monteCarlo1->energy();
+    cout << "Six non-interacting energy was " << fabs(energy) << endl;
+    QVERIFY(fabs(energy - 10) < 1e-2);
 }
 
 /*!
@@ -456,7 +452,6 @@ void VmcTests::fullSlaterSixInteractionTest()
         config1->setHamiltonian(hamiltonian);
         config1->setInteractionEnabled(true);
         int nCycles = 5000;
-        int nTotalCycles = nCycles;
 
         WaveSlater *waveSlater2 = new WaveSlater(config1);
         double parameters[2];
@@ -465,10 +460,9 @@ void VmcTests::fullSlaterSixInteractionTest()
         waveSlater2->setParameters(parameters);
         config1->setWave(waveSlater2);
         MonteCarloStandard *monteCarlo2 = new MonteCarloStandard(config1);
-        double *allEnergies = new double[nCycles+1];
-        double *energies = new double[2];
-        monteCarlo2->sample(nCycles, energies, allEnergies);
-        cout << "Six interacting energy was " << fabs(energies[0] / nTotalCycles) << endl;
+        monteCarlo2->sample(nCycles);
+        double energy = monteCarlo2->energy();
+        cout << "Six interacting energy was " << fabs(energy) << endl;
 //        QVERIFY(fabs(energies[0] / nTotalCycles - 20.190) < 1e-2);
     }
 }

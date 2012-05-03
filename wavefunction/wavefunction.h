@@ -14,7 +14,7 @@ class WaveFunction
 {
 public:
     WaveFunction(Config *config);
-    virtual double wave(vec2 r[]) = 0;
+    virtual double evaluate(vec2 r[]) = 0;
     virtual void gradient(vec2 r[], vec2 &rGradient) {
         gradientNumerical(r, rGradient);
     }
@@ -24,19 +24,26 @@ public:
     virtual void loadConfiguration(INIReader *settings) {
         (void)settings;
     }
-    double laplaceNumerical(vec2 r[]);
-    void gradientNumerical(vec2 r[], vec2 &rGradient);
-    virtual void setParameters(double *m_parameters);
+    virtual double laplaceNumerical(vec2 r[]);
+    virtual void gradientNumerical(vec2 r[], vec2 &rGradient);
+    virtual void setParameters(double *parameters);
     static WaveFunction* fromName(string waveClass, Config *config);
+    virtual void setPreviousMovedParticle(int particleNumber);
+    virtual double ratio(vec2 rNew[]);
+    virtual void acceptEvaluation();
+    virtual void init(vec2 r[]);
 
     ~WaveFunction();
 protected:
-    Config *m_config;
-    int m_nParticles;
-    int m_nDimensions;
-    double *m_parameters;
+    Config *config;
+    int previousMovedParticle;
+    int nParticles;
+    int nDimensions;
+    double *parameters;
     vec2 *rPlus;
     vec2 *rMinus;
+    double previousEvaluation;
+    double currentEvaluation;
 };
 
 #endif // WAVEFUNCTION_H

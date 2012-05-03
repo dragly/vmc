@@ -5,7 +5,8 @@
 #-------------------------------------------------
 
 
-QT       += core
+QT       -= core
+CONFIG   += console
 
 TARGET = vmc
 
@@ -20,28 +21,21 @@ OTHER_FILES += config.ini \
 
 FORMS +=
 
-CONFIG += mpi
-
 # MPI Settings
 
-contains(CONFIG,mpi) {
-    message(Using MPI)
-    QMAKE_CXX = mpicxx
-    QMAKE_CXX_RELEASE = $$QMAKE_CXX
-    QMAKE_CXX_DEBUG = $$QMAKE_CXX
-    QMAKE_LINK = $$QMAKE_CXX
-    QMAKE_CC = mpicc
+message(Using MPI)
+QMAKE_CXX = mpicxx
+QMAKE_CXX_RELEASE = $$QMAKE_CXX
+QMAKE_CXX_DEBUG = $$QMAKE_CXX
+QMAKE_LINK = $$QMAKE_CXX
+QMAKE_CC = mpicc
 
 #    QMAKE_CFLAGS = $$system(mpicc --showme:compile)
 #    QMAKE_LFLAGS = $$system(mpicxx --showme:link)
 #    QMAKE_CXXFLAGS = $$system(mpicxx --showme:compile)
-    QMAKE_CXXFLAGS += -DMPICH_IGNORE_CXX_SEEK
+QMAKE_CXXFLAGS += -DMPICH_IGNORE_CXX_SEEK
 
-    DEFINES += USE_MPI
-} else {
-    message(Not using MPI)
-    # slow debug mode
-}
+DEFINES += USE_MPI
 
 contains(CONFIG,debug) {
     message(Debug mode. Disabling optimization)

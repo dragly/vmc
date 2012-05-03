@@ -12,19 +12,18 @@ WaveSlater::WaveSlater(Config *config) :
     WaveFunction(config),
     m_interactionEnabled(config->interactionEnabled())
 {
-    slater = new Slater(config);
     jastrow = new Jastrow(config);
 
-    orbitals = new Orbital*[m_nParticles/2];
+    orbitals = new Orbital*[nParticles/2];
 
     int shells = 0;
-    if(m_nParticles < 3) {
+    if(nParticles < 3) {
         shells = 1;
-    } else if(m_nParticles < 7) {
+    } else if(nParticles < 7) {
         shells = 2;
-    } else if(m_nParticles < 13) {
+    } else if(nParticles < 13) {
         shells = 3;
-    } else if(m_nParticles < 21) {
+    } else if(nParticles < 21) {
         shells = 4;
     } else {
         cerr << "Too many particles! Cannot calculate the number of orbitals." << endl;
@@ -39,12 +38,14 @@ WaveSlater::WaveSlater(Config *config) :
             if(nx + ny < shells) {
                 orbitals[orbital] = new Orbital(nx, ny, config);
                 orbital++;
-                if(orbital > m_nParticles / 2 + 1) {
+                if(orbital > nParticles / 2 + 1) {
                     break;
                 }
             }
         }
     }
+    slaterUp = new Slater(config, orbitals);
+    slaterDown = new Slater(config, orbitals);
 }
 
 /*!
@@ -58,17 +59,26 @@ WaveSlater::WaveSlater(Config *config) :
 */
 void WaveSlater::setParameters(double *parameters) {
     WaveFunction::setParameters(parameters);
-    for(int i = 0; i < m_nParticles / 2; i++) {
+    for(int i = 0; i < nParticles / 2; i++) {
         orbitals[i]->setParameters(parameters);
     }
     jastrow->setParameters(parameters);
 }
 
-double WaveSlater::wave(vec2 r[])
+double WaveSlater::evaluate(vec2 r[])
 {
-    if(m_interactionEnabled) {
-        return slater->determinant(r, orbitals) * jastrow->evaluate(r);
-    } else {
-        return slater->determinant(r, orbitals);
+    double normFactorial = 1;
+    for(int i = 2; i < nParticles / 2; i++) {
+        normFactorial *= i;
     }
+    if(m_interactionEnabled) {
+        return 1 / sqrt(normFactorial) * slaterUp->determinant(r) * slaterDown->determinant(r) * jastrow->evaluate(r);
+    } else {
+        return 1 / sqrt(normFactorial) * slaterUp->determinant(r) * slaterDown->determinant(r);
+    }
+}
+
+void WaveSlater::setPreviousMovedParticle(int particleNumber) {
+    WaveFunction::setPreviousMovedParticle(particleNumber);
+    // TODO Set last moved particle for slater or something
 }

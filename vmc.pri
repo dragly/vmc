@@ -3,6 +3,7 @@ message(Assuming Armadillo is installed under $$myHome/apps/armadillo-2.4.4/incl
 INCLUDEPATH+=$$myHome/apps/armadillo-2.4.4/include
 
 #LIBS += -llapack
+#LIBS += -lblas
 
 HEADERS += \
     matrix.h \

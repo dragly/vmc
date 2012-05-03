@@ -11,16 +11,16 @@ WaveSimple::WaveSimple(Config *config)  :
 {
 }
 
-double WaveSimple::wave(vec2 r[])
+double WaveSimple::evaluate(vec2 r[])
 {
-    double alpha = m_parameters[0];
+    double alpha = parameters[0];
     int i, j;
     double wf, argument, rSingleParticle;
 
     argument = wf = 0;
-    for (i = 0; i < m_nParticles; i++) {
+    for (i = 0; i < nParticles; i++) {
         rSingleParticle = 0;
-        for (j = 0; j < m_nDimensions; j++) {
+        for (j = 0; j < nDimensions; j++) {
             rSingleParticle  += r[i][j]*r[i][j];
         }
         argument += rSingleParticle;
@@ -31,13 +31,13 @@ double WaveSimple::wave(vec2 r[])
 
 double WaveSimple::laplace(vec2 r[])
 {
-    double alpha = m_parameters[0];
+    double alpha = parameters[0];
     if(useAnalytical) {
         double eKinetic = 0;
         double rSingleParticle;
-        for (int i = 0; i < m_nParticles; i++) {
+        for (int i = 0; i < nParticles; i++) {
             rSingleParticle = 0;
-            for (int j = 0; j < m_nDimensions; j++) {
+            for (int j = 0; j < nDimensions; j++) {
                 rSingleParticle  += r[i][j]*r[i][j];
             }
             eKinetic += -2*alpha  + alpha*alpha * rSingleParticle;
