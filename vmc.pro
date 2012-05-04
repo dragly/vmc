@@ -23,30 +23,27 @@ FORMS +=
 
 # MPI Settings
 
-message(Using MPI)
-QMAKE_CXX = mpicxx
-QMAKE_CXX_RELEASE = $$QMAKE_CXX
-QMAKE_CXX_DEBUG = $$QMAKE_CXX
-QMAKE_LINK = $$QMAKE_CXX
-QMAKE_CC = mpicc
+#message(Using MPI)
+#QMAKE_CXX = mpicxx
+#QMAKE_CXX_RELEASE = $$QMAKE_CXX
+#QMAKE_CXX_DEBUG = $$QMAKE_CXX
+#QMAKE_LINK = $$QMAKE_CXX
+#QMAKE_CC = mpicc
 
-#    QMAKE_CFLAGS = $$system(mpicc --showme:compile)
-#    QMAKE_LFLAGS = $$system(mpicxx --showme:link)
-#    QMAKE_CXXFLAGS = $$system(mpicxx --showme:compile)
-QMAKE_CXXFLAGS += -DMPICH_IGNORE_CXX_SEEK
+##    QMAKE_CFLAGS = $$system(mpicc --showme:compile)
+##    QMAKE_LFLAGS = $$system(mpicxx --showme:link)
+##    QMAKE_CXXFLAGS = $$system(mpicxx --showme:compile)
+#QMAKE_CXXFLAGS += -DMPICH_IGNORE_CXX_SEEK
 
-contains(CONFIG,debug) {
-    message(Debug mode. Disabling optimization)
-    QMAKE_CXXFLAGS = -O0
-} else {
-    message(Release mode. Optimization at O3.)
-    QMAKE_CXXFLAGS -= -O2
-    QMAKE_CXXFLAGS = -O3
-}
-QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS
-
-message(compiler: $$QMAKE_CXX)
-message(compile flags: $$QMAKE_CXXFLAGS_RELEASE)
+#contains(CONFIG,debug) {
+#    message(Debug mode. Disabling optimization)
+#    QMAKE_CXXFLAGS = -O0
+#} else {
+#    message(Release mode. Optimization at O3.)
+#    QMAKE_CXXFLAGS -= -O2
+#    QMAKE_CXXFLAGS = -O3
+#}
+#QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS
 
 # Copy config file to shadow build directory
 copyCommand = $(COPY_DIR) $$PWD/config.ini $$OUT_PWD/config.ini

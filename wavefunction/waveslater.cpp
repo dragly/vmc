@@ -44,8 +44,8 @@ WaveSlater::WaveSlater(Config *config) :
             }
         }
     }
-    slaterUp = new Slater(config, orbitals);
-    slaterDown = new Slater(config, orbitals);
+    slaterUp = new Slater(config, orbitals, true);
+    slaterDown = new Slater(config, orbitals, false);
 }
 
 /*!

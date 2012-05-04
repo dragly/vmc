@@ -32,6 +32,7 @@ public:
     VmcTests();
 
     void waveSimpleGradientTest(); // TODO - consider implementing this again
+private slots:
     void initTestCase();
     void orbitalTest();
     void jastrowTest();
@@ -48,7 +49,6 @@ public:
     void slaterFourParticleTest();
     void slaterSixParticleTest();
     void fullSlaterSixNoInteractionTest();
-private slots:
     void fullSlaterSixInteractionTest();
 
 private:
@@ -146,6 +146,7 @@ void VmcTests::fullIdealTest()
     //  Do the mc sampling
     monteCarlo->sample(nCycles);
     energy = monteCarlo->energy();
+    std::cout << "Full ideal energy was " << energy << std::endl;
     QVERIFY(fabs(energy - 3.00034530284643397025) < 1e-20);
 }
 
@@ -168,7 +169,7 @@ void VmcTests::fullIdealHastingsTest()
 }
 
 void VmcTests::hermiteTest() {
-//    Hermite* hermite5 = new Hermite(5);
+    //    Hermite* hermite5 = new Hermite(5);
 
     QVERIFY(Hermite::evaluate(2,4) - (4*4*4 - 2) < 1e-20);
     QVERIFY(Hermite::evaluate(3,5) - (8*5*5*5 - 12) < 1e-20);
@@ -238,9 +239,15 @@ void VmcTests::slaterTest() {
     orbitals[0] = new Orbital(0,0,config1);
     orbitals[0]->setParameters(parameters);
 
-    Slater *slater1 = new Slater(config1, orbitals);
+    Slater *slaterUp = new Slater(config1, orbitals, true);
+    Slater *slaterDown = new Slater(config1, orbitals, false);
 
-    double val2 = slater1->determinant(rpos);
+    double normFactorial = 1;
+    for(int i = 2; i < config1->nParticles() / 2; i++) {
+        normFactorial *= i;
+    }
+
+    double val2 =  1 / sqrt(normFactorial) * slaterUp->determinant(rpos) * slaterDown->determinant(rpos);
 
     QCOMPARE(val1,val2);
 }
@@ -262,9 +269,9 @@ void VmcTests::fullIdealHastingsSlaterTest()
     parameters[1] = 0.4;
     waveSlater1->setParameters(parameters);
     int nCycles = 100000;
-//    waveSlater1->setUseAnalyticalLaplace(false);
+    //    waveSlater1->setUseAnalyticalLaplace(false);
     MonteCarloMetropolisHastings *monteCarlo = new MonteCarloMetropolisHastings(config1);
-//    double *allEnergies = new double[nCycles+1];
+    //    double *allEnergies = new double[nCycles+1];
     double energy;
     //  Do the mc sampling
     monteCarlo->sample(nCycles);
@@ -325,11 +332,11 @@ void VmcTests::jastrowTest() {
     double r13 = sqrt(dot(r[1] - r[3], r[1] - r[3]));
     double r23 = sqrt(dot(r[2] - r[3], r[2] - r[3]));
     double jastrowValue = exp(1./3. * r01 / (1 + parameters[1] * r01))
-            * exp(1. * r02 / (1 + parameters[1] * r02))
-            * exp(1. * r03 / (1 + parameters[1] * r03))
-            * exp(1. * r12 / (1 + parameters[1] * r12))
-            * exp(1. * r13 / (1 + parameters[1] * r13))
-            * exp(1./3. * r23 / (1 + parameters[1] * r23));
+                          * exp(1. * r02 / (1 + parameters[1] * r02))
+                          * exp(1. * r03 / (1 + parameters[1] * r03))
+                          * exp(1. * r12 / (1 + parameters[1] * r12))
+                          * exp(1. * r13 / (1 + parameters[1] * r13))
+                          * exp(1./3. * r23 / (1 + parameters[1] * r23));
 
     QCOMPARE(jastrow->evaluate(r), jastrowValue);
 }
@@ -368,8 +375,8 @@ void VmcTests::slaterFourParticleTest()
     r[3][1] = 0.7;
     waveSlater1->setParameters(parameters);
     double waveValue = (orbital00->evaluate(r[0]) * orbital01->evaluate(r[1]) - orbital01->evaluate(r[0]) * orbital00->evaluate(r[1]))
-            * (orbital00->evaluate(r[2]) * orbital01->evaluate(r[3]) - orbital01->evaluate(r[2]) * orbital00->evaluate(r[3]))
-            * jastrow->evaluate(r);
+                       * (orbital00->evaluate(r[2]) * orbital01->evaluate(r[3]) - orbital01->evaluate(r[2]) * orbital00->evaluate(r[3]))
+                       * jastrow->evaluate(r);
     QCOMPARE(waveSlater1->evaluate(r), waveValue);
 }
 // TODO: Test slater wave for four particles
@@ -427,7 +434,7 @@ void VmcTests::fullSlaterSixNoInteractionTest()
     parameters[1] = 1.0;
     waveSlater1->setParameters(parameters);
     int nCycles = 100000;
-//    waveSlater1->setUseAnalyticalLaplace(false);
+    //    waveSlater1->setUseAnalyticalLaplace(false);
     MonteCarloStandard *monteCarlo1 = new MonteCarloStandard(config1);
     //  Do the mc sampling
     monteCarlo1->sample(nCycles);
@@ -444,27 +451,25 @@ void VmcTests::fullSlaterSixNoInteractionTest()
   */
 void VmcTests::fullSlaterSixInteractionTest()
 {
-    QBENCHMARK{
-        Config *config1 = new Config(0,1);
-        config1->setNDimensions(2);
-        config1->setNParticles(6);
-        HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
-        config1->setHamiltonian(hamiltonian);
-        config1->setInteractionEnabled(true);
-        int nCycles = 5000;
+    Config *config1 = new Config(0,1);
+    config1->setNDimensions(2);
+    config1->setNParticles(6);
+    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
+    config1->setHamiltonian(hamiltonian);
+    config1->setInteractionEnabled(true);
+    int nCycles = 5000;
 
-        WaveSlater *waveSlater2 = new WaveSlater(config1);
-        double parameters[2];
-        parameters[0] = 0.92;
-        parameters[1] = 0.565;
-        waveSlater2->setParameters(parameters);
-        config1->setWave(waveSlater2);
-        MonteCarloStandard *monteCarlo2 = new MonteCarloStandard(config1);
-        monteCarlo2->sample(nCycles);
-        double energy = monteCarlo2->energy();
-        cout << "Six interacting energy was " << fabs(energy) << endl;
-//        QVERIFY(fabs(energies[0] / nTotalCycles - 20.190) < 1e-2);
-    }
+    WaveSlater *waveSlater2 = new WaveSlater(config1);
+    double parameters[2];
+    parameters[0] = 0.92;
+    parameters[1] = 0.565;
+    waveSlater2->setParameters(parameters);
+    config1->setWave(waveSlater2);
+    MonteCarloStandard *monteCarlo2 = new MonteCarloStandard(config1);
+    monteCarlo2->sample(nCycles);
+    double energy = monteCarlo2->energy();
+    cout << "Six interacting energy was " << fabs(energy) << endl;
+    //        QVERIFY(fabs(energies[0] / nTotalCycles - 20.190) < 1e-2);
 }
 
 QTEST_APPLESS_MAIN(VmcTests)

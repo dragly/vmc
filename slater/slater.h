@@ -10,7 +10,7 @@ class Orbital;
 class Slater
 {
 public:
-    Slater(Config *config, Orbital *orbitals[]);
+    Slater(Config *config, Orbital *orbitals[], bool spinUp_);
 
     ~Slater();
     double determinant(vec2 r[]);
@@ -18,13 +18,15 @@ public:
 private:
     mat matrixUpNew;
     mat matrixDownNew;
-    mat matrixUpOld;
+    mat matrixOld;
     mat matrixDownOld;
 
     int nDimensions;
     int nParticles;
 
     Orbital **orbitals;
+
+    bool spinUp;
 };
 
 #endif // SLATER_H
