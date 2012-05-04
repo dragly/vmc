@@ -7,7 +7,7 @@
 #include <iomanip>
 // disable annoying unused parameter warnings from the MPI library which we don't have any control over
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#include <mpi.h>
+#include <mpi/mpi.h>
 // Enable warnings again
 #pragma GCC diagnostic warning "-Wunused-parameter"
 #include <stdio.h>
@@ -57,24 +57,18 @@ void MinimizerStandard::runMinimizer()
     mat parameter1Map;
     double timeStart;
     double timeEnd;
-#ifndef USE_MPI
-    timeStart = timeEnd = -1;
-#endif
     double totalTime;
 
     //    WaveIdeal *wave = new WaveIdeal(nParticles, m_config->nDimensions());
     //    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(nParticles, m_config->nDimensions(), charge);
 
 
-#ifdef USE_MPI
     timeStart = MPI_Wtime();
-#endif
 
-#ifdef USE_MPI
     // broadcast the total number of  variations
     MPI_Bcast (&nVariations, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast (&m_nCycles, 1, MPI_INT, 0, MPI_COMM_WORLD);
-#endif
+
     //  initialize the arrays  by zeroing them
     totalCumulativeEnergy = zeros<mat>(nVariations,nVariations);
     totalCumulativeEnergySquared = zeros<mat>(nVariations,nVariations);

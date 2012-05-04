@@ -35,8 +35,6 @@ QMAKE_CC = mpicc
 #    QMAKE_CXXFLAGS = $$system(mpicxx --showme:compile)
 QMAKE_CXXFLAGS += -DMPICH_IGNORE_CXX_SEEK
 
-DEFINES += USE_MPI
-
 contains(CONFIG,debug) {
     message(Debug mode. Disabling optimization)
     QMAKE_CXXFLAGS = -O0

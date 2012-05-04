@@ -34,6 +34,8 @@ double Slater::determinant(vec2 r[]) {
     // the slater determinant can be divided into two parts multiplied together
     double detUp = det(matrixUpOld);
     double detDown = det(matrixDownOld);
+//    double detUp = 1;
+//    double detDown = 2;
     return detUp * detDown;
 }
 

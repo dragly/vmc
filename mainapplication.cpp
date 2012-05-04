@@ -8,13 +8,11 @@
 #include <iomanip>
 #include <stdlib.h>
 #include <stdio.h>
-#ifdef USE_MPI
 // disable annoying unused parameter warnings from the MPI library which we don't have any control over
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <mpi.h>
 // Enable warnings again
 #pragma GCC diagnostic warning "-Wunused-parameter"
-#endif
 
 #include "inih/cpp/INIReader.h"
 
@@ -34,15 +32,10 @@ MainApplication::MainApplication(int* argc, char*** argv) :
     argc(argc),
     argv(argv)
 {
-#ifdef USE_MPI
     //  MPI initializations
     MPI_Init (argc, argv);
     MPI_Comm_size (MPI_COMM_WORLD, &m_nProcesses);
     MPI_Comm_rank (MPI_COMM_WORLD, &m_rank);
-#else
-    m_nProcesses = 1;
-    m_rank = 0;
-#endif
 }
 
 void MainApplication::loadConfiguration()
