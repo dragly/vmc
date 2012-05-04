@@ -59,10 +59,10 @@ void MonteCarloStandard::sample(int nCycles)
             double ratio = wave->ratio(rNew);
             // The Metropolis test is performed by moving one particle at the time
             if(ran2(idum) <= (ratio*ratio)) {
-                rOld = rNew;
+                rOld[i] = rNew[i];
                 wave->acceptEvaluation();
             } else {
-                rNew = rOld; // Move the particle back
+                rNew[i] = rOld[i]; // Move the particle back
             }
             // compute local energy
             localEnergy = config->hamiltonian()->energy(wave, rOld);
