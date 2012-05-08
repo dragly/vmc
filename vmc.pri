@@ -4,8 +4,8 @@ INCLUDEPATH+=$$myHome/apps/armadillo-2.4.4/include
 
 #LIBS += -llapack
 #LIBS += -lblas
-LIBS += -lblas -llapack
-LIBS += -larmadillo
+#LIBS += -lblas -llapack
+LIBS += -llapack -L/usr/lib64/atlas/ -L$$myHome/apps/libs -L$$myHome/apps/armadillo-2.4.4 -larmadillo
 
 QMAKE_CXX = mpicxx
 QMAKE_CXX_RELEASE = $$QMAKE_CXX
