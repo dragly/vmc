@@ -7,14 +7,15 @@
 
 using namespace arma;
 
-Slater::Slater(Config *config, Orbital* orbitals[]) :
+Slater::Slater(Config *config, Orbital* orbitals[], bool spinUp_) :
     nDimensions(config->nDimensions()),
     nParticles(config->nParticles()),
-    orbitals(orbitals)
+    orbitals(orbitals),
+    spinUp(spinUp_)
 {
     // the slater determinant can de separated into two parts, one for spin up and the other for spin down
-    matrixUpOld = zeros<mat>(nParticles / 2, nParticles / 2);
-    matrixDownOld = zeros<mat>(nParticles / 2, nParticles / 2);
+    matrixOld = zeros<mat>(nParticles / 2, nParticles / 2);
+    //    matrixDownOld = zeros<mat>(nParticles / 2, nParticles / 2);
 }
 
 /*!
@@ -23,8 +24,11 @@ Slater::Slater(Config *config, Orbital* orbitals[]) :
 void Slater::constructMatrix(vec2 r[]) {
     for(int i = 0; i < nParticles / 2; i++) {
         for(int j = 0; j < nParticles / 2; j++) {
-            matrixUpOld(i,j) = orbitals[j]->evaluate(r[i]);
-            matrixDownOld(i,j) = orbitals[j]->evaluate(r[i + nParticles / 2]);
+            if(spinUp) {
+                matrixOld(i,j) = orbitals[j]->evaluate(r[i]);
+            } else {
+                matrixOld(i,j) = orbitals[j]->evaluate(r[i + nParticles / 2]);
+            }
         }
     }
 }
@@ -32,11 +36,10 @@ void Slater::constructMatrix(vec2 r[]) {
 double Slater::determinant(vec2 r[]) {
     constructMatrix(r);
     // the slater determinant can be divided into two parts multiplied together
-    double detUp = det(matrixUpOld);
-    double detDown = det(matrixDownOld);
-//    double detUp = 1;
-//    double detDown = 2;
-    return detUp * detDown;
+    double detUp = det(matrixOld);
+    //    double detUp = 1;
+    //    double detDown = 2;
+    return detUp;
 }
 
 Slater::~Slater() {

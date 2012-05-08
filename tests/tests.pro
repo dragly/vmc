@@ -33,7 +33,7 @@ SOURCES += tst_vmctests.cpp
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
-LIBS += -larmadillo
+#LIBS += -larmadillo
 
 QMAKE_CXX = mpicxx
 QMAKE_CXX_RELEASE = $$QMAKE_CXX
