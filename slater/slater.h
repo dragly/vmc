@@ -15,14 +15,23 @@ public:
     ~Slater();
     double determinant(vec2 r[]);
     void constructMatrix(vec2 r[]);
+
+    mat matrix();
+    mat inverse();
+    void calculateInverse();
+    void setPreviousMovedParticle(int particleNumber);
+    double ratio(vec2 &rNew, int movedParticle);
 private:
-    mat matrixUpNew;
-    mat matrixDownNew;
+    mat matrixNew;
     mat matrixOld;
-    mat matrixDownOld;
+
+    mat inverseNew;
+    mat inverseOld;
 
     int nDimensions;
     int nParticles;
+
+    int previousMovedParticle;
 
     Orbital **orbitals;
 

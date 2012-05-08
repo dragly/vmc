@@ -36,10 +36,43 @@ void Slater::constructMatrix(vec2 r[]) {
 double Slater::determinant(vec2 r[]) {
     constructMatrix(r);
     // the slater determinant can be divided into two parts multiplied together
-    double detUp = det(matrixOld);
+    double determ = det(matrixOld);
     //    double detUp = 1;
     //    double detDown = 2;
-    return detUp;
+    return determ;
+}
+
+void Slater::calculateInverse() {
+    inverseOld = inv(matrixOld);
+}
+
+void Slater::setPreviousMovedParticle(int particleNumber)
+{
+    previousMovedParticle = particleNumber;
+}
+
+double Slater::ratio(vec2 &rNew, int movedParticle)
+{
+    int localParticle;
+    if(spinUp) {
+        localParticle = movedParticle;
+    } else {
+        localParticle = movedParticle - nParticles / 2;
+    }
+    double R = 0;
+    for(int j = 0; j < nParticles / 2; j++) {
+        matrixNew.at(localParticle,j) = orbitals[j]->evaluate(rNew);
+        R += matrixNew.at(localParticle, j) * inverseOld.at(j, localParticle);
+    }
+    return R;
+}
+
+mat Slater::inverse() {
+    return inverseOld;
+}
+
+mat Slater::matrix() {
+    return matrixOld;
 }
 
 Slater::~Slater() {
