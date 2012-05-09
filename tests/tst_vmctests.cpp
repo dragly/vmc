@@ -197,6 +197,7 @@ void VmcTests::slaterRatio() {
     Config *config1 = new Config(1,1);
     config1->setNDimensions(2);
     config1->setNParticles(4);
+    int movedParticle = 1;
     double parameters[2];
     parameters[0] = 1;
     parameters[1] = 1;
@@ -213,15 +214,29 @@ void VmcTests::slaterRatio() {
         }
         rNew[i] = rOld[i];
     }
-    rNew[1].at(0) = 3;
-    rNew[1].at(1) = 2;
+    rNew[movedParticle].at(0) = 1;
+    rNew[movedParticle].at(1) = 2;
     Slater* slater1 = new Slater(config1, orbitals, true);
+    slater1->constructMatrix(rOld);
+    std::cout << slater1->matrix() << std::endl;
+    slater1->constructMatrix(rNew);
+    std::cout << slater1->matrix() << std::endl;
     double simpleRatio = slater1->determinant(rNew) / slater1->determinant(rOld);
     Slater* slater2 = new Slater(config1, orbitals, true);
     slater2->constructMatrix(rOld);
+    std::cout << slater2->matrix() << std::endl;
     slater2->calculateInverse();
 //    slater2->setPreviousMovedParticle(1);
-    double fancyRatio = slater2->ratio(rNew[1], 1);
+    double fancyRatio = slater2->ratio(rNew[movedParticle], movedParticle);
+
+    // TODO remove this stuff about normFactorial
+    double normFactorial = 1;
+    for(int i = 2; i < config1->nParticles() / 2; i++) {
+        normFactorial *= i;
+    }
+    std::cout << normFactorial << std::endl;
+    // END TODO
+
     QCOMPARE(simpleRatio, fancyRatio);
 }
 

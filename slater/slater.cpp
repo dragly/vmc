@@ -19,7 +19,7 @@ Slater::Slater(Config *config, Orbital* orbitals[], bool spinUp_) :
 }
 
 /*!
-  Note: The first half of the particles have spin up, while the others are spin down.
+  Note: The first half of the particles have spin up, while the others have spin down.
   */
 void Slater::constructMatrix(vec2 r[]) {
     for(int i = 0; i < nParticles / 2; i++) {
@@ -51,20 +51,29 @@ void Slater::setPreviousMovedParticle(int particleNumber)
     previousMovedParticle = particleNumber;
 }
 
+/*!
+  Note: The first half of the particles have spin up, while the others have spin down.
+  */
 double Slater::ratio(vec2 &rNew, int movedParticle)
 {
-    int localParticle;
-    if(spinUp) {
-        localParticle = movedParticle;
+    vec movedRow = zeros<vec>(nParticles / 2);
+    bool hasParticle = (spinUp && movedParticle < nParticles / 2) || (!spinUp && movedParticle > nParticles / 2);
+    if(hasParticle) {
+        if(spinUp) {
+            movedParticle = movedParticle;
+        } else {
+            movedParticle = movedParticle - nParticles / 2;
+        }
+        double R = 0;
+        for(int i = 0; i < nParticles / 2; i++) {
+            movedRow.at(i) = orbitals[i]->evaluate(rNew);
+            R += movedRow.at(i) * inverseOld.at(i, movedParticle);
+        }
+        std::cout << movedRow << std::endl;
+        return R;
     } else {
-        localParticle = movedParticle - nParticles / 2;
+        return 1;
     }
-    double R = 0;
-    for(int j = 0; j < nParticles / 2; j++) {
-        matrixNew.at(localParticle,j) = orbitals[j]->evaluate(rNew);
-        R += matrixNew.at(localParticle, j) * inverseOld.at(j, localParticle);
-    }
-    return R;
 }
 
 mat Slater::inverse() {
