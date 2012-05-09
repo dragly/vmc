@@ -56,7 +56,7 @@ void MonteCarloStandard::sample(int nCycles)
             for (int j=0; j < nDimensions; j++) {
                 rNew[i][j] = rOld[i][j]+step_length*(ran2(idum)-0.5);
             }
-            double ratio = wave->ratio(rNew);
+            double ratio = wave->ratio(rNew[i], i);
             // The Metropolis test is performed by moving one particle at the time
             if(ran2(idum) <= (ratio*ratio)) {
                 rOld[i] = rNew[i];

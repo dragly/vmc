@@ -26,6 +26,9 @@ WaveFunction::WaveFunction(Config *config) :
     // the function matrix is defined in the progam library
     rPlus = new vec2[ nParticles];
     rMinus = new vec2[ nParticles];
+
+    rNew = new vec2[nParticles];
+    rOld = new vec2[nParticles];
 }
 
 double WaveFunction::laplaceNumerical(vec2 r[])
@@ -98,14 +101,14 @@ WaveFunction* WaveFunction::fromName(std::string waveClass, Config* config) {
     }
 }
 
-/*!
-  Tells the system about which particle was moved last
-*/
-void WaveFunction::setPreviousMovedParticle(int particleNumber)
-{
-    assert(particleNumber < nParticles);
-    previousMovedParticle = particleNumber;
-}
+///*!
+//  Tells the system about which particle was moved last
+//*/
+//void WaveFunction::setPreviousMovedParticle(int particleNumber)
+//{
+//    assert(particleNumber < nParticles);
+//    previousMovedParticle = particleNumber;
+//}
 
 /*!
   This function does a ratio by evaluating the system in its current
@@ -115,8 +118,9 @@ void WaveFunction::setPreviousMovedParticle(int particleNumber)
 
   @param r An array of vectors denoting all the particle positions.
 */
-double WaveFunction::ratio(vec2 rNew[])
+double WaveFunction::ratio(vec2 &rParticle, int particleNumber)
 {
+    rNew[particleNumber] = rParticle;
     currentEvaluation = evaluate(rNew);
     double ratio = currentEvaluation / previousEvaluation;
     return ratio;
@@ -124,10 +128,17 @@ double WaveFunction::ratio(vec2 rNew[])
 
 void WaveFunction::acceptEvaluation() {
     previousEvaluation = currentEvaluation;
+    for(int i = 0; i < nParticles; i++) {
+        rOld[i] = rNew[i];
+    }
 }
 
 void WaveFunction::init(vec2 r[]) {
     previousEvaluation = evaluate(r);
+    for(int i = 0; i < nParticles; i++) {
+        rNew[i] = r[i];
+        rOld[i] = r[i];
+    }
 }
 
 WaveFunction::~WaveFunction()

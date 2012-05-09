@@ -34,7 +34,6 @@ public:
     void waveSimpleGradientTest(); // TODO - consider implementing this again
     void initTestCase();
     void orbitalTest();
-    void jastrowTest();
     void cleanupTestCase();
     void waveSimpleLaplaceTest();
     void waveIdealLaplaceTest();
@@ -43,15 +42,17 @@ public:
     void hermiteTest();
     void minimizerEvolutionaryTest();
     void twoOrbitalsOneWavefunctionTest();
-    void slaterTest();
     void fullIdealHastingsSlaterTest();
+    void slaterTest();
+    void slaterInverse();
+    void slaterRatioTest();
+    void jastrowTest();
+    void jastrowRatioTest();
     void slaterFourParticleTest();
     void slaterSixParticleTest();
+private slots:
     void fullSlaterSixNoInteractionTest();
     void fullSlaterSixInteractionTest();
-private slots:
-    void slaterRatio();
-    void slaterInverse();
 
 private:
     Config *oldConfig;
@@ -162,12 +163,9 @@ void VmcTests::slaterInverse() {
     config1->setNDimensions(2);
     config1->setNParticles(4);
     double parameters[2];
-    parameters[0] = 1;
-    parameters[1] = 1;
     Orbital **orbitals = new Orbital*[4];
     for(int i = 0; i < 4; i++) {
         orbitals[i] = new Orbital(0,i,config1);
-        orbitals[i]->setParameters(parameters);
     }
     vec2 r[4];
     for(int i = 0; i < config1->nParticles(); i++) {
@@ -185,29 +183,32 @@ void VmcTests::slaterInverse() {
     slater->constructMatrix(r);
     slater->calculateInverse();
     mat invComparison = inv(comparison);
-    for(int i = 0; i < 2; i++) {
-        for(int j = 0; j < 2; j++) {
-            QCOMPARE(comparison.at(i,j), slater->matrix().at(i,j));
-            QCOMPARE(invComparison.at(i,j), slater->inverse().at(i,j));
+    for(int a = 0; a < 10; a++) {
+        parameters[0] = a * 0.31;
+        parameters[1] = a * 0.92;
+        for(int i = 0; i < 4; i++) {
+            orbitals[i]->setParameters(parameters);
+        }
+        for(int i = 0; i < 2; i++) {
+            for(int j = 0; j < 2; j++) {
+                QCOMPARE(comparison.at(i,j), slater->matrix().at(i,j));
+                QCOMPARE(invComparison.at(i,j), slater->inverse().at(i,j));
+            }
         }
     }
 }
 
-void VmcTests::slaterRatio() {
+void VmcTests::slaterRatioTest() {
     Config *config1 = new Config(1,1);
     config1->setNDimensions(2);
     config1->setNParticles(4);
-    int movedParticle = 1;
-    double parameters[2];
-    parameters[0] = 1;
-    parameters[1] = 1;
     Orbital **orbitals = new Orbital*[4];
     for(int i = 0; i < 4; i++) {
         orbitals[i] = new Orbital(0,i,config1);
-        orbitals[i]->setParameters(parameters);
     }
     vec2 rOld[4];
     vec2 rNew[4];
+    int movedParticle = 1;
     for(int i = 0; i < config1->nParticles(); i++) {
         for(int j = 0; j < config1->nDimensions(); j++) {
             rOld[i].at(j) = i * config1->nDimensions() + j;
@@ -218,25 +219,52 @@ void VmcTests::slaterRatio() {
     rNew[movedParticle].at(1) = 2;
     Slater* slater1 = new Slater(config1, orbitals, true);
     slater1->constructMatrix(rOld);
-    std::cout << slater1->matrix() << std::endl;
     slater1->constructMatrix(rNew);
-    std::cout << slater1->matrix() << std::endl;
-    double simpleRatio = slater1->determinant(rNew) / slater1->determinant(rOld);
     Slater* slater2 = new Slater(config1, orbitals, true);
-    slater2->constructMatrix(rOld);
-    std::cout << slater2->matrix() << std::endl;
-    slater2->calculateInverse();
-//    slater2->setPreviousMovedParticle(1);
-    double fancyRatio = slater2->ratio(rNew[movedParticle], movedParticle);
-
-    // TODO remove this stuff about normFactorial
-    double normFactorial = 1;
-    for(int i = 2; i < config1->nParticles() / 2; i++) {
-        normFactorial *= i;
+    for(int a = 0; a < 10; a++) {
+        double parameters[2];
+        parameters[0] = a * 0.19;
+        parameters[1] = a * 0.23;
+        for(int i = 0; i < 4; i++) {
+            orbitals[i]->setParameters(parameters);
+        }
+        double simpleRatio = slater1->determinant(rNew) / slater1->determinant(rOld);
+        slater2->constructMatrix(rOld);
+        slater2->calculateInverse();
+    //    slater2->setPreviousMovedParticle(1);
+        double fancyRatio = slater2->ratio(rNew[movedParticle], movedParticle);
+        QCOMPARE(simpleRatio, fancyRatio);
     }
-    std::cout << normFactorial << std::endl;
-    // END TODO
+    delete slater2;
+    delete slater1;
+}
 
+void VmcTests::jastrowRatioTest() {
+    Config *config1 = new Config(1,1);
+    config1->setNDimensions(2);
+    config1->setNParticles(4);
+    double parameters[2];
+    parameters[0] = 1;
+    parameters[1] = 1;
+
+    vec2 rOld[4];
+    vec2 rNew[4];
+    int movedParticle = 1;
+    for(int i = 0; i < config1->nParticles(); i++) {
+        for(int j = 0; j < config1->nDimensions(); j++) {
+            rOld[i].at(j) = i * config1->nDimensions() + j;
+        }
+        rNew[i] = rOld[i];
+    }
+    rNew[movedParticle].at(0) = 1;
+    rNew[movedParticle].at(1) = 2;
+
+    Jastrow* jastrow1 = new Jastrow(config1);
+    double simpleRatio = jastrow1->evaluate(rNew) / jastrow1->evaluate(rOld);
+
+    Jastrow* jastrow2 = new Jastrow(config1);
+    jastrow2->calculateDistances(rOld);
+    double fancyRatio = jastrow2->ratio(rNew[movedParticle], movedParticle);
     QCOMPARE(simpleRatio, fancyRatio);
 }
 
@@ -547,25 +575,28 @@ void VmcTests::fullSlaterSixNoInteractionTest()
   */
 void VmcTests::fullSlaterSixInteractionTest()
 {
-    Config *config1 = new Config(0,1);
-    config1->setNDimensions(2);
-    config1->setNParticles(6);
-    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
-    config1->setHamiltonian(hamiltonian);
-    config1->setInteractionEnabled(true);
-    int nCycles = 50000;
+    QBENCHMARK {
+        Config *config1 = new Config(0,1);
+        config1->setNDimensions(2);
+        config1->setNParticles(6);
+        HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
+        config1->setHamiltonian(hamiltonian);
+        config1->setInteractionEnabled(true);
+        int nCycles = 50000;
 
-    WaveSlater *waveSlater2 = new WaveSlater(config1);
-    double parameters[2];
-    parameters[0] = 0.92;
-    parameters[1] = 0.565;
-    waveSlater2->setParameters(parameters);
-    config1->setWave(waveSlater2);
-    MonteCarloStandard *monteCarlo2 = new MonteCarloStandard(config1);
-    monteCarlo2->sample(nCycles);
-    double energy = monteCarlo2->energy();
-    cout << "Six interacting energy was " << fabs(energy) << endl;
-    QVERIFY(fabs(energy - 20.190) < 1e-1);
+        WaveSlater *waveSlater2 = new WaveSlater(config1);
+        double parameters[2];
+        parameters[0] = 0.92;
+        parameters[1] = 0.565;
+        waveSlater2->setParameters(parameters);
+        config1->setWave(waveSlater2);
+        MonteCarloStandard *monteCarlo2 = new MonteCarloStandard(config1);
+        monteCarlo2->sample(nCycles);
+        double energy = monteCarlo2->energy();
+        cout << "Six interacting energy was " << fabs(energy) << endl;
+        QVERIFY(fabs(energy - 20.190) < 1e-1);
+    }
+    std::cout << "Benchmark used to be 51.328 seconds @ hyperon" << std::endl;
 }
 
 QTEST_APPLESS_MAIN(VmcTests)

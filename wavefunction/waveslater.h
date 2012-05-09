@@ -23,7 +23,10 @@ public:
     WaveSlater(Config *config);
     double evaluate(vec2 r[]);
     void setParameters(double *parameters);
-    void setPreviousMovedParticle(int particleNumber);
+//    void setPreviousMovedParticle(int particleNumber);
+    void acceptEvaluation();
+    double ratio(vec2 &rParticle, int particleNumber);
+    void init(vec2 r[]);
 private:
     Slater *slaterDown;
     Slater *slaterUp;

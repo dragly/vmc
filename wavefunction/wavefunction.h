@@ -28,8 +28,8 @@ public:
     virtual void gradientNumerical(vec2 r[], vec2 &rGradient);
     virtual void setParameters(double *parameters);
     static WaveFunction* fromName(string waveClass, Config *config);
-    virtual void setPreviousMovedParticle(int particleNumber);
-    virtual double ratio(vec2 rNew[]);
+//    virtual void setPreviousMovedParticle(int particleNumber);
+    virtual double ratio(vec2 &rParticle, int particleNumber);
     virtual void acceptEvaluation();
     virtual void init(vec2 r[]);
 
@@ -42,6 +42,9 @@ protected:
     double *parameters;
     vec2 *rPlus;
     vec2 *rMinus;
+
+    vec2 *rNew;
+    vec2 *rOld;
     double previousEvaluation;
     double currentEvaluation;
 };

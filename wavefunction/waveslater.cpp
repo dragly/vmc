@@ -71,14 +71,43 @@ double WaveSlater::evaluate(vec2 r[])
     for(int i = 2; i < nParticles / 2; i++) {
         normFactorial *= i;
     }
+    double evaluation = 1 / sqrt(normFactorial) * slaterUp->determinant(r) * slaterDown->determinant(r);
     if(m_interactionEnabled) {
-        return 1 / sqrt(normFactorial) * slaterUp->determinant(r) * slaterDown->determinant(r) * jastrow->evaluate(r);
-    } else {
-        return 1 / sqrt(normFactorial) * slaterUp->determinant(r) * slaterDown->determinant(r);
+        evaluation *= jastrow->evaluate(r);
     }
+    return evaluation;
 }
 
-void WaveSlater::setPreviousMovedParticle(int particleNumber) {
-    WaveFunction::setPreviousMovedParticle(particleNumber);
-    // TODO Set last moved particle for slater or something
+double WaveSlater::ratio(vec2 &rParticle, int particleNumber) {
+    // TODO Is it necessary to calculate the inverse here?
+//    slaterUp->calculateInverse();
+//    slaterDown->calculateInverse();
+    double theRatio = slaterUp->ratio(rParticle, particleNumber) * slaterDown->ratio(rParticle, particleNumber);
+    if(m_interactionEnabled) {
+        theRatio *= jastrow->ratio(rParticle, particleNumber);
+    }
+    return theRatio;
+}
+
+void WaveSlater::init(vec2 r[]) {
+    WaveFunction::init(r);
+    slaterUp->constructMatrix(r);
+    std::cout << slaterUp->matrix() << std::endl;
+    slaterUp->calculateInverse();
+    slaterDown->constructMatrix(r);
+    std::cout << slaterDown->matrix() << std::endl;
+    slaterDown->calculateInverse();
+    std::cout << "Doing fine" << std::endl;
+}
+
+//void WaveSlater::setPreviousMovedParticle(int particleNumber) {
+//    WaveFunction::setPreviousMovedParticle(particleNumber);
+//    // TODO Set last moved particle for slater or something
+//}
+
+void WaveSlater::acceptEvaluation() {
+    WaveFunction::acceptEvaluation();
+    slaterDown->acceptEvaluation();
+    slaterUp->acceptEvaluation();
+    jastrow->acceptEvaluation();
 }

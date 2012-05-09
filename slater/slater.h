@@ -21,6 +21,7 @@ public:
     void calculateInverse();
     void setPreviousMovedParticle(int particleNumber);
     double ratio(vec2 &rNew, int movedParticle);
+    void acceptEvaluation();
 private:
     mat matrixNew;
     mat matrixOld;

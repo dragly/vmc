@@ -15,6 +15,7 @@ Slater::Slater(Config *config, Orbital* orbitals[], bool spinUp_) :
 {
     // the slater determinant can de separated into two parts, one for spin up and the other for spin down
     matrixOld = zeros<mat>(nParticles / 2, nParticles / 2);
+    matrixNew = zeros<mat>(nParticles / 2, nParticles / 2);
     //    matrixDownOld = zeros<mat>(nParticles / 2, nParticles / 2);
 }
 
@@ -43,7 +44,13 @@ double Slater::determinant(vec2 r[]) {
 }
 
 void Slater::calculateInverse() {
-    inverseOld = inv(matrixOld);
+    try {
+        inverseOld = inv(matrixOld);
+    } catch(std::runtime_error &e) {
+        inverseOld = zeros<mat>(nParticles / 2, nParticles / 2);
+//        std::cout << matrix() << std::endl;
+//        std::cout << "Caught inverse exception!" << std::endl;
+    }
 }
 
 void Slater::setPreviousMovedParticle(int particleNumber)
@@ -56,7 +63,6 @@ void Slater::setPreviousMovedParticle(int particleNumber)
   */
 double Slater::ratio(vec2 &rNew, int movedParticle)
 {
-    vec movedRow = zeros<vec>(nParticles / 2);
     bool hasParticle = (spinUp && movedParticle < nParticles / 2) || (!spinUp && movedParticle > nParticles / 2);
     if(hasParticle) {
         if(spinUp) {
@@ -66,14 +72,18 @@ double Slater::ratio(vec2 &rNew, int movedParticle)
         }
         double R = 0;
         for(int i = 0; i < nParticles / 2; i++) {
-            movedRow.at(i) = orbitals[i]->evaluate(rNew);
-            R += movedRow.at(i) * inverseOld.at(i, movedParticle);
+            matrixNew.at(movedParticle,i) = orbitals[i]->evaluate(rNew);
+            R += matrixNew.at(movedParticle,i) * inverseOld.at(i, movedParticle);
         }
-        std::cout << movedRow << std::endl;
         return R;
     } else {
         return 1;
     }
+}
+
+void Slater::acceptEvaluation()
+{
+    matrixOld = matrixNew;
 }
 
 mat Slater::inverse() {

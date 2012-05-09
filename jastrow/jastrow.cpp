@@ -3,13 +3,20 @@
 #include "../config.h"
 
 Jastrow::Jastrow(Config *config) :
-    m_nParticles(config->nParticles())
+    nParticles(config->nParticles())
 {
-    a = zeros<mat>(m_nParticles, m_nParticles);
+    a = zeros<mat>(nParticles, nParticles);
+    distancesOld = zeros<mat>(nParticles, nParticles);
+    distancesNew = zeros<mat>(nParticles, nParticles);
+    jastrowArgumentsOld = zeros<mat>(nParticles, nParticles);
+    jastrowArgumentsNew = zeros<mat>(nParticles, nParticles);
+    rOld = new vec2[nParticles];
+    rNew = new vec2[nParticles];
 
-    for(int i = 0; i < m_nParticles; i++) {
-        for(int j = 0; j < m_nParticles; j++) {
-            if((i < m_nParticles / 2 && j < m_nParticles / 2) || (i >= m_nParticles / 2 && j >= m_nParticles / 2)) {
+
+    for(int i = 0; i < nParticles; i++) {
+        for(int j = 0; j < nParticles; j++) {
+            if((i < nParticles / 2 && j < nParticles / 2) || (i >= nParticles / 2 && j >= nParticles / 2)) {
                 a(i,j) = 1. / 3;
             } else {
                 a(i,j) = 1.;
@@ -18,20 +25,78 @@ Jastrow::Jastrow(Config *config) :
     }
 }
 
+Jastrow::~Jastrow() {
+    delete rOld;
+    delete rNew;
+}
+
+/*!
+  Note: Only sets values for the upper right triangle of the distance and Jastrow argument matrices.
+  */
+void Jastrow::calculateDistances(vec2 r[]) {
+    for(int i = 0; i < nParticles; i++) {
+        rOld[i] = r[i];
+        rNew[i] = r[i];
+        for(int j = i + 1; j < nParticles; j++) {
+            vec2 diff = r[i] - r[j];
+            distancesOld.at(i,j) = sqrt(dot(diff,diff));
+            jastrowArgumentsOld.at(i,j) = argument(i,j,distancesOld);
+        }
+    }
+}
+
+void Jastrow::acceptEvaluation()
+{
+    for(int i = 0; i < nParticles; i++) {
+        rNew[i] = rOld[i];
+    }
+}
+
+double Jastrow::argument(int i, int j, mat &distances) {
+    return (a(i,j) * distances.at(i,j)) / (1 + m_beta * distances.at(i,j));
+}
+
 double Jastrow::evaluate(vec2 r[]) {
     double wf = 1;
-    // TODO Does this need a factor in front of it to account for counting only half of the particles?
-    double vec[2];
-    for(int i = 0; i < m_nParticles; i++) {
-        for(int j = i + 1; j < m_nParticles; j++) {
-            vec[0] = r[i][0]-r[j][0];
-            vec[1] = r[i][1]-r[j][1];
-            double r12 = sqrt(vec[0]*vec[0]+vec[1]*vec[1]);
-            double jastrowArgument = (a(i,j) * r12) / (1 + m_beta * r12);
-            wf *= exp(jastrowArgument);
+
+    calculateDistances(r);
+    for(int i = 0; i < nParticles; i++) {
+        for(int j = i + 1; j < nParticles; j++) {
+            wf *= exp(jastrowArgumentsOld.at(i,j));
         }
     }
     return wf;
+}
+
+/*!
+  Note: The distance and Jastrow argument matrices only have values in their upper right triangle.
+  */
+double Jastrow::ratio(vec2 &r, int particleNumber)
+{
+    rNew[particleNumber] = r;
+    // we only need to update the elements in the matrix that are affected by the move of one particle
+    distancesNew = distancesOld;
+    double argumentChange = 0;
+    for(int i = 0; i < particleNumber; i++) {
+        vec2 diff = rOld[i] - r;
+        distancesNew.at(i,particleNumber) = sqrt(dot(diff,diff));
+        jastrowArgumentsNew.at(i,particleNumber) = argument(i,particleNumber,distancesNew);
+        argumentChange += jastrowArgumentsNew.at(i,particleNumber) - jastrowArgumentsOld.at(i,particleNumber);
+    }
+    for(int j = particleNumber + 1; j < nParticles; j++) {
+        vec2 diff = r - rOld[j];
+        distancesNew.at(particleNumber,j) = sqrt(dot(diff,diff));
+        jastrowArgumentsNew.at(particleNumber,j) = argument(particleNumber,j,distancesNew);
+        argumentChange += jastrowArgumentsNew.at(particleNumber,j) - jastrowArgumentsOld.at(particleNumber,j);
+    }
+//    jastrowArgumentsNew = jastrowArgumentsOld;
+//    calculateDistances(rNew);
+//    for(int i = 0; i < nParticles; i++) {
+//        for(int j = i + 1; j < nParticles; j++) {
+//            argumentChange += jastrowArgumentsOld.at(i,j) - jastrowArgumentsNew.at(i,j);
+//        }
+//    }
+    return exp(argumentChange);
 }
 
 void Jastrow::setParameters(double *parameters)
