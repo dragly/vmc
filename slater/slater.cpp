@@ -43,13 +43,21 @@ double Slater::determinant(vec2 r[]) {
     return determ;
 }
 
+int nExceptions = 0;
+
 void Slater::calculateInverse() {
     try {
         inverseOld = inv(matrixOld);
     } catch(std::runtime_error &e) {
-        inverseOld = zeros<mat>(nParticles / 2, nParticles / 2);
-//        std::cout << matrix() << std::endl;
-//        std::cout << "Caught inverse exception!" << std::endl;
+        std::cout << matrix() << std::endl;
+        std::cout << "Caught inverse exception! Setting inverse to large random matrix." << std::endl;
+        inverseOld = randu<mat>(nParticles / 2, nParticles / 2) * 99999999;
+        std::cout << inverseOld << std::endl;
+        nExceptions++;
+        if(nExceptions > 10) {
+            std::cout << "Too may exceptions. Quitting!" << std::endl;
+            exit(1337);
+        }
     }
 }
 

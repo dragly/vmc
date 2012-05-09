@@ -80,8 +80,8 @@ double WaveSlater::evaluate(vec2 r[])
 
 double WaveSlater::ratio(vec2 &rParticle, int particleNumber) {
     // TODO Is it necessary to calculate the inverse here?
-//    slaterUp->calculateInverse();
-//    slaterDown->calculateInverse();
+    slaterUp->calculateInverse();
+    slaterDown->calculateInverse();
     double theRatio = slaterUp->ratio(rParticle, particleNumber) * slaterDown->ratio(rParticle, particleNumber);
     if(m_interactionEnabled) {
         theRatio *= jastrow->ratio(rParticle, particleNumber);
