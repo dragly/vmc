@@ -14,13 +14,16 @@
 #include "waveideal.h"
 #include "waveslater.h"
 #include "../config.h"
+#include "../inih/cpp/INIReader.h"
 
 WaveFunction::WaveFunction(Config *config) :
     config(config),
     nParticles(config->nParticles()),
     nDimensions(config->nDimensions()),
     previousEvaluation(0),
-    currentEvaluation(0)
+    currentEvaluation(0),
+    useAnalyticalLaplace(false),
+    useAnalyticalGradient(false)
 {
     // allocate matrices which contain the position of the particles
     // the function matrix is defined in the progam library
@@ -29,6 +32,11 @@ WaveFunction::WaveFunction(Config *config) :
 
     rNew = new vec2[nParticles];
     rOld = new vec2[nParticles];
+}
+
+void WaveFunction::loadConfiguration(INIReader *settings) {
+    useAnalyticalLaplace = settings->GetBoolean("Wave", "useAnalyticalLaplace", false);
+    useAnalyticalGradient = settings->GetBoolean("Wave", "useAnalyticalGradient", false);
 }
 
 double WaveFunction::laplaceNumerical(vec2 r[])
@@ -126,14 +134,15 @@ double WaveFunction::ratio(vec2 &rParticle, int particleNumber)
     return ratio;
 }
 
-void WaveFunction::acceptEvaluation() {
+void WaveFunction::acceptEvaluation(int movedParticle) {
+    (void)movedParticle;
     previousEvaluation = currentEvaluation;
     for(int i = 0; i < nParticles; i++) {
         rOld[i] = rNew[i];
     }
 }
 
-void WaveFunction::init(vec2 r[]) {
+void WaveFunction::initialize(vec2 r[]) {
     previousEvaluation = evaluate(r);
     for(int i = 0; i < nParticles; i++) {
         rNew[i] = r[i];

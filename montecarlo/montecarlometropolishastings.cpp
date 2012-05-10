@@ -45,7 +45,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
             rOld[i][j] = step_length*(ran2(idum)-0.5);
         }
     }
-    wave->init(rOld);
+    wave->initialize(rOld);
     wave->gradient(rOld, waveGradientOld);
     quantumForce(rOld, forceVectorOld);
     // loop over monte carlo cycles

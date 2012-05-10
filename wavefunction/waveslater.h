@@ -24,9 +24,11 @@ public:
     double evaluate(vec2 r[]);
     void setParameters(double *parameters);
 //    void setPreviousMovedParticle(int particleNumber);
-    void acceptEvaluation();
-    double ratio(vec2 &rParticle, int particleNumber);
-    void init(vec2 r[]);
+    void acceptEvaluation(int movedParticle);
+    double ratio(vec2 &particlePosition, int particleNumber);
+    void initialize(vec2 positions[]);
+    double laplace(vec2 r[]);
+    void gradient(vec2 r[], vec2 &rGradient);
 private:
     Slater *slaterDown;
     Slater *slaterUp;

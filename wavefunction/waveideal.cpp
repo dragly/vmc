@@ -2,8 +2,7 @@
 #include <math.h>
 
 WaveIdeal::WaveIdeal(Config *config) :
-    WaveFunction(config),
-    useAnalytical(false)
+    WaveFunction(config)
 {
 }
 
@@ -37,7 +36,7 @@ double WaveIdeal::laplace(vec2 r[])
 {
     double alpha = parameters[0];
     double beta = parameters[1];
-    if(useAnalytical) {
+    if(useAnalyticalLaplace) {
         double omega = 1;
         double aconst = 1;
         // TODO: Generalize for more dimensions

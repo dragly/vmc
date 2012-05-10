@@ -45,8 +45,9 @@ void Jastrow::calculateDistances(vec2 r[]) {
     }
 }
 
-void Jastrow::acceptEvaluation()
+void Jastrow::acceptEvaluation(int movedParticle)
 {
+    (void)movedParticle;
     for(int i = 0; i < nParticles; i++) {
         rNew[i] = rOld[i];
     }
@@ -54,6 +55,11 @@ void Jastrow::acceptEvaluation()
 
 double Jastrow::argument(int i, int j, mat &distances) {
     return (a(i,j) * distances.at(i,j)) / (1 + m_beta * distances.at(i,j));
+}
+
+void Jastrow::gradient(vec2 r[], vec2 &rGradient)
+{
+
 }
 
 double Jastrow::evaluate(vec2 r[]) {

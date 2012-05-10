@@ -14,7 +14,6 @@ public:
     WaveSimple(Config *config);
     double evaluate(vec2 r[]);
     double laplace(vec2 r[]);
-    void setUseAnalyticalLaplace(bool val);
 private:
     bool useAnalytical;
     vec2 rPlus[];

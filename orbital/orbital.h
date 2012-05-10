@@ -18,6 +18,7 @@ public:
 
     double evaluate(const vec2 &r) const;
     void setParameters(double* parameters);
+    void gradient(const vec2 &r, vec2 &rGradient) const;
 private:
     // the quantum numbers, one for each dimension in this problem
     double m_nx;

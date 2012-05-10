@@ -32,27 +32,31 @@ public:
     VmcTests();
 
     void waveSimpleGradientTest(); // TODO - consider implementing this again
+    // slow tests
+    void fullSlaterSixInteractionTest();
+    void fullIdealHastingsTest();
+    void fullSlaterSixNoInteractionTest();
+    void fullIdealHastingsSlaterTest();
+    void fullIdealTest();
+    // quick tests
     void initTestCase();
     void orbitalTest();
     void cleanupTestCase();
     void waveSimpleLaplaceTest();
     void waveIdealLaplaceTest();
-    void fullIdealTest();
-    void fullIdealHastingsTest();
     void hermiteTest();
     void minimizerEvolutionaryTest();
     void twoOrbitalsOneWavefunctionTest();
-    void fullIdealHastingsSlaterTest();
-    void slaterTest();
-    void slaterInverse();
-    void slaterRatioTest();
     void jastrowTest();
     void jastrowRatioTest();
     void slaterFourParticleTest();
-    void slaterSixParticleTest();
-    void fullSlaterSixNoInteractionTest();
+    void waveSlaterSixParticleTest();
 private slots:
-    void fullSlaterSixInteractionTest();
+    void slaterTest();
+    void slaterInverse();
+    void slaterRatioTest();
+    void orbitalGradientTest();
+    void slaterGradientTest();
 
 private:
     Config *oldConfig;
@@ -180,8 +184,7 @@ void VmcTests::slaterInverse() {
         }
     }
     Slater* slater = new Slater(config1, orbitals, true);
-    slater->constructMatrix(r);
-    slater->calculateInverse();
+    slater->initialize(r);
     mat invComparison = inv(comparison);
     for(int a = 0; a < 10; a++) {
         parameters[0] = a * 0.31;
@@ -211,17 +214,15 @@ void VmcTests::slaterRatioTest() {
     int movedParticle = 1;
     for(int i = 0; i < config1->nParticles(); i++) {
         for(int j = 0; j < config1->nDimensions(); j++) {
-            rOld[i].at(j) = i * config1->nDimensions() + j;
+            rOld[i].at(j) = 0.2 * i * config1->nDimensions() + j * 0.1 + 0.24;
         }
         rNew[i] = rOld[i];
     }
     rNew[movedParticle].at(0) = 1;
     rNew[movedParticle].at(1) = 2;
     Slater* slater1 = new Slater(config1, orbitals, true);
-    slater1->constructMatrix(rOld);
-    slater1->constructMatrix(rNew);
     Slater* slater2 = new Slater(config1, orbitals, true);
-    for(int a = 0; a < 10; a++) {
+    for(int a = 1; a < 10; a++) {
         double parameters[2];
         parameters[0] = a * 0.19;
         parameters[1] = a * 0.23;
@@ -229,9 +230,8 @@ void VmcTests::slaterRatioTest() {
             orbitals[i]->setParameters(parameters);
         }
         double simpleRatio = slater1->determinant(rNew) / slater1->determinant(rOld);
-        slater2->constructMatrix(rOld);
-        slater2->calculateInverse();
-    //    slater2->setPreviousMovedParticle(1);
+        slater2->initialize(rOld);
+        //    slater2->setPreviousMovedParticle(1);
         double fancyRatio = slater2->ratio(rNew[movedParticle], movedParticle);
         QCOMPARE(simpleRatio, fancyRatio);
     }
@@ -456,13 +456,47 @@ void VmcTests::jastrowTest() {
     double r13 = sqrt(dot(r[1] - r[3], r[1] - r[3]));
     double r23 = sqrt(dot(r[2] - r[3], r[2] - r[3]));
     double jastrowValue = exp(1./3. * r01 / (1 + parameters[1] * r01))
-                          * exp(1. * r02 / (1 + parameters[1] * r02))
-                          * exp(1. * r03 / (1 + parameters[1] * r03))
-                          * exp(1. * r12 / (1 + parameters[1] * r12))
-                          * exp(1. * r13 / (1 + parameters[1] * r13))
-                          * exp(1./3. * r23 / (1 + parameters[1] * r23));
+            * exp(1. * r02 / (1 + parameters[1] * r02))
+            * exp(1. * r03 / (1 + parameters[1] * r03))
+            * exp(1. * r12 / (1 + parameters[1] * r12))
+            * exp(1. * r13 / (1 + parameters[1] * r13))
+            * exp(1./3. * r23 / (1 + parameters[1] * r23));
 
     QCOMPARE(jastrow->evaluate(r), jastrowValue);
+}
+
+/*!
+  Test the slater gradient
+  */
+void VmcTests::slaterGradientTest()
+{
+    Config *config1 = new Config(0,1);
+    config1->setNDimensions(2);
+    config1->setNParticles(4);
+    double omega = 1;
+    config1->setOmega(omega);
+    double parameters[2];
+    WaveSlater *waveSlater1 = new WaveSlater(config1);
+    config1->setWave(waveSlater1);
+    for(int p = 1; p < 11; p++) {
+        parameters[0] = 0.34 * p;
+        parameters[1] = 0.12 * p;
+        waveSlater1->setParameters(parameters);
+        vec2 *r = new vec2[config1->nParticles()];
+        for(int i = 0; i < config1->nParticles(); i++) {
+            r[i][0] = i *0.12;
+            r[i][1] = i *0.31;
+        }
+        waveSlater1->setParameters(parameters);
+        vec2 analyticalGradient;
+        vec2 numericalGradient;
+        waveSlater1->gradient(r, analyticalGradient);
+        waveSlater1->gradientNumerical(r, numericalGradient);
+        for(int i = 0; i < config1->nDimensions(); i++) {
+            std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
+            QVERIFY(analyticalGradient[i] - numericalGradient[i] < 1e-4);
+        }
+    }
 }
 
 /*!
@@ -499,8 +533,8 @@ void VmcTests::slaterFourParticleTest()
     r[3][1] = 0.7;
     waveSlater1->setParameters(parameters);
     double waveValue = (orbital00->evaluate(r[0]) * orbital01->evaluate(r[1]) - orbital01->evaluate(r[0]) * orbital00->evaluate(r[1]))
-                       * (orbital00->evaluate(r[2]) * orbital01->evaluate(r[3]) - orbital01->evaluate(r[2]) * orbital00->evaluate(r[3]))
-                       * jastrow->evaluate(r);
+            * (orbital00->evaluate(r[2]) * orbital01->evaluate(r[3]) - orbital01->evaluate(r[2]) * orbital00->evaluate(r[3]))
+            * jastrow->evaluate(r);
     QCOMPARE(waveSlater1->evaluate(r), waveValue);
 }
 // TODO: Test slater wave for four particles
@@ -509,7 +543,7 @@ void VmcTests::slaterFourParticleTest()
   Test the slater wave function with multiple particles. There is no benchmark
   for this function, so we just make sure it runs and prints without error.
   */
-void VmcTests::slaterSixParticleTest()
+void VmcTests::waveSlaterSixParticleTest()
 {
     Config *config1 = new Config(0,1);
     config1->setNDimensions(2);
@@ -565,6 +599,48 @@ void VmcTests::fullSlaterSixNoInteractionTest()
     double energy = monteCarlo1->energy();
     cout << "Six non-interacting energy was " << fabs(energy) << endl;
     QVERIFY(fabs(energy - 10) < 1e-2);
+}
+
+void VmcTests::orbitalGradientTest()
+{
+    int nParticles = 2;
+    int nDimensions = 2;
+    double hstep = 0.00001;
+    Config *config1 = new Config(0,1);
+    config1->setNParticles(nParticles);
+    config1->setNDimensions(nDimensions);
+    for(int nx = 0; nx < 5; nx++) {
+        for(int ny = 0; ny < 5; ny++) {
+            //            std::cout << std::endl << "Orbital " << nx  << " " << ny << std::endl;
+            Orbital *orbital = new Orbital(nx,ny,config1);
+
+            vec2 rPlus;
+            vec2 rMinus;
+            vec2 rPos;
+            vec2 simpleGradient;
+            for(int i = 1; i < 10; i++) {
+                rPos[0] = i*0.12;
+                rPos[1] = i*0.05;
+                rPlus = rPos;
+                rMinus = rPos;
+                //                std::cout << rPos << std::endl;
+                vec2 analyticalGradient;
+                orbital->gradient(rPos, analyticalGradient);
+                for (int j = 0; j < nDimensions; j++) {
+                    rPlus = rPos;
+                    rMinus = rPos;
+                    rPlus[j] = rPos[j] + hstep;
+                    rMinus[j] = rPos[j] - hstep;
+                    double wfminus = orbital->evaluate(rMinus);
+                    double wfplus  = orbital->evaluate(rPlus);
+                    simpleGradient[j] = (wfplus - wfminus)/(2*hstep);
+                    //                    std::cout << analyticalGradient[j] << " " << simpleGradient[j] << std::endl;
+                    QVERIFY(fabs(analyticalGradient[j] - simpleGradient[j]) < 1e-6);
+                }
+            }
+            delete orbital;
+        }
+    }
 }
 
 /*!

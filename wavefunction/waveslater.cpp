@@ -78,27 +78,19 @@ double WaveSlater::evaluate(vec2 r[])
     return evaluation;
 }
 
-double WaveSlater::ratio(vec2 &rParticle, int particleNumber) {
-    // TODO Is it necessary to calculate the inverse here?
-    slaterUp->calculateInverse();
-    slaterDown->calculateInverse();
-    double theRatio = slaterUp->ratio(rParticle, particleNumber) * slaterDown->ratio(rParticle, particleNumber);
+double WaveSlater::ratio(vec2 &particlePosition, int particleNumber) {
+    double theRatio = slaterUp->ratio(particlePosition, particleNumber) * slaterDown->ratio(particlePosition, particleNumber);
     if(m_interactionEnabled) {
-        theRatio *= jastrow->ratio(rParticle, particleNumber);
+        theRatio *= jastrow->ratio(particlePosition, particleNumber);
     }
     return theRatio;
 //    return WaveFunction::ratio(rParticle, particleNumber);
 }
 
-void WaveSlater::init(vec2 r[]) {
-    WaveFunction::init(r);
-    slaterUp->constructMatrix(r);
-    std::cout << slaterUp->matrix() << std::endl;
-    slaterUp->calculateInverse();
-    slaterDown->constructMatrix(r);
-    std::cout << slaterDown->matrix() << std::endl;
-    slaterDown->calculateInverse();
-    std::cout << "Doing fine" << std::endl;
+void WaveSlater::initialize(vec2 positions[]) {
+    WaveFunction::initialize(positions);
+    slaterUp->initialize(positions);
+    slaterDown->initialize(positions);
 }
 
 //void WaveSlater::setPreviousMovedParticle(int particleNumber) {
@@ -106,9 +98,23 @@ void WaveSlater::init(vec2 r[]) {
 //    // TODO Set last moved particle for slater or something
 //}
 
-void WaveSlater::acceptEvaluation() {
-    WaveFunction::acceptEvaluation();
-    slaterDown->acceptEvaluation();
-    slaterUp->acceptEvaluation();
-    jastrow->acceptEvaluation();
+void WaveSlater::acceptEvaluation(int movedParticle) {
+    WaveFunction::acceptEvaluation(movedParticle);
+    slaterDown->acceptEvaluation(movedParticle);
+    slaterUp->acceptEvaluation(movedParticle);
+    jastrow->acceptEvaluation(movedParticle);
+}
+
+double WaveSlater::laplace(vec2 r[]) {
+    return 0;
+}
+
+void WaveSlater::gradient(vec2 r[], vec2 &rGradient) {
+    vec2 slaterUpGradient;
+    vec2 slaterDownGradient;
+    vec2 jastrowGradient;
+    slaterUp->gradient(r, slaterUpGradient);
+    slaterDown->gradient(r, slaterDownGradient);
+    jastrow->gradient(r, jastrowGradient);
+    rGradient = slaterUpGradient + slaterDownGradient + jastrowGradient;
 }

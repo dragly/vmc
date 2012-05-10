@@ -16,8 +16,10 @@ public:
     double ratio(vec2 &rNew, int particleNumber);
     void setParameters(double *parameters);
     void calculateDistances(vec2 r[]);
-    void acceptEvaluation();
+    void acceptEvaluation(int movedParticle);
     double argument(int i, int j, mat &distances);
+
+    void gradient(vec2 r[], vec2 &rGradient);
     ~Jastrow();
 private:
     int nParticles;

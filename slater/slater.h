@@ -18,21 +18,28 @@ public:
 
     mat matrix();
     mat inverse();
-    void calculateInverse();
+    void calculateInverse(int movedParticle);
+    void calculateInverseNumerically();
     void setPreviousMovedParticle(int particleNumber);
     double ratio(vec2 &rNew, int movedParticle);
-    void acceptEvaluation();
+    void acceptEvaluation(int movedParticle);
+    void initialize(vec2 r[]);
+    double laplace(const vec2 &r);
+    void gradient(const vec2 r[], vec2 &rGradient) const;
 private:
-    mat matrixNew;
-    mat matrixOld;
+    mat currentMatrix;
+    mat previousMatrix;
 
-    mat inverseNew;
-    mat inverseOld;
+    mat currentInverse;
+    mat previousInverse;
 
     int nDimensions;
     int nParticles;
 
     int previousMovedParticle;
+
+    double previousRatio;
+    double currentRatio;
 
     Orbital **orbitals;
 

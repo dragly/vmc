@@ -17,6 +17,7 @@ QMAKE_CFLAGS += $$system(mpicc --showme:compile)
 QMAKE_LFLAGS += $$system(mpicxx --showme:link)
 QMAKE_CXXFLAGS += $$system(mpicxx --showme:compile)
 QMAKE_CXXFLAGS += -DMPICH_IGNORE_CXX_SEEK
+QMAKE_CXXFLAGS += -std=c++0x
 
 contains(CONFIG,debug) {
     message(Debug mode. Disabling optimization)

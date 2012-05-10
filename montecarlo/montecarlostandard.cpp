@@ -11,7 +11,8 @@ MonteCarloStandard::MonteCarloStandard(Config *config) :
     MonteCarlo(config),
     rank(config->rank()),
     step_length(config->stepLength()),
-    wave(config->wave())
+    wave(config->wave()),
+    recordMoves(false)
 {
     // allocate matrices which contain the position of the particles
     rOld = new vec2[ nParticles];
@@ -32,7 +33,6 @@ MonteCarloStandard::~MonteCarloStandard()
 
 void MonteCarloStandard::sample(int nCycles)
 {
-    recordMoves = true;
     if(recordMoves) {
         std::cout << "Opening file..." << std::endl;
         movesFile.open("moves.dat");
@@ -54,7 +54,7 @@ void MonteCarloStandard::sample(int nCycles)
             rOld[i][j] = step_length*(ran2(idum)-0.5);
         }
     }
-    wave->init(rOld);
+    wave->initialize(rOld);
     // TODO Optimize step length by Newton's method
     // loop over monte carlo cycles
     for (cycle = 0; cycle < nCycles; cycle++){
@@ -67,7 +67,7 @@ void MonteCarloStandard::sample(int nCycles)
             // The Metropolis test is performed by moving one particle at the time
             if(ran2(idum) <= (ratio*ratio)) {
                 rOld[i] = rNew[i];
-                wave->acceptEvaluation();
+                wave->acceptEvaluation(i);
             } else {
                 rNew[i] = rOld[i]; // Move the particle back
             }

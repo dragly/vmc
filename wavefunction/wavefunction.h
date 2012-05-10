@@ -21,17 +21,22 @@ public:
     virtual double laplace(vec2 r[]) {
         return laplaceNumerical(r);
     }
-    virtual void loadConfiguration(INIReader *settings) {
-        (void)settings;
-    }
+    virtual void loadConfiguration(INIReader *settings);
     virtual double laplaceNumerical(vec2 r[]);
     virtual void gradientNumerical(vec2 r[], vec2 &rGradient);
     virtual void setParameters(double *parameters);
     static WaveFunction* fromName(string waveClass, Config *config);
 //    virtual void setPreviousMovedParticle(int particleNumber);
     virtual double ratio(vec2 &rParticle, int particleNumber);
-    virtual void acceptEvaluation();
-    virtual void init(vec2 r[]);
+    virtual void acceptEvaluation(int movedParticle);
+    virtual void initialize(vec2 r[]);
+    void setUseAnalyticalLaplace(bool val) {
+        useAnalyticalLaplace = val;
+    }
+
+    void setUseAnalyticalGradient(bool val) {
+        useAnalyticalGradient = val;
+    }
 
     ~WaveFunction();
 protected:
@@ -47,6 +52,9 @@ protected:
     vec2 *rOld;
     double previousEvaluation;
     double currentEvaluation;
+
+    bool useAnalyticalLaplace;
+    bool useAnalyticalGradient;
 };
 
 #endif // WAVEFUNCTION_H

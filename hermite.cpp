@@ -41,7 +41,31 @@ double Hermite::evaluate(int degree, double x) {
         break;
     default:
         cerr << __PRETTY_FUNCTION__ << ": Hermite polynomial of unknown degree called. Degree was: " << degree << endl;
-        exit(1);
+        throw 999;
+        return 0;
+    }
+}
+
+double Hermite::derivative(int degree, double x) {
+    switch(degree) {
+    case 0:
+        return 0;
+        break;
+    case 1:
+        return 2;
+        break;
+    case 2:
+        return 8*x;
+        break;
+    case 3:
+        return 8 * 3 * x * x;
+        break;
+    case 4:
+        return 16 * 4 * x * x * x - 48 * 2 * x;
+        break;
+    default:
+        cerr << __PRETTY_FUNCTION__ << ": Hermite polynomial of unknown degree called. Degree was: " << degree << endl;
+        throw 999;
         return 0;
     }
 }

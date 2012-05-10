@@ -11,11 +11,7 @@ public:
     WaveIdeal(Config *config);
     double evaluate(vec2 r[]);
     double laplace(vec2 r[]);
-    void setUseAnalyticalLaplace(bool val){
-        useAnalytical = val;
-    }
 private:
-    bool useAnalytical;
 };
 
 #endif // WAVEFUNCTIONIDEAL_H

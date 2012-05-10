@@ -6,8 +6,7 @@
 using namespace std;
 
 WaveSimple::WaveSimple(Config *config)  :
-    WaveFunction(config),
-    useAnalytical(false)
+    WaveFunction(config)
 {
 }
 
@@ -32,7 +31,7 @@ double WaveSimple::evaluate(vec2 r[])
 double WaveSimple::laplace(vec2 r[])
 {
     double alpha = parameters[0];
-    if(useAnalytical) {
+    if(useAnalyticalLaplace) {
         double eKinetic = 0;
         double rSingleParticle;
         for (int i = 0; i < nParticles; i++) {
@@ -46,9 +45,4 @@ double WaveSimple::laplace(vec2 r[])
     } else {
         return laplaceNumerical(r);
     }
-}
-
-void WaveSimple::setUseAnalyticalLaplace(bool val)
-{
-    useAnalytical = val;
 }
