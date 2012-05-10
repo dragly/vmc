@@ -64,25 +64,20 @@ double WaveFunction::laplaceNumerical(vec2 r[])
     return eKinetic;
 }
 
-void WaveFunction::gradientNumerical(vec2 r[], vec2 &rGradient)
+void WaveFunction::gradientNumerical(const vec2 &r, int particleNumber, vec2 &rGradient)
 {
     for (int j = 0; j < nDimensions; j++) {
-        for (int i = 0; i < nParticles; i++) {
-            rPlus[i][j] = rMinus[i][j] = r[i][j];
-            rPlus[i][j] = rMinus[i][j] = r[i][j];
-        }
+        rPlus[j] = rMinus[j] = r[j];
+        rPlus[j] = rMinus[j] = r[j];
     }
     for (int j = 0; j < nDimensions; j++) {
-        rGradient[j] = 0;
-        for (int i = 0; i < nParticles; i++) {
-            rPlus[i][j] = r[i][j]+h;
-            rMinus[i][j] = r[i][j]-h;
-            double wfminus = evaluate(rMinus);
-            double wfplus  = evaluate(rPlus);
-            rGradient[j] += (wfplus - wfminus)/(2*h);
-            rPlus[i][j] = r[i][j];
-            rMinus[i][j] = r[i][j];
-        }
+        rPlus[j] = r[j]+h;
+        rMinus[j] = r[j]-h;
+        double wfminus = evaluate(rMinus);
+        double wfplus  = evaluate(rPlus);
+        rGradient[j] = (wfplus - wfminus)/(2*h);
+        rPlus[j] = r[j];
+        rMinus[j] = r[j];
     }
 }
 

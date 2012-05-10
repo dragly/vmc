@@ -19,7 +19,7 @@ public:
     void acceptEvaluation(int movedParticle);
     double argument(int i, int j, mat &distances);
 
-    void gradient(vec2 r[], vec2 &rGradient);
+    void gradient(const vec2 &r, vec2 &rGradient);
     ~Jastrow();
 private:
     int nParticles;

@@ -132,7 +132,7 @@ void VmcTests::waveSimpleGradientTest()
     parameters[0] = 2;
     parameters[1] = 1;
     waveSimpleNew->setParameters(parameters);
-    waveSimpleNew->gradient(rPositions, rGradient);
+    waveSimpleNew->gradient(rPositions[0], 0, rGradient);
     QVERIFY(fabs(rGradient[0] - 0.735) < 0.001);
     QVERIFY(fabs(rGradient[1] - 0.000) < 0.0000001);
     cout << "Particles..." << endl;
@@ -472,26 +472,25 @@ void VmcTests::slaterGradientTest()
 {
     Config *config1 = new Config(0,1);
     config1->setNDimensions(2);
-    config1->setNParticles(4);
-    double omega = 1;
-    config1->setOmega(omega);
+    config1->setNParticles(6);
+    config1->setInteractionEnabled(false);
     double parameters[2];
     WaveSlater *waveSlater1 = new WaveSlater(config1);
     config1->setWave(waveSlater1);
+    vec2 *r = new vec2[config1->nParticles()];
+    for(int i = 0; i < config1->nParticles(); i++) {
+        r[i][0] = -i * 0.32;
+        r[i][1] = i * 0.13;
+    }
+    waveSlater1->initialize(r);
     for(int p = 1; p < 11; p++) {
         parameters[0] = 0.34 * p;
         parameters[1] = 0.12 * p;
         waveSlater1->setParameters(parameters);
-        vec2 *r = new vec2[config1->nParticles()];
-        for(int i = 0; i < config1->nParticles(); i++) {
-            r[i][0] = i *0.12;
-            r[i][1] = i *0.31;
-        }
-        waveSlater1->setParameters(parameters);
         vec2 analyticalGradient;
         vec2 numericalGradient;
-        waveSlater1->gradient(r, analyticalGradient);
-        waveSlater1->gradientNumerical(r, numericalGradient);
+        waveSlater1->gradient(r[1], 1, analyticalGradient);
+        waveSlater1->gradientNumerical(r[1], 1, numericalGradient);
         for(int i = 0; i < config1->nDimensions(); i++) {
             std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
             QVERIFY(analyticalGradient[i] - numericalGradient[i] < 1e-4);

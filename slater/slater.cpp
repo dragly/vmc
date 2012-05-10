@@ -135,8 +135,17 @@ void Slater::acceptEvaluation(int movedParticle)
     previousRatio = currentRatio;
 }
 
-void Slater::gradient(const vec2 r[], vec2 &rGradient) const {
-
+void Slater::gradient(const vec2 &r, int particleNumber, vec2 &rGradient) const {
+    for(int i = 0; i < nDimensions; i++) {
+        rGradient[i] = 0;
+    }
+    for(int i = 0; i < nParticles / 2; i++) {
+        for(int j = 1; j < nParticles / 2; j++) {
+            vec2 orbitalGradient;
+            orbitals[j]->gradient(r, orbitalGradient);
+            rGradient += orbitalGradient * previousInverse(j,i);
+        }
+    }
 }
 
 mat Slater::inverse() {

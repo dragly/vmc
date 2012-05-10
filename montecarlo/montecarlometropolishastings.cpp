@@ -23,7 +23,7 @@ MonteCarloMetropolisHastings::~MonteCarloMetropolisHastings()
 
 void MonteCarloMetropolisHastings::quantumForce(vec2 rPosition[], vec2 &forceVector) {
     double waveValue = config->wave()->evaluate(rPosition);
-    config->wave()->gradient(rPosition, forceVector);
+    config->wave()->gradient(rPosition[0], 0, forceVector); // TODO add particle number
     forceVector = 2 * forceVector / waveValue;
 }
 
@@ -46,7 +46,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
         }
     }
     wave->initialize(rOld);
-    wave->gradient(rOld, waveGradientOld);
+    wave->gradient(rOld[0], 0, waveGradientOld); // TODO add particle number
     quantumForce(rOld, forceVectorOld);
     // loop over monte carlo cycles
     for (int cycle = 1; cycle <= nCycles; cycle++){
@@ -65,7 +65,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
                 }
             }
             wfnew = wave->evaluate(rNew);
-            wave->gradient(rNew, waveGradientNew);
+            wave->gradient(rNew[i], i, waveGradientNew);
             double argument = 0;
             for( int j = 0; j < nDimensions; j++) {
                 forceVectorSum[j] = forceVectorNew[j] + forceVectorOld[j];

@@ -109,12 +109,13 @@ double WaveSlater::laplace(vec2 r[]) {
     return 0;
 }
 
-void WaveSlater::gradient(vec2 r[], vec2 &rGradient) {
+void WaveSlater::gradient(const vec2 &r, int particleNumber, vec2 &rGradient) {
     vec2 slaterUpGradient;
     vec2 slaterDownGradient;
     vec2 jastrowGradient;
-    slaterUp->gradient(r, slaterUpGradient);
-    slaterDown->gradient(r, slaterDownGradient);
+    slaterUp->gradient(r, particleNumber, slaterUpGradient);
+    std::cout << slaterUpGradient << std::endl;
+    slaterDown->gradient(r, particleNumber, slaterDownGradient);
     jastrow->gradient(r, jastrowGradient);
     rGradient = slaterUpGradient + slaterDownGradient + jastrowGradient;
 }

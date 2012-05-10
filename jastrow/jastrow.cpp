@@ -57,7 +57,7 @@ double Jastrow::argument(int i, int j, mat &distances) {
     return (a(i,j) * distances.at(i,j)) / (1 + m_beta * distances.at(i,j));
 }
 
-void Jastrow::gradient(vec2 r[], vec2 &rGradient)
+void Jastrow::gradient(const vec2 &r, vec2 &rGradient)
 {
 
 }

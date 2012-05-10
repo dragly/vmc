@@ -28,7 +28,7 @@ public:
     double ratio(vec2 &particlePosition, int particleNumber);
     void initialize(vec2 positions[]);
     double laplace(vec2 r[]);
-    void gradient(vec2 r[], vec2 &rGradient);
+    void gradient(const vec2 &r, int particleNumber, vec2 &rGradient);
 private:
     Slater *slaterDown;
     Slater *slaterUp;

@@ -25,7 +25,7 @@ public:
     void acceptEvaluation(int movedParticle);
     void initialize(vec2 r[]);
     double laplace(const vec2 &r);
-    void gradient(const vec2 r[], vec2 &rGradient) const;
+    void gradient(const vec2 &r, int particleNumber, vec2 &rGradient) const;
 private:
     mat currentMatrix;
     mat previousMatrix;
