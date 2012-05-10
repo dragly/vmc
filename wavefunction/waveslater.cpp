@@ -87,6 +87,7 @@ double WaveSlater::ratio(vec2 &rParticle, int particleNumber) {
         theRatio *= jastrow->ratio(rParticle, particleNumber);
     }
     return theRatio;
+//    return WaveFunction::ratio(rParticle, particleNumber);
 }
 
 void WaveSlater::init(vec2 r[]) {

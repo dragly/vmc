@@ -21,6 +21,9 @@ private:
     vec2 *rOld;
     vec2 *rNew;
     WaveFunction* wave;
+
+    bool recordMoves;
+    ofstream movesFile;
 };
 
 #endif // MONTECARLOSTANDARD_H

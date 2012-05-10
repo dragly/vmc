@@ -50,8 +50,8 @@ public:
     void jastrowRatioTest();
     void slaterFourParticleTest();
     void slaterSixParticleTest();
-private slots:
     void fullSlaterSixNoInteractionTest();
+private slots:
     void fullSlaterSixInteractionTest();
 
 private:

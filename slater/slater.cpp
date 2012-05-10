@@ -71,7 +71,7 @@ void Slater::setPreviousMovedParticle(int particleNumber)
   */
 double Slater::ratio(vec2 &rNew, int movedParticle)
 {
-    bool hasParticle = (spinUp && movedParticle < nParticles / 2) || (!spinUp && movedParticle > nParticles / 2);
+    bool hasParticle = (spinUp && movedParticle < nParticles / 2) || (!spinUp && movedParticle >= nParticles / 2);
     if(hasParticle) {
         if(spinUp) {
             movedParticle = movedParticle;

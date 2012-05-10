@@ -1,9 +1,11 @@
-#include <math.h>
-
 #include "montecarlostandard.h"
 #include "../matrix.h"
 #include "../random.h"
 #include "../utils.h"
+
+#include <math.h>
+#include <iostream>
+#include <iomanip>
 
 MonteCarloStandard::MonteCarloStandard(Config *config) :
     MonteCarlo(config),
@@ -30,6 +32,11 @@ MonteCarloStandard::~MonteCarloStandard()
 
 void MonteCarloStandard::sample(int nCycles)
 {
+    recordMoves = true;
+    if(recordMoves) {
+        std::cout << "Opening file..." << std::endl;
+        movesFile.open("moves.dat");
+    }
     m_energy = 0;
     m_energySquared = 0;
     terminalizationSum = 0;
@@ -79,8 +86,18 @@ void MonteCarloStandard::sample(int nCycles)
             } else {
                 checkTerminalization(localEnergy);
             }
+            if(recordMoves) {
+                movesFile << std::setw(26) << std::setprecision(20) << rOld[i][0] << "," << std::setw(26) << rOld[i][1] << " ";
+            }
         }   // end of loop over MC trials
+        if(recordMoves) {
+            movesFile << std::endl;
+            flush(movesFile);
+        }
     }  //  end of loop over particles
+    if(recordMoves) {
+        movesFile.close();
+    }
     m_energy /= (nCycles * nParticles);
     m_energySquared /= (nCycles * nParticles);
     std::cout << "Done sampling. Had " << terminalizationTrials << " terminalization trials with the last diff at " << diffAverage << std::endl;
