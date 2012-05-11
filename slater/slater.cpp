@@ -48,21 +48,14 @@ void Slater::constructMatrix(vec2 r[]) {
             previousMatrix(i,j) = orbitals[j]->evaluate(r[index]);
         }
     }
+    currentMatrix = previousMatrix;
     // TODO Remove this
 //    previousMatrix = randu<mat>(nParticles / 2, nParticles / 2);
 }
 
 double Slater::determinant(vec2 r[]) {
     constructMatrix(r);
-    std::cout << "Here is matrix: " << previousMatrix << std::endl;
-    for(int i = 0; i < previousMatrix.n_rows; i++) {
-        for(int j = 0; j < previousMatrix.n_cols; j++) {
-            std::cout << std::setprecision(10) << previousMatrix(i,j) << " ";
-        }
-        std::cout << std::endl;
-    }
     double determ = det(previousMatrix);
-    std::cout << "Determ is " << determ << std::endl;
     return determ;
 }
 
@@ -86,12 +79,14 @@ void Slater::calculateInverse(int movedParticle)
             }
         }
     }
+    calculateInverseNumerically(); // TODO revert this to analytical solution of inverse after fixing it
 }
 
 int nExceptions = 0;
 void Slater::calculateInverseNumerically() {
     try {
         previousInverse = inv(previousMatrix);
+        currentInverse = previousInverse;
     } catch(std::runtime_error &e) {
         std::cout << matrix() << std::endl;
         std::cout << "Caught inverse exception! Setting inverse to large random matrix." << std::endl;
@@ -165,7 +160,6 @@ void Slater::gradient(const vec2 r[], int movedParticlea, vec &rGradient) const 
 
 double Slater::laplace(vec2 r[], int movedParticlea)
 {
-
     // TODO we are now recalculating the laplace for all particles, this could be avoided
     double laplaceResult = 0;
     for(int a = 0; a < nParticles; a++) {
@@ -173,8 +167,11 @@ double Slater::laplace(vec2 r[], int movedParticlea)
         int movedParticle = a;
         if(hasParticle(movedParticle)) {
             int localParticle = movedParticle - particleIndexOffset;
+//            std::cout << "a" << localParticle << std::endl;
             for(int j = 0; j < nParticles / 2; j++) {
                 laplaceResult += orbitals[j]->laplace(r[movedParticle]) * previousInverse(j,localParticle);
+//                std::cout << orbitals[j]->laplace(r[movedParticle]) << std::endl;
+//                std::cout << "inverse: " << previousInverse(j,localParticle) << std::endl;
             }
         }
     }

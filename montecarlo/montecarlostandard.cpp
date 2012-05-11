@@ -53,6 +53,7 @@ void MonteCarloStandard::sample(int nCycles)
         for (int j=0; j < nDimensions; j++) {
             rOld[i][j] = step_length*(ran2(idum)-0.5);
         }
+        rNew[i] = rOld[i];
     }
     wave->initialize(rOld);
     // TODO Optimize step length by Newton's method

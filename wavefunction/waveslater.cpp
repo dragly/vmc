@@ -12,7 +12,7 @@ WaveSlater::WaveSlater(Config *config) :
     WaveFunction(config),
     m_interactionEnabled(config->interactionEnabled())
 {
-    std::cout << "Creating with " << nParticles << std::endl;
+//    std::cout << "Creating with " << nParticles << std::endl;
     jastrow = new Jastrow(config);
 
     orbitals = new Orbital*[nParticles/2];
@@ -82,6 +82,7 @@ double WaveSlater::evaluate(vec2 r[])
 }
 
 double WaveSlater::ratio(vec2 &particlePosition, int particleNumber) {
+    rNew[particleNumber] = particlePosition;
     double theRatio = slaterUp->ratio(particlePosition, particleNumber) * slaterDown->ratio(particlePosition, particleNumber);
     if(m_interactionEnabled) {
         theRatio *= jastrow->ratio(particlePosition, particleNumber);
@@ -94,14 +95,13 @@ void WaveSlater::initialize(vec2 positions[]) {
     slaterUp->initialize(positions);
     slaterDown->initialize(positions);
     WaveFunction::initialize(positions);
-    std::cout << "Slater up init:\n" << slaterUp->matrix() << std::endl << slaterUp->inverse() << std::endl;
 }
 
 //void WaveSlater::setPreviousMovedParticle(int particleNumber) {
 //    WaveFunction::setPreviousMovedParticle(particleNumber);
 //    // TODO Set last moved particle for slater or something
 //}
-
+// TODO update matrices with new values for moved particle
 void WaveSlater::acceptEvaluation(int movedParticle) {
     WaveFunction::acceptEvaluation(movedParticle);
     slaterDown->acceptEvaluation(movedParticle);
@@ -112,22 +112,20 @@ void WaveSlater::acceptEvaluation(int movedParticle) {
 double WaveSlater::laplace(vec2 r[], int movedParticle) {
     double laplaceSum = 0;
     laplaceSum += slaterUp->laplace(r, movedParticle);
+//    std::cout << "up " << slaterUp->laplace(r, movedParticle) << std::endl;
     laplaceSum += slaterDown->laplace(r, movedParticle);
+//    std::cout << "down " << slaterDown->laplace(r, movedParticle) << std::endl;
 //    laplaceSum += jastrow->laplace(r, movedParticle);
     return laplaceSum;
 }
 
 void WaveSlater::gradient(vec2 r[], int particleNumber, vec &rGradient) {
-    std::cout << "rGrad size " << rGradient.size() << " " << nParticles * nDimensions << std::endl;
     vec slaterUpGradient = zeros<vec>(nParticles * nDimensions);
     vec slaterDownGradient = zeros<vec>(nParticles * nDimensions);
     vec jastrowGradient = zeros<vec>(nParticles * nDimensions);
     slaterUp->gradient(r, particleNumber, slaterUpGradient);
     slaterDown->gradient(r, particleNumber, slaterDownGradient);
-    std::cout << "Slater Up\n" << slaterUpGradient << std::endl;
-    std::cout << "Slater Down\n" << slaterDownGradient << std::endl;
 //    jastrow->gradient(r, jastrowGradient);
     rGradient = slaterUpGradient + slaterDownGradient + jastrowGradient;
-    std::cout << "Total gradient\n" << rGradient << std::endl;
 //    gradientNumerical(r, particleNumber, rGradient);
 }

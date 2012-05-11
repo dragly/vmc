@@ -8,7 +8,7 @@ HamiltonianIdeal::HamiltonianIdeal(Config *config) :
     Hamiltonian(config)
 {
 }
-
+int ntries = 0;
 double HamiltonianIdeal::energy(WaveFunction *wave, vec2 r[])
 {
     double eLocal, eKinetic, ePotential,
@@ -18,6 +18,7 @@ double HamiltonianIdeal::energy(WaveFunction *wave, vec2 r[])
     // TODO: Create a derivative-finder function that uses interpolation to approximate the derivative
     // TODO: Add the number of the particle that has been moved
     eKinetic = -0.5*wave->laplace(r, 0);
+//    std::cout << "eKinetic " << eKinetic << std::endl;
     //    e_kinetic = 0.5*e_kinetic/h2;
     // compute the potential energy
     ePotential = 0;

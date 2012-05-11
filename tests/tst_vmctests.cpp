@@ -34,12 +34,6 @@ public:
     VmcTests();
 
     void waveSimpleGradientTest(); // TODO - consider implementing this again
-    // slow tests
-    void fullSlaterSixInteractionTest();
-    void fullIdealHastingsTest();
-    void fullSlaterSixNoInteractionTest();
-    void fullIdealHastingsSlaterTest();
-    void fullIdealTest();
     // quick tests
     void initTestCase();
     void orbitalTest();
@@ -53,14 +47,22 @@ public:
     void jastrowRatioTest();
     void slaterFourParticleTest();
     void waveSlaterSixParticleTest();
-    void slaterLaplaceTest();
     void slaterTest();
     void slaterInverse();
     void slaterRatioTest();
     void orbitalGradientTest();
     void orbitalLaplaceTest();
+    // slow tests
+    void fullIdealTest();
+    void fullIdealHastingsTest();
+    void fullIdealHastingsSlaterTest();
+    void fullSlaterSixInteractionTest();
 private slots:
+    // quick tests
+    void slaterLaplaceTest();
     void slaterGradientTest();
+    // slow tests
+    void fullSlaterSixNoInteractionTest();
 
 private:
     Config *oldConfig;
@@ -426,9 +428,9 @@ void VmcTests::orbitalTest() {
     r[0] = 1.8;
     r[1] = 2.9;
     double A = 1;
-    QCOMPARE(orbital11->evaluate(r), A * 2 * sqrt(omega) * r[0] * 2 * sqrt(omega) * r[1] * exp(- parameters[0] * omega * (r[0] * r[0] + r[1] * r[1]) / 2));
-    double sqrtomegax = (sqrt(omega) * r[0]);
-    double sqrtomegay = (sqrt(omega) * r[1]);
+    QCOMPARE(orbital11->evaluate(r), A * 2 * sqrt(omega * parameters[0]) * r[0] * 2 * sqrt(omega * parameters[0]) * r[1] * exp(- parameters[0] * omega * (r[0] * r[0] + r[1] * r[1]) / 2));
+    double sqrtomegax = (sqrt(omega * parameters[0]) * r[0]);
+    double sqrtomegay = (sqrt(omega * parameters[0]) * r[1]);
     QCOMPARE(orbital23->evaluate(r), A * (4 * sqrtomegax * sqrtomegax - 2) * (8 * sqrtomegay * sqrtomegay * sqrtomegay - 12) * exp(- parameters[0] * omega * (r[0] * r[0] + r[1] * r[1]) / 2));
 }
 
@@ -481,32 +483,30 @@ void VmcTests::slaterGradientTest()
     config1->setNParticles(nParticles);
     config1->setInteractionEnabled(false);
     double parameters[2];
-    long idum = -1-time(NULL);
+    long idum = -1;
     for(int w = 1; w < 11; w++) {
         config1->setOmega(w * 0.1);
         WaveSlater *waveSlater1 = new WaveSlater(config1);
         vec2 *r = new vec2[nParticles];
         for(int i = 0; i < nParticles; i++) {
-            r[i][0] = ran2(&idum);
-            r[i][1] = ran2(&idum);
+            r[i][0] = 4 * ran2(&idum) - 2;
+            r[i][1] = 4 * ran2(&idum) - 2;
+//            r[i][0] = 0.34 + i * 0.2;
+//            r[i][1] = 0.12 + i * 0.42;
         }
-        for(int p = 1; p < 2; p++) {
-            parameters[0] = 0.34 * p;
-            parameters[1] = 0.12 * p;
-            parameters[0] = 1;
-            parameters[1] = 1;
+        for(int p = 1; p < 11; p++) {
+            parameters[0] = ran2(&idum);
+            parameters[1] = ran2(&idum);
             waveSlater1->setParameters(parameters);
-            std::cout << "Init" << std::endl;
             waveSlater1->initialize(r);
             vec analyticalGradient = zeros<vec>(nParticles * nDimensions);
             vec numericalGradient = zeros<vec>(nParticles * nDimensions);
-            std::cout << "Gradient" << std::endl;
             waveSlater1->gradient(r, 1, analyticalGradient);
             waveSlater1->gradientNumerical(r, numericalGradient);
             for(int i = 0; i < nDimensions * nParticles; i++) {
-                std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
-                std::cout << "Diff: " << fabs(analyticalGradient[i] - numericalGradient[i]) << std::endl;
-//                QVERIFY(fabs(analyticalGradient[i] - numericalGradient[i]) < 1e-4);
+//                std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
+//                std::cout << "Diff: " << fabs(analyticalGradient[i] - numericalGradient[i]) << std::endl;
+                QVERIFY(fabs(analyticalGradient[i] - numericalGradient[i]) < 1e-2);
             }
         }
         delete waveSlater1;
@@ -527,23 +527,22 @@ void VmcTests::slaterLaplaceTest()
     double parameters[2];
     WaveSlater *waveSlater1 = new WaveSlater(config1);
     config1->setWave(waveSlater1);
+    long idum = -1;
     vec2 *r = new vec2[nParticles];
     for(int i = 0; i < nParticles; i++) {
-        r[i][0] = 0.5 + i * 0.2;
-        r[i][1] = 0.23 + i * 0.12;
+        r[i][0] = 4 * ran2(&idum) - 2;
+        r[i][1] = 4 * ran2(&idum) - 2;
     }
     for(int p = 1; p < 10; p++) {
-        parameters[0] = 0.34 * p;
-        parameters[1] = 0.12 * p;
+        parameters[0] = ran2(&idum);
+        parameters[1] = ran2(&idum);
         waveSlater1->setParameters(parameters);
         waveSlater1->initialize(r);
         double analyticalLaplace = waveSlater1->laplace(r, 0);
         double numericalLaplace = waveSlater1->laplaceNumerical(r);
-        for(int i = 0; i < nDimensions * nParticles; i++) {
-            //            std::cout << analyticalLaplace << " " << numericalLaplace << std::endl;
-            //            std::cout << "Diff: " << fabs(analyticalLaplace - numericalLaplace) << std::endl;
-            QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 1e-5);
-        }
+        //            std::cout << analyticalLaplace << " " << numericalLaplace << std::endl;
+        //            std::cout << "Diff: " << fabs(analyticalLaplace - numericalLaplace) << std::endl;
+        QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 1e-5);
     }
 }
 
@@ -617,36 +616,6 @@ void VmcTests::waveSlaterSixParticleTest()
     parameters[1] = 0.4;
     waveSlater1->setParameters(parameters);
     cout << "Value for slaterSixParticleTest: " << waveSlater1->evaluate(rpos) << endl;
-}
-
-/*!
-  Test the Metropolis-Hastings algorithm by using the Slater determinant with 6 particles.
-  This is benchmarked against the optimal result found in Lars-Eivind Lervåg's thesis.
-
-  This test is slow, but gives a decent benchmark.
-  */
-void VmcTests::fullSlaterSixNoInteractionTest()
-{
-    Config *config1 = new Config(0,1);
-    config1->setNDimensions(2);
-    config1->setNParticles(6);
-    config1->setInteractionEnabled(false);
-    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
-    config1->setHamiltonian(hamiltonian);
-    WaveSlater *waveSlater1 = new WaveSlater(config1);
-    config1->setWave(waveSlater1);
-    double parameters[2];
-    parameters[0] = 1.0;
-    parameters[1] = 1.0;
-    waveSlater1->setParameters(parameters);
-    int nCycles = 50000;
-    //    waveSlater1->setUseAnalyticalLaplace(false);
-    MonteCarloStandard *monteCarlo1 = new MonteCarloStandard(config1);
-    //  Do the mc sampling
-    monteCarlo1->sample(nCycles);
-    double energy = monteCarlo1->energy();
-    cout << "Six non-interacting energy was " << fabs(energy) << endl;
-    QVERIFY(fabs(energy - 10) < 1e-2);
 }
 
 void VmcTests::orbitalGradientTest()
@@ -750,7 +719,35 @@ void VmcTests::orbitalLaplaceTest()
     }
 }
 
+/*!
+  Test the Metropolis-Hastings algorithm by using the Slater determinant with 6 particles.
+  This is benchmarked against the optimal result found in Lars-Eivind Lervåg's thesis.
 
+  This test is slow, but gives a decent benchmark.
+  */
+void VmcTests::fullSlaterSixNoInteractionTest()
+{
+    Config *config1 = new Config(0,1);
+    config1->setNDimensions(2);
+    config1->setNParticles(6);
+    config1->setInteractionEnabled(false);
+    HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
+    config1->setHamiltonian(hamiltonian);
+    WaveSlater *waveSlater1 = new WaveSlater(config1);
+    config1->setWave(waveSlater1);
+    double parameters[2];
+    parameters[0] = 1.0;
+    parameters[1] = 1.0;
+    waveSlater1->setParameters(parameters);
+    int nCycles = 50000;
+    //    waveSlater1->setUseAnalyticalLaplace(false);
+    MonteCarloStandard *monteCarlo1 = new MonteCarloStandard(config1);
+    //  Do the mc sampling
+    monteCarlo1->sample(nCycles);
+    double energy = monteCarlo1->energy();
+    cout << "Six non-interacting energy was " << fabs(energy) << endl;
+    QVERIFY(fabs(energy - 10) < 1e-2);
+}
 
 /*!
   Test the Metropolis-Hastings algorithm by using the Slater determinant with 6 particles.

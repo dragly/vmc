@@ -82,7 +82,6 @@ void WaveFunction::gradientNumerical(vec2 r[], vec &rGradient)
             rMinus[i][j] = r[i][j];
         }
     }
-    std::cout << "Wave evaluation " << waveEvaluation << std::endl;
     rGradient = rGradient / waveEvaluation;
 }
 
