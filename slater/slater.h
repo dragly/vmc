@@ -23,9 +23,10 @@ public:
     void setPreviousMovedParticle(int particleNumber);
     double ratio(vec2 &rNew, int movedParticle);
     void acceptEvaluation(int movedParticle);
-    void initialize(vec2 r[]);
-    double laplace(const vec2 &r);
-    void gradient(const vec2 &r, int particleNumber, vec2 &rGradient) const;
+    void initialize(vec2 positions[]);
+    double laplace(vec2 r[], int movedParticlea);
+    void gradient(const vec2 r[], int movedParticle, vec &rGradient) const;
+    bool hasParticle(int particleNumber) const;
 private:
     mat currentMatrix;
     mat previousMatrix;
@@ -40,6 +41,8 @@ private:
 
     double previousRatio;
     double currentRatio;
+
+    int particleIndexOffset;
 
     Orbital **orbitals;
 

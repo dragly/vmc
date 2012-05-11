@@ -39,7 +39,6 @@ double WaveIdeal::laplace(vec2 r[])
     if(useAnalyticalLaplace) {
         double omega = 1;
         double aconst = 1;
-        // TODO: Generalize for more dimensions
         double r12vec[2];
         r12vec[0] = r[0][0]-r[1][0];
         r12vec[1] = r[0][1]-r[1][1];

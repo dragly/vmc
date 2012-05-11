@@ -64,21 +64,26 @@ double WaveFunction::laplaceNumerical(vec2 r[])
     return eKinetic;
 }
 
-void WaveFunction::gradientNumerical(const vec2 &r, int particleNumber, vec2 &rGradient)
+void WaveFunction::gradientNumerical(vec2 r[], vec &rGradient)
 {
-    for (int j = 0; j < nDimensions; j++) {
-        rPlus[j] = rMinus[j] = r[j];
-        rPlus[j] = rMinus[j] = r[j];
+    double waveEvaluation = evaluate(r);
+    for (int i = 0; i < nParticles; i++) {
+            rPlus[i] = rMinus[i] = r[i];
+            rPlus[i] = rMinus[i] = r[i];
     }
-    for (int j = 0; j < nDimensions; j++) {
-        rPlus[j] = r[j]+h;
-        rMinus[j] = r[j]-h;
-        double wfminus = evaluate(rMinus);
-        double wfplus  = evaluate(rPlus);
-        rGradient[j] = (wfplus - wfminus)/(2*h);
-        rPlus[j] = r[j];
-        rMinus[j] = r[j];
+    for (int i = 0; i < nParticles; i++) {
+        for (int j = 0; j < nDimensions; j++) {
+            rPlus[i][j] = r[i][j]+h;
+            rMinus[i][j] = r[i][j]-h;
+            double wfminus = evaluate(rMinus);
+            double wfplus  = evaluate(rPlus);
+            rGradient[i * nDimensions + j] = (wfplus - wfminus)/(2*h);
+            rPlus[i][j] = r[i][j];
+            rMinus[i][j] = r[i][j];
+        }
     }
+    std::cout << "Wave evaluation " << waveEvaluation << std::endl;
+    rGradient = rGradient / waveEvaluation;
 }
 
 void WaveFunction::setParameters(double* parameters)

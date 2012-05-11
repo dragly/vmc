@@ -4,6 +4,8 @@
 #include "../orbital/orbital.h"
 
 #include <armadillo>
+#include <iomanip>
+#include <iostream>
 
 using namespace arma;
 
@@ -17,18 +19,18 @@ Slater::Slater(Config *config, Orbital* orbitals[], bool spinUp_) :
     currentMatrix = zeros<mat>(nParticles / 2, nParticles / 2);
     previousInverse = zeros<mat>(nParticles / 2, nParticles / 2);
     currentInverse = zeros<mat>(nParticles / 2, nParticles / 2);
+    if(spinUp) {
+        particleIndexOffset = 0;
+    } else {
+        particleIndexOffset = nParticles / 2;
+    }
 }
 
-void Slater::initialize(vec2 r[])
+void Slater::initialize(vec2 positions[])
 {
-    constructMatrix(r);
+    constructMatrix(positions);
     calculateInverseNumerically();
     currentRatio = 1;
-}
-
-double Slater::laplace(const vec2 &r)
-{
-    return 0;
 }
 
 /*!
@@ -46,14 +48,21 @@ void Slater::constructMatrix(vec2 r[]) {
             previousMatrix(i,j) = orbitals[j]->evaluate(r[index]);
         }
     }
+    // TODO Remove this
+//    previousMatrix = randu<mat>(nParticles / 2, nParticles / 2);
 }
 
 double Slater::determinant(vec2 r[]) {
     constructMatrix(r);
-    // the slater determinant can be divided into two parts multiplied together
+    std::cout << "Here is matrix: " << previousMatrix << std::endl;
+    for(int i = 0; i < previousMatrix.n_rows; i++) {
+        for(int j = 0; j < previousMatrix.n_cols; j++) {
+            std::cout << std::setprecision(10) << previousMatrix(i,j) << " ";
+        }
+        std::cout << std::endl;
+    }
     double determ = det(previousMatrix);
-    //    double detUp = 1;
-    //    double detDown = 2;
+    std::cout << "Determ is " << determ << std::endl;
     return determ;
 }
 
@@ -105,16 +114,11 @@ void Slater::setPreviousMovedParticle(int particleNumber)
   */
 double Slater::ratio(vec2 &rNew, int movedParticle)
 {
-    bool hasParticle = (spinUp && movedParticle < nParticles / 2) || (!spinUp && movedParticle >= nParticles / 2);
-    if(hasParticle) {
+    if(hasParticle(movedParticle)) {
         for(int i = 0; i < nParticles / 2; i++) {
             currentMatrix.at(movedParticle,i) = orbitals[i]->evaluate(rNew);
         }
-        if(spinUp) {
-            movedParticle = movedParticle;
-        } else {
-            movedParticle = movedParticle - nParticles / 2;
-        }
+        movedParticle = movedParticle - particleIndexOffset;
         double R = 0;
         for(int i = 0; i < nParticles / 2; i++) {
             R += currentMatrix.at(movedParticle,i) * previousInverse.at(i, movedParticle);
@@ -127,6 +131,10 @@ double Slater::ratio(vec2 &rNew, int movedParticle)
     }
 }
 
+bool Slater::hasParticle(int particleNumber) const {
+    return (spinUp && particleNumber < nParticles / 2) || (!spinUp && particleNumber >= nParticles / 2);
+}
+
 void Slater::acceptEvaluation(int movedParticle)
 {
     calculateInverse(movedParticle);
@@ -135,15 +143,39 @@ void Slater::acceptEvaluation(int movedParticle)
     previousRatio = currentRatio;
 }
 
-void Slater::gradient(const vec2 &r, int particleNumber, vec2 &rGradient) const {
-    for(int i = 0; i < nDimensions; i++) {
-        rGradient[i] = 0;
+void Slater::gradient(const vec2 r[], int movedParticlea, vec &rGradient) const {
+    rGradient.zeros();
+    for(int a = 0; a < nParticles; a++) {
+        // TODO we are now recalculating the gradient for all particles, this could be avoided
+        int movedParticle = a;
+        if(hasParticle(movedParticle)) {
+            int localParticle = movedParticle - particleIndexOffset;
+            for(int j = 0; j < nParticles / 2; j++) {
+                vec2 orbitalGradient;
+                orbitals[j]->gradient(r[movedParticle], orbitalGradient);
+                double inverseValue = previousInverse(j,localParticle);
+                for(int l = 0; l < nDimensions; l++) {
+                    int rGradientIndex = movedParticle * nDimensions + l;
+                    rGradient[rGradientIndex] += orbitalGradient[l] * inverseValue;
+                }
+            }
+        }
     }
-    for(int i = 0; i < nParticles / 2; i++) {
-        for(int j = 1; j < nParticles / 2; j++) {
-            vec2 orbitalGradient;
-            orbitals[j]->gradient(r, orbitalGradient);
-            rGradient += orbitalGradient * previousInverse(j,i);
+}
+
+double Slater::laplace(vec2 r[], int movedParticlea)
+{
+
+    // TODO we are now recalculating the laplace for all particles, this could be avoided
+    double laplaceResult = 0;
+    for(int a = 0; a < nParticles; a++) {
+        // TODO we are now recalculating the gradient for all particles, this could be avoided
+        int movedParticle = a;
+        if(hasParticle(movedParticle)) {
+            int localParticle = movedParticle - particleIndexOffset;
+            for(int j = 0; j < nParticles / 2; j++) {
+                laplaceResult += orbitals[j]->laplace(r[movedParticle]) * previousInverse(j,localParticle);
+            }
         }
     }
 }

@@ -15,15 +15,17 @@ class WaveFunction
 public:
     WaveFunction(Config *config);
     virtual double evaluate(vec2 r[]) = 0;
-    virtual void gradient(const vec2 &r, int particleNumber, vec2 &rGradient) {
-        gradientNumerical(r, particleNumber, rGradient);
+    virtual void gradient(vec2 r[], int movedParticle, vec &rGradient) {
+        (void)movedParticle;
+        gradientNumerical(r, rGradient);
     }
-    virtual double laplace(vec2 r[]) {
+    virtual double laplace(vec2 r[], int movedParticle) {
+        (void)movedParticle;
         return laplaceNumerical(r);
     }
     virtual void loadConfiguration(INIReader *settings);
     virtual double laplaceNumerical(vec2 r[]);
-    virtual void gradientNumerical(const vec2 &r, int particleNumber, vec2 &rGradient);
+    virtual void gradientNumerical(vec2 r[], vec &rGradient);
     virtual void setParameters(double *parameters);
     static WaveFunction* fromName(string waveClass, Config *config);
 //    virtual void setPreviousMovedParticle(int particleNumber);

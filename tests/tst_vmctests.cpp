@@ -1,10 +1,3 @@
-#include <QtCore/QString>
-#include <QtTest/QtTest>
-
-#include <stdio.h>
-#include <iostream>
-#include <armadillo>
-
 #include "../wavefunction/wavesimple.h"
 #include "../wavefunction/waveideal.h"
 #include "../matrix.h"
@@ -18,8 +11,17 @@
 #include "../slater/slater.h"
 #include "../wavefunction/waveslater.h"
 #include "../jastrow/jastrow.h"
+#include "../random.h"
 
 #include "minimizerevolutionarytest.h"
+
+#include <QtCore/QString>
+#include <QtTest/QtTest>
+
+#include <stdio.h>
+#include <iostream>
+#include <armadillo>
+#include <time.h>
 
 using namespace std;
 using namespace arma;
@@ -51,11 +53,13 @@ public:
     void jastrowRatioTest();
     void slaterFourParticleTest();
     void waveSlaterSixParticleTest();
-private slots:
+    void slaterLaplaceTest();
     void slaterTest();
     void slaterInverse();
     void slaterRatioTest();
     void orbitalGradientTest();
+    void orbitalLaplaceTest();
+private slots:
     void slaterGradientTest();
 
 private:
@@ -132,7 +136,7 @@ void VmcTests::waveSimpleGradientTest()
     parameters[0] = 2;
     parameters[1] = 1;
     waveSimpleNew->setParameters(parameters);
-    waveSimpleNew->gradient(rPositions[0], 0, rGradient);
+    waveSimpleNew->gradient(rPositions, 0, rGradient);
     QVERIFY(fabs(rGradient[0] - 0.735) < 0.001);
     QVERIFY(fabs(rGradient[1] - 0.000) < 0.0000001);
     cout << "Particles..." << endl;
@@ -466,34 +470,79 @@ void VmcTests::jastrowTest() {
 }
 
 /*!
-  Test the slater gradient
+  Tests the slater gradient numerically against our implementation
   */
 void VmcTests::slaterGradientTest()
 {
+    int nParticles = 6;
+    int nDimensions = 2;
     Config *config1 = new Config(0,1);
-    config1->setNDimensions(2);
-    config1->setNParticles(6);
+    config1->setNDimensions(nDimensions);
+    config1->setNParticles(nParticles);
+    config1->setInteractionEnabled(false);
+    double parameters[2];
+    long idum = -1-time(NULL);
+    for(int w = 1; w < 11; w++) {
+        config1->setOmega(w * 0.1);
+        WaveSlater *waveSlater1 = new WaveSlater(config1);
+        vec2 *r = new vec2[nParticles];
+        for(int i = 0; i < nParticles; i++) {
+            r[i][0] = ran2(&idum);
+            r[i][1] = ran2(&idum);
+        }
+        for(int p = 1; p < 2; p++) {
+            parameters[0] = 0.34 * p;
+            parameters[1] = 0.12 * p;
+            parameters[0] = 1;
+            parameters[1] = 1;
+            waveSlater1->setParameters(parameters);
+            std::cout << "Init" << std::endl;
+            waveSlater1->initialize(r);
+            vec analyticalGradient = zeros<vec>(nParticles * nDimensions);
+            vec numericalGradient = zeros<vec>(nParticles * nDimensions);
+            std::cout << "Gradient" << std::endl;
+            waveSlater1->gradient(r, 1, analyticalGradient);
+            waveSlater1->gradientNumerical(r, numericalGradient);
+            for(int i = 0; i < nDimensions * nParticles; i++) {
+                std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
+                std::cout << "Diff: " << fabs(analyticalGradient[i] - numericalGradient[i]) << std::endl;
+//                QVERIFY(fabs(analyticalGradient[i] - numericalGradient[i]) < 1e-4);
+            }
+        }
+        delete waveSlater1;
+    }
+}
+
+/*!
+  Tests the slater laplace numerically against our implementation
+  */
+void VmcTests::slaterLaplaceTest()
+{
+    int nParticles = 4;
+    int nDimensions = 2;
+    Config *config1 = new Config(0,1);
+    config1->setNDimensions(nDimensions);
+    config1->setNParticles(nParticles);
     config1->setInteractionEnabled(false);
     double parameters[2];
     WaveSlater *waveSlater1 = new WaveSlater(config1);
     config1->setWave(waveSlater1);
-    vec2 *r = new vec2[config1->nParticles()];
-    for(int i = 0; i < config1->nParticles(); i++) {
-        r[i][0] = -i * 0.32;
-        r[i][1] = i * 0.13;
+    vec2 *r = new vec2[nParticles];
+    for(int i = 0; i < nParticles; i++) {
+        r[i][0] = 0.5 + i * 0.2;
+        r[i][1] = 0.23 + i * 0.12;
     }
-    waveSlater1->initialize(r);
-    for(int p = 1; p < 11; p++) {
+    for(int p = 1; p < 10; p++) {
         parameters[0] = 0.34 * p;
         parameters[1] = 0.12 * p;
         waveSlater1->setParameters(parameters);
-        vec2 analyticalGradient;
-        vec2 numericalGradient;
-        waveSlater1->gradient(r[1], 1, analyticalGradient);
-        waveSlater1->gradientNumerical(r[1], 1, numericalGradient);
-        for(int i = 0; i < config1->nDimensions(); i++) {
-            std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
-            QVERIFY(analyticalGradient[i] - numericalGradient[i] < 1e-4);
+        waveSlater1->initialize(r);
+        double analyticalLaplace = waveSlater1->laplace(r, 0);
+        double numericalLaplace = waveSlater1->laplaceNumerical(r);
+        for(int i = 0; i < nDimensions * nParticles; i++) {
+            //            std::cout << analyticalLaplace << " " << numericalLaplace << std::endl;
+            //            std::cout << "Diff: " << fabs(analyticalLaplace - numericalLaplace) << std::endl;
+            QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 1e-5);
         }
     }
 }
@@ -608,39 +657,100 @@ void VmcTests::orbitalGradientTest()
     Config *config1 = new Config(0,1);
     config1->setNParticles(nParticles);
     config1->setNDimensions(nDimensions);
+    double parameters[2];
     for(int nx = 0; nx < 5; nx++) {
         for(int ny = 0; ny < 5; ny++) {
-            //            std::cout << std::endl << "Orbital " << nx  << " " << ny << std::endl;
-            Orbital *orbital = new Orbital(nx,ny,config1);
+            for(int p = 1; p < 11; p++) {
+                parameters[0] = 0.34 * p;
+                parameters[1] = 0.12 * p;
+                config1->setOmega(0.23 * p);
+                //                            std::cout << std::endl << "Orbital " << nx  << " " << ny << std::endl;
+                Orbital *orbital = new Orbital(nx,ny,config1);
 
-            vec2 rPlus;
-            vec2 rMinus;
-            vec2 rPos;
-            vec2 simpleGradient;
-            for(int i = 1; i < 10; i++) {
-                rPos[0] = i*0.12;
-                rPos[1] = i*0.05;
-                rPlus = rPos;
-                rMinus = rPos;
-                //                std::cout << rPos << std::endl;
-                vec2 analyticalGradient;
-                orbital->gradient(rPos, analyticalGradient);
-                for (int j = 0; j < nDimensions; j++) {
+                vec2 rPlus;
+                vec2 rMinus;
+                vec2 rPos;
+                vec2 simpleGradient;
+                for(int i = 1; i < 10; i++) {
+                    rPos[0] = i*0.12;
+                    rPos[1] = i*0.05;
                     rPlus = rPos;
                     rMinus = rPos;
-                    rPlus[j] = rPos[j] + hstep;
-                    rMinus[j] = rPos[j] - hstep;
-                    double wfminus = orbital->evaluate(rMinus);
-                    double wfplus  = orbital->evaluate(rPlus);
-                    simpleGradient[j] = (wfplus - wfminus)/(2*hstep);
-                    //                    std::cout << analyticalGradient[j] << " " << simpleGradient[j] << std::endl;
-                    QVERIFY(fabs(analyticalGradient[j] - simpleGradient[j]) < 1e-6);
+                    //                std::cout << rPos << std::endl;
+                    vec2 analyticalGradient;
+                    orbital->gradient(rPos, analyticalGradient);
+                    for (int j = 0; j < nDimensions; j++) {
+                        rPlus = rPos;
+                        rMinus = rPos;
+                        rPlus[j] = rPos[j] + hstep;
+                        rMinus[j] = rPos[j] - hstep;
+                        double wfminus = orbital->evaluate(rMinus);
+                        double wfplus  = orbital->evaluate(rPlus);
+                        simpleGradient[j] = (wfplus - wfminus)/(2*hstep);
+                        //                                            std::cout << analyticalGradient[j] << " " << simpleGradient[j] << std::endl;
+                        QVERIFY(fabs(analyticalGradient[j] - simpleGradient[j]) < 1e-6);
+                    }
                 }
+                delete orbital;
             }
-            delete orbital;
         }
     }
 }
+
+void VmcTests::orbitalLaplaceTest()
+{
+    int nParticles = 2;
+    int nDimensions = 2;
+    double hstep = 0.00001;
+    Config *config1 = new Config(0,1);
+    config1->setNParticles(nParticles);
+    config1->setNDimensions(nDimensions);
+    double parameters[2];
+    for(int nx = 0; nx < 5; nx++) {
+        for(int ny = 0; ny < 5; ny++) {
+            for(int p = 1; p < 11; p++) {
+                parameters[0] = 0.34 * p;
+                parameters[1] = 0.12 * p;
+                config1->setOmega(0.23 * p);
+                //                std::cout << std::endl << "Orbital " << nx  << " " << ny << std::endl;
+                Orbital *orbital = new Orbital(nx,ny,config1);
+                orbital->setParameters(parameters);
+
+                vec2 rPlus;
+                vec2 rMinus;
+                vec2 rPos;
+                for(int i = 1; i < 10; i++) {
+
+                    rPos[0] = i*0.12;
+                    rPos[1] = i*0.05;
+                    rPlus = rPos;
+                    rMinus = rPos;
+                    //                std::cout << rPos << std::endl;
+                    double analyticalLaplace = orbital->laplace(rPos);
+                    double simpleLaplace = 0;
+                    for (int j = 0; j < nDimensions; j++) {
+                        rPlus = rPos;
+                        rMinus = rPos;
+                        rPlus[j] = rPos[j] + hstep;
+                        rMinus[j] = rPos[j] - hstep;
+                        double wfold = orbital->evaluate(rPos);
+                        double wfminus = orbital->evaluate(rMinus);
+                        double wfplus  = orbital->evaluate(rPlus);
+                        double partialLaplace =  (wfminus+wfplus-2*wfold) / (hstep * hstep);
+                        //                    std::cout << partialLaplace << std::endl;
+                        simpleLaplace += partialLaplace;
+                    }
+                    //                    std::cout << analyticalLaplace << " " << simpleLaplace << std::endl;
+                    //                    std::cout << "diff: " << fabs(analyticalLaplace - simpleLaplace) << std::endl;
+                    QVERIFY(fabs(analyticalLaplace - simpleLaplace) < 1e-2);
+                }
+                delete orbital;
+            }
+        }
+    }
+}
+
+
 
 /*!
   Test the Metropolis-Hastings algorithm by using the Slater determinant with 6 particles.
