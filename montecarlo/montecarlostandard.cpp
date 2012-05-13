@@ -10,7 +10,7 @@
 MonteCarloStandard::MonteCarloStandard(Config *config) :
     MonteCarlo(config),
     rank(config->rank()),
-    step_length(config->stepLength()),
+    stepLength(config->stepLength()),
     wave(config->wave()),
     recordMoves(false)
 {
@@ -51,7 +51,7 @@ void MonteCarloStandard::sample(int nCycles)
     //  initial trial position, note calling with alpha
     for (int i = 0; i < nParticles; i++) {
         for (int j=0; j < nDimensions; j++) {
-            rOld[i][j] = step_length*(ran2(idum)-0.5);
+            rOld[i][j] = stepLength*(ran2(idum)-0.5);
         }
         rNew[i] = rOld[i];
     }
@@ -62,7 +62,7 @@ void MonteCarloStandard::sample(int nCycles)
         // new position
         for (int i = 0; i < nParticles; i++) {
             for (int j=0; j < nDimensions; j++) {
-                rNew[i][j] = rOld[i][j]+step_length*(ran2(idum)-0.5);
+                rNew[i][j] = rOld[i][j]+stepLength*(ran2(idum)-0.5);
             }
             double ratio = wave->ratio(rNew[i], i);
             // The Metropolis test is performed by moving one particle at the time
@@ -71,6 +71,7 @@ void MonteCarloStandard::sample(int nCycles)
                 wave->acceptEvaluation(i);
             } else {
                 rNew[i] = rOld[i]; // Move the particle back
+                wave->refuseEvaluation();
             }
             // compute local energy
             localEnergy = config->hamiltonian()->energy(wave, rOld);

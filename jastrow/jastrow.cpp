@@ -62,6 +62,11 @@ void Jastrow::gradient(const vec2 &r, vec2 &rGradient)
 
 }
 
+void Jastrow::refuseEvaluation()
+{
+    // TODO revert necessary changes here
+}
+
 double Jastrow::evaluate(vec2 r[]) {
     double wf = 1;
 

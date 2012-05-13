@@ -20,6 +20,7 @@ public:
     double argument(int i, int j, mat &distances);
 
     void gradient(const vec2 &r, vec2 &rGradient);
+    void refuseEvaluation();
     ~Jastrow();
 private:
     int nParticles;

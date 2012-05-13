@@ -107,16 +107,17 @@ void Slater::setPreviousMovedParticle(int particleNumber)
 /*!
   Note: The first half of the particles have spin up, while the others have spin down.
   */
-double Slater::ratio(vec2 &rNew, int movedParticle)
+double Slater::ratio(vec2 &particlePosition, int movedParticle)
 {
     if(hasParticle(movedParticle)) {
-        for(int i = 0; i < nParticles / 2; i++) {
-            currentMatrix.at(movedParticle,i) = orbitals[i]->evaluate(rNew);
+        int localParticle = movedParticle - particleIndexOffset;
+        for(int j = 0; j < nParticles / 2; j++) {
+            currentMatrix.at(localParticle,j) = orbitals[j]->evaluate(particlePosition);
         }
         movedParticle = movedParticle - particleIndexOffset;
         double R = 0;
         for(int i = 0; i < nParticles / 2; i++) {
-            R += currentMatrix.at(movedParticle,i) * previousInverse.at(i, movedParticle);
+            R += currentMatrix.at(localParticle,i) * previousInverse.at(i, localParticle);
         }
         currentRatio = R;
         return R;
@@ -132,10 +133,17 @@ bool Slater::hasParticle(int particleNumber) const {
 
 void Slater::acceptEvaluation(int movedParticle)
 {
-    calculateInverse(movedParticle);
     previousMatrix = currentMatrix;
-    previousInverse = currentInverse;
     previousRatio = currentRatio;
+    calculateInverse(movedParticle);
+    previousInverse = currentInverse;
+}
+
+void Slater::refuseEvaluation() {
+    currentMatrix = previousMatrix;
+    // TODO might not need to copy back the inverse
+    currentInverse = previousInverse;
+    currentRatio = previousRatio;
 }
 
 void Slater::gradient(const vec2 r[], int movedParticlea, vec &rGradient) const {
@@ -169,7 +177,7 @@ double Slater::laplace(vec2 r[], int movedParticlea)
             int localParticle = movedParticle - particleIndexOffset;
 //            std::cout << "a" << localParticle << std::endl;
             for(int j = 0; j < nParticles / 2; j++) {
-                laplaceResult += orbitals[j]->laplace(r[movedParticle]) * previousInverse(j,localParticle);
+                laplaceResult += orbitals[j]->laplace(r[movedParticle]) * currentInverse(j,localParticle);
 //                std::cout << orbitals[j]->laplace(r[movedParticle]) << std::endl;
 //                std::cout << "inverse: " << previousInverse(j,localParticle) << std::endl;
             }

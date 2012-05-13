@@ -17,7 +17,7 @@ public:
     ~MonteCarloStandard();
 private:
     int rank;
-    double step_length;
+    double stepLength;
     vec2 *rOld;
     vec2 *rNew;
     WaveFunction* wave;

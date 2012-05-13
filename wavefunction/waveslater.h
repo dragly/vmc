@@ -29,6 +29,7 @@ public:
     void initialize(vec2 positions[]);
     double laplace(vec2 r[], int movedParticle);
     void gradient(vec2 r[], int particleNumber, vec &rGradient);
+    void refuseEvauluation();
 private:
     Slater *slaterDown;
     Slater *slaterUp;

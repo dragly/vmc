@@ -83,6 +83,10 @@ double WaveSlater::evaluate(vec2 r[])
 
 double WaveSlater::ratio(vec2 &particlePosition, int particleNumber) {
     rNew[particleNumber] = particlePosition;
+//    std::cout << "after:" << std::endl;
+//    for(int i = 0; i < nParticles; i++) {
+//        std::cout << std::setprecision(20) << rNew[i][0] << "," << rNew[i][1] << std::endl;
+//    }
     double theRatio = slaterUp->ratio(particlePosition, particleNumber) * slaterDown->ratio(particlePosition, particleNumber);
     if(m_interactionEnabled) {
         theRatio *= jastrow->ratio(particlePosition, particleNumber);
@@ -104,9 +108,16 @@ void WaveSlater::initialize(vec2 positions[]) {
 // TODO update matrices with new values for moved particle
 void WaveSlater::acceptEvaluation(int movedParticle) {
     WaveFunction::acceptEvaluation(movedParticle);
-    slaterDown->acceptEvaluation(movedParticle);
     slaterUp->acceptEvaluation(movedParticle);
+    slaterDown->acceptEvaluation(movedParticle);
     jastrow->acceptEvaluation(movedParticle);
+}
+
+void WaveSlater::refuseEvauluation() {
+    WaveFunction::refuseEvaluation();
+    slaterUp->refuseEvaluation();
+    slaterDown->refuseEvaluation();
+    jastrow->refuseEvaluation();
 }
 
 double WaveSlater::laplace(vec2 r[], int movedParticle) {
