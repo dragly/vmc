@@ -1,3 +1,5 @@
+#ifndef INI_H
+#define INI_H
 /*
  * Copyright (C) Jefferson 2010 <web@jeffersongta.de> / <remis80@gmx.net>
  *
@@ -106,3 +108,4 @@ class ini {
   int entries;
 
 };
+#endif // INI_H

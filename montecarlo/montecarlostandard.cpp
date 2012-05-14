@@ -66,9 +66,9 @@ void MonteCarloStandard::sample(int nCycles)
             }
             double ratio = wave->ratio(rNew[i], i);
 //            std::cout << "Ratio calculated " << std::endl;
-            for(int i = 0; i < nParticles; i++) {
+//            for(int i = 0; i < nParticles; i++) {
 //                std::cout << "rNew[" << i << "] = " << rNew[i] << std::endl;
-            }
+//            }
             // The Metropolis test is performed by moving one particle at the time
             if(ran2(idum) <= (ratio*ratio)) {
                 rOld[i] = rNew[i];
