@@ -8,7 +8,7 @@
 MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(Config *config) :
     MonteCarlo(config),
     rank(config->rank()),
-    step_length(config->stepLength()),
+    stepLength(config->stepLength()),
     wave(config->wave()),
     hamiltonian(config->hamiltonian())
 {
@@ -21,28 +21,23 @@ MonteCarloMetropolisHastings::~MonteCarloMetropolisHastings()
 {
 }
 
-void MonteCarloMetropolisHastings::quantumForce(vec2 rPosition[], vec2 &forceVector) {
-    double waveValue = config->wave()->evaluate(rPosition);
-    config->wave()->gradient(rPosition, 0, forceVector); // TODO add particle number
-    forceVector = 2 * forceVector / waveValue;
+void MonteCarloMetropolisHastings::quantumForce(vec2 rPosition[], vec &forceVector) {
+    wave->gradient(rPosition, 0, forceVector); // TODO add particle number
+    forceVector *= 2;
 }
 
 void MonteCarloMetropolisHastings::sample(int nCycles)
 {
-    double wfnew = 0;
-    double wfold = 0;
     m_energy = 0;
     m_energySquared = 0;
     terminalizationSum = 0;
     terminalizationNum = 1;
     double localEnergy = 0;
     double diffConstant = 1;
-    // initialisations of variational parameters and energies
-    m_energy = m_energySquared = 0; localEnergy=0;
     //  initial trial position, note calling with alpha
     for (int i = 0; i < nParticles; i++) {
         for (int j=0; j < nDimensions; j++) {
-            rOld[i][j] = step_length*(ran2(idum)-0.5);
+            rOld[i][j] = stepLength*(ran2(idum)-0.5);
         }
     }
     wave->initialize(rOld);
@@ -53,9 +48,12 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
         // new trial position
         for (int i = 0; i < nParticles; i++) {
             quantumForce(rOld, forceVectorNew);
-            rNew[i] = rOld[i] + diffConstant*forceVectorNew*step_length;
+            vec2 particleQuantumForce;
+            particleQuantumForce(0) = forceVectorNew(i);
+            particleQuantumForce(1) = forceVectorNew(i+1);
+            rNew[i] = rOld[i] + diffConstant*particleQuantumForce*stepLength;
             for (int j=0; j < nDimensions; j++) {
-                rNew[i][j] += simpleGaussRandom(idum);
+                rNew[i][j] += simpleGaussRandom(idum) * sqrt(stepLength);
             }
             //  for the other particles we need to set the position to the old position since
             //  we move only one particle at the time
@@ -64,21 +62,25 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
                     rNew[k] = rOld[k];
                 }
             }
-            wfnew = wave->evaluate(rNew);
-            wave->gradient(rNew, i, waveGradientNew);
-            double argument = 0;
-            for( int j = 0; j < nDimensions; j++) {
-                forceVectorSum[j] = forceVectorNew[j] + forceVectorOld[j];
-                forceVectorDiff[j] = forceVectorOld[j] - forceVectorNew[j];
-                positionDiff[j] = rNew[i][j] - rOld[i][j];
-                argument += 0.5 * forceVectorSum[j] * (diffConstant * step_length / 2 * forceVectorDiff[j] - positionDiff[j]);
-            }
-            double waveFrac = wfnew*wfnew/(wfold*wfold);
+//            wfnew = wave->evaluate(rNew);
+//            wave->gradient(rNew, i, waveGradientNew);
+//            double argument = 0;
+//            for( int j = 0; j < nDimensions; j++) {
+//                forceVectorSum[j] = forceVectorNew[j] + forceVectorOld[j];
+//                forceVectorDiff[j] = forceVectorOld[j] - forceVectorNew[j];
+//                positionDiff[j] = rNew[i][j] - rOld[i][j];
+//                argument += 0.5 * forceVectorSum[j] * (diffConstant * stepLength / 2 * forceVectorDiff[j] - positionDiff[j]);
+//            }
+//            double waveFrac = wfnew*wfnew/(wfold*wfold);
             // The Metropolis test is performed by moving one particle at the time
-            if(ran2(idum) <= exp(argument) * waveFrac) {
-                rOld[i]=rNew[i];
-                waveGradientOld = waveGradientNew;
-                wfold = wfnew;
+            double ratio = wave->ratio(rNew[i], i);
+            if(ran2(idum) <= (ratio*ratio)) {
+                rOld[i] = rNew[i];
+                wave->acceptEvaluation(i);
+//                std::cout << "Accepted" << std::endl;
+            } else {
+                rNew[i] = rOld[i]; // Move the particle back
+                wave->refuseEvaluation();
             }
             localEnergy = hamiltonian->energy(wave, rOld);
             if(terminalized) {

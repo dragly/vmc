@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-from enthought.mayavi.mlab import *
+try:
+    from enthought.mayavi.mlab import *
+except ImportError:
+    from mayavi.mlab import *
+
 from numpy import *
 from matplotlib import rc
 from sys import argv

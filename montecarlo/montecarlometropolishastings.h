@@ -14,18 +14,18 @@ public:
     void sample(int nCycles);
 
     ~MonteCarloMetropolisHastings();
-    void quantumForce(vec2 rPosition[], vec2 &forceVector);
+    void quantumForce(vec2 rPosition[], vec &forceVector);
 private:
     int rank;
-    double step_length;
+    double stepLength;
     vec2 *rOld;
     vec2 *rNew;
-    vec2 waveGradientOld;
-    vec2 waveGradientNew;
-    vec2 forceVectorNew;
-    vec2 forceVectorOld;
-    vec2 forceVectorSum;
-    vec2 forceVectorDiff ;
+    vec waveGradientOld;
+    vec waveGradientNew;
+    vec forceVectorNew;
+    vec forceVectorOld;
+    vec forceVectorSum;
+    vec forceVectorDiff ;
     vec2 positionDiff ;
     WaveFunction* wave;
     Hamiltonian* hamiltonian;
