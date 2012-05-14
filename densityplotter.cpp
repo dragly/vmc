@@ -42,7 +42,7 @@ DensityPlotter::~DensityPlotter()
     delete [] r_new;
 }
 
-void DensityPlotter::loadConfiguration(ini *settings)
+void DensityPlotter::loadConfiguration(INIParser *settings)
 {
     m_settings = settings;
     m_charge = atof(settings->Get("DensityPlotter", "charge", "1.0").c_str());

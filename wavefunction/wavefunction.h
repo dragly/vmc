@@ -7,7 +7,7 @@ using namespace arma;
 #include <string>
 using namespace std;
 
-class ini;
+class INIParser;
 class Config;
 
 class WaveFunction
@@ -23,7 +23,7 @@ public:
         (void)movedParticle;
         return laplaceNumerical(r);
     }
-    virtual void loadConfiguration(ini *settings);
+    virtual void loadConfiguration(INIParser *settings);
     virtual double laplaceNumerical(vec2 r[]);
     virtual void gradientNumerical(vec2 r[], vec &rGradient);
     virtual void setParameters(double *parameters);

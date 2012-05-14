@@ -50,7 +50,7 @@ instead of writing the code again and again
 #include "ini.h"
 using namespace std;
 
-ini::ini(const char _filename[])
+INIParser::INIParser(const char _filename[])
 {
     // init some variables
     this->Closed = false;
@@ -141,13 +141,13 @@ To get the sectionidx, loop through this->sectionnames. the sectionidx will be t
     inifile.close();
 }
 
-ini::~ini()
+INIParser::~INIParser()
 {
     if(this->Closed == false)
         this->Close();
 }
 
-void ini::Close()
+void INIParser::Close()
 {
     int emptylines = 0;
     fstream inifile;
@@ -194,14 +194,14 @@ void ini::Close()
     }
 }
 
-bool ini::Good()
+bool INIParser::Good()
 {
     bool returnVal = this->InitGood;
     return returnVal;
 }
 
 
-int ini::GetInteger(const char section[], const char key[], int defaultValue)
+int INIParser::GetInteger(const char section[], const char key[], int defaultValue)
 {
     // Get the right dimension for accessing the buffer
     vector<string>::iterator sectionnames_it;
@@ -247,7 +247,7 @@ int ini::GetInteger(const char section[], const char key[], int defaultValue)
     return defaultValue;
 }
 
-double ini::GetDouble(const char section[], const char key[], double defaultValue)
+double INIParser::GetDouble(const char section[], const char key[], double defaultValue)
 {
     // Get the right dimension for accessing the buffer
     vector<string>::iterator sectionnames_it;
@@ -294,7 +294,7 @@ double ini::GetDouble(const char section[], const char key[], double defaultValu
 }
 
 
-long ini::GetLong(const char section[], const char key[], long defaultValue)
+long INIParser::GetLong(const char section[], const char key[], long defaultValue)
 {
     // Get the right dimension for accessing the buffer
     vector<string>::iterator sectionnames_it;
@@ -341,7 +341,7 @@ long ini::GetLong(const char section[], const char key[], long defaultValue)
 }
 
 
-bool ini::GetBoolean(const char section[], const char key[], bool defaultValue)
+bool INIParser::GetBoolean(const char section[], const char key[], bool defaultValue)
 {
     // Get the right dimension for accessing the buffer
     vector<string>::iterator sectionnames_it;
@@ -392,12 +392,12 @@ bool ini::GetBoolean(const char section[], const char key[], bool defaultValue)
     return defaultValue;
 }
 
-string ini::Get(const char section[], const char key[], string defaultValue)
+string INIParser::Get(const char section[], const char key[], string defaultValue)
 {
     return this->GetString(section, key, defaultValue);
 }
 
-string ini::GetString(const char section[], const char key[], string defaultValue)
+string INIParser::GetString(const char section[], const char key[], string defaultValue)
 {
     // Get the right dimension for accessing the buffer
     vector<string>::iterator sectionnames_it;
@@ -443,7 +443,7 @@ string ini::GetString(const char section[], const char key[], string defaultValu
     return defaultValue;
 }
 
-void ini::Set(const char section[], const char key[], const char newval[])
+void INIParser::Set(const char section[], const char key[], const char newval[])
 {
     // Get the right dimension for accessing the buffer
     vector<string>::iterator sectionnames_it;
@@ -508,7 +508,7 @@ void ini::Set(const char section[], const char key[], const char newval[])
     }
 }
 
-void ini::SetString(const char section[], const char key[], string newval)
+void INIParser::SetString(const char section[], const char key[], string newval)
 {
     // Get the right dimension for accessing the buffer
     vector<string>::iterator sectionnames_it;
@@ -573,7 +573,7 @@ void ini::SetString(const char section[], const char key[], string newval)
     }
 }
 
-void ini::SetInt(const char section[], const char key[], int newval)
+void INIParser::SetInt(const char section[], const char key[], int newval)
 {
     // Get the right dimension for accessing the buffer
     vector<string>::iterator sectionnames_it;
@@ -638,7 +638,7 @@ void ini::SetInt(const char section[], const char key[], int newval)
     }
 }
 
-void ini::SetLong(const char section[], const char key[], long newval)
+void INIParser::SetLong(const char section[], const char key[], long newval)
 {
     // Get the right dimension for accessing the buffer
     vector<string>::iterator sectionnames_it;
@@ -703,7 +703,7 @@ void ini::SetLong(const char section[], const char key[], long newval)
     }
 }
 
-void ini::SetBool(const char section[], const char key[], const bool newval)
+void INIParser::SetBool(const char section[], const char key[], const bool newval)
 {
     // Get the right dimension for accessing the buffer
     vector<string>::iterator sectionnames_it;
@@ -769,7 +769,7 @@ void ini::SetBool(const char section[], const char key[], const bool newval)
 }
 
 
-void ini::CreateSection(const char section[])
+void INIParser::CreateSection(const char section[])
 {
     bool lsecfound = false;
     vector<string>::iterator sectionnames_it;
@@ -794,7 +794,7 @@ void ini::CreateSection(const char section[])
     }
 }
 
-void ini::RemoveSection(const char section[])
+void INIParser::RemoveSection(const char section[])
 {
     vector<string>::iterator sectionnames_it;
     int lpos = 0;
@@ -817,7 +817,7 @@ void ini::RemoveSection(const char section[])
     }
 }
 
-void ini::RemoveEntry(const char section[], const char key[])
+void INIParser::RemoveEntry(const char section[], const char key[])
 {
     // Get the right dimension for accessing the buffer
     vector<string>::iterator sectionnames_it;
@@ -863,7 +863,7 @@ void ini::RemoveEntry(const char section[], const char key[])
     }
 }
 
-bool ini::ValidSection(const char section[])
+bool INIParser::ValidSection(const char section[])
 {
     vector<string>::iterator sectionnames_it;
 
@@ -879,7 +879,7 @@ bool ini::ValidSection(const char section[])
     return false;
 }
 
-bool ini::ValidEntry(const char section[], const char key[])
+bool INIParser::ValidEntry(const char section[], const char key[])
 {
     // Get the right dimension for accessing the buffer
     vector<string>::iterator sectionnames_it;
@@ -922,19 +922,19 @@ bool ini::ValidEntry(const char section[], const char key[])
     return false;
 }
 
-int ini::CountSections()
+int INIParser::CountSections()
 {
     int lsections = this->sections;
     return lsections;
 }
 
-int ini::CountEntries()
+int INIParser::CountEntries()
 {
     int lentries = this->entries;
     return lentries;
 }
 
-void ini::Clear()
+void INIParser::Clear()
 {
     // clear buffers
     this->sectionnames.clear();
@@ -953,7 +953,7 @@ Function: Gets a key from a string, which is in the ini format
 (key = value)
 returns: The key as std:string
 */
-string ini::getKeyFromString(string mystring)
+string INIParser::getKeyFromString(string mystring)
 {
     int i = mystring.find('=');
     if(i>=0)
@@ -969,7 +969,7 @@ Function: Gets a value from a string, which is in the ini format
 (key = value)
 returns: The value as std:string
 */
-string ini::getValueFromString(string mystring)
+string INIParser::getValueFromString(string mystring)
 {
     int i = mystring.find_last_of('=');
     if(i>=0)
@@ -980,7 +980,7 @@ string ini::getValueFromString(string mystring)
 }
 
 template <class T>
-string ini::numtostring(T num)
+string INIParser::numtostring(T num)
 {
     string mystring;
     ostringstream convert;
@@ -990,7 +990,7 @@ string ini::numtostring(T num)
 }
 
 template <class T>
-T ini::stringtonum(string mystring)
+T INIParser::stringtonum(string mystring)
 {
     T num;
     istringstream convert(mystring);

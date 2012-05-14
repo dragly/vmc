@@ -55,10 +55,10 @@ using namespace std;
 #define INI_LINE_DONTSAVE "ini_dont_save123" // if a line contains this, it won't save
 
 
-class ini {
+class INIParser {
  public:
-  ini(const char _filename[]);
-  ~ini();
+  INIParser(const char _filename[]);
+  ~INIParser();
 
   int GetInteger(const char section[], const char key[], int defaultValue);
   double GetDouble(const char section[], const char key[], double defaultValue);

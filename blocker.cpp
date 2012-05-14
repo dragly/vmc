@@ -24,7 +24,7 @@ Blocker::Blocker()
 {
 }
 
-void Blocker::loadConfiguration(ini *settings)
+void Blocker::loadConfiguration(INIParser *settings)
 {
     m_settings = settings;
     m_nProcesses = atoi(settings->Get("Blocker","nProcesses", "1").c_str());

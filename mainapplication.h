@@ -4,7 +4,7 @@
 //#include <QSettings>
 
 class Minimizer;
-class ini;
+class INIParser;
 class Config;
 
 class MainApplication
@@ -26,7 +26,7 @@ public:
     void runDensity();
     void finalize();
 private:
-    ini *m_settings;
+    INIParser *m_settings;
 
 
 

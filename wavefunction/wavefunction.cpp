@@ -34,7 +34,7 @@ WaveFunction::WaveFunction(Config *config) :
     rOld = new vec2[nParticles];
 }
 
-void WaveFunction::loadConfiguration(ini *settings) {
+void WaveFunction::loadConfiguration(INIParser *settings) {
     useAnalyticalLaplace = settings->GetBoolean("Wave", "useAnalyticalLaplace", false);
     useAnalyticalGradient = settings->GetBoolean("Wave", "useAnalyticalGradient", false);
 }

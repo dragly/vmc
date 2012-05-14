@@ -27,7 +27,8 @@ Config::Config(int rank, int nProcesses) :
 {
 }
 
-void Config::loadConfiguration(ini* settings) {
+void Config::loadConfiguration(INIParser* settings) {
+    std::cout << "CONFIGURATION LOADED" << std::endl << std::endl << std::endl;
     m_nParticles = settings->GetInteger("General", "nParticles", m_nParticles);
     m_nDimensions = settings->GetInteger("General", "nDimensions", m_nDimensions);
     m_interactionEnabled = settings->GetBoolean("General", "interactionEnabled", m_interactionEnabled);

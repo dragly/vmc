@@ -43,7 +43,7 @@ MainApplication::MainApplication(int* argc, char*** argv) :
 void MainApplication::loadConfiguration()
 {
     std::cout << "Loading ini reader" << std::endl;
-    m_settings = new ini("config.ini");
+    m_settings = new INIParser("config.ini");
 
     std::cout << "Checking for parse errors" << std::endl;
     if(!m_settings->Good()) {

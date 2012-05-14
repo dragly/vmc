@@ -5,7 +5,7 @@
 using namespace arma;
 
 class WaveFunction;
-class ini;
+class INIParser;
 class Config;
 
 using namespace std;
@@ -28,7 +28,7 @@ class DensityPlotter
 public:
     DensityPlotter(Config *config);
     void makePlot();
-    void loadConfiguration(ini *settings);
+    void loadConfiguration(INIParser *settings);
     ~DensityPlotter();
 
     double charge() const {
@@ -44,7 +44,7 @@ public:
 private:
     Config *m_config;
     WaveFunction *m_wave;
-    ini *m_settings;
+    INIParser *m_settings;
     long idum;
     vec2 *r_old;
     vec2 *r_new;

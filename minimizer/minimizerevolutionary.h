@@ -20,7 +20,7 @@ public:
     MinimizerEvolutionary(Config *config);
 
     void runMinimizer();
-    void loadConfiguration(ini * settings);
+    void loadConfiguration(INIParser * settings);
 
     void startEvolution();
 

@@ -4,7 +4,7 @@
 #include "../wavefunction/wavefunction.h"
 #include "../hamiltonian/hamiltonian.h"
 
-class ini;
+class INIParser;
 
 class MonteCarlo
 {
@@ -12,7 +12,7 @@ public:
     MonteCarlo(Config *config);
 
     virtual void sample(int numberCycles) = 0;
-    virtual void loadConfiguration(ini *settings) {
+    virtual void loadConfiguration(INIParser *settings) {
         (void)settings;
     }
     static MonteCarlo *fromName(string monteCarloClass, Config *config);

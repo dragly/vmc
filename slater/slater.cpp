@@ -196,6 +196,7 @@ double Slater::laplace(vec2 r[], int movedParticlea)
             }
         }
     }
+    return laplaceResult;
 }
 
 mat Slater::inverse() {

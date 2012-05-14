@@ -32,7 +32,7 @@ MinimizerStandard::MinimizerStandard(Config *config) :
 {
 }
 
-void MinimizerStandard::loadConfiguration(ini *settings)
+void MinimizerStandard::loadConfiguration(INIParser *settings)
 {
     m_settings = settings;
     charge = atof(settings->Get("MinimizerStandard","charge", "1.0").c_str());

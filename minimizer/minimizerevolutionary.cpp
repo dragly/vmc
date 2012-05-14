@@ -12,7 +12,7 @@ void MinimizerEvolutionary::runMinimizer()
     startEvolution();
 }
 
-void MinimizerEvolutionary::loadConfiguration(ini *settings)
+void MinimizerEvolutionary::loadConfiguration(INIParser *settings)
 {
     nIndividuals = settings->GetInteger("MinimizerEvolutionary","nIndividuals",64);
     nPopulations = settings->GetInteger("MinimizerEvolutionary","nPopulations",2);
