@@ -125,9 +125,9 @@ WaveFunction* WaveFunction::fromName(std::string waveClass, Config* config) {
 
   @param r An array of vectors denoting all the particle positions.
 */
-double WaveFunction::ratio(vec2 &particlePosition, int particleNumber)
+double WaveFunction::ratio(vec2 &particlePosition, int movedParticle)
 {
-    rNew[particleNumber] = particlePosition;
+    rNew[movedParticle] = particlePosition;
     currentEvaluation = evaluate(rNew);
     double ratio = currentEvaluation / previousEvaluation;
     return ratio;

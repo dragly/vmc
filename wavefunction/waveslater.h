@@ -25,18 +25,18 @@ public:
     void setParameters(double *parameters);
 //    void setPreviousMovedParticle(int particleNumber);
     void acceptEvaluation(int movedParticle);
-    double ratio(vec2 &particlePosition, int particleNumber);
+    double ratio(vec2 &particlePosition, int movedParticle);
     void initialize(vec2 positions[]);
     double laplace(vec2 r[], int movedParticle);
-    void gradient(vec2 r[], int particleNumber, vec &rGradient);
-    void refuseEvauluation();
+    void gradient(vec2 r[], int movedParticle, vec &rGradient);
+    void refuseEvaluation();
 private:
     Slater *slaterDown;
     Slater *slaterUp;
     Jastrow *jastrow;
 
     Orbital **orbitals;
-    bool m_interactionEnabled;
+    bool interactionEnabled;
 };
 
 #endif // WAVESLATER_H

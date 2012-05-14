@@ -65,16 +65,26 @@ void MonteCarloStandard::sample(int nCycles)
                 rNew[i][j] = rOld[i][j]+stepLength*(ran2(idum)-0.5);
             }
             double ratio = wave->ratio(rNew[i], i);
+//            std::cout << "Ratio calculated " << std::endl;
+            for(int i = 0; i < nParticles; i++) {
+//                std::cout << "rNew[" << i << "] = " << rNew[i] << std::endl;
+            }
             // The Metropolis test is performed by moving one particle at the time
             if(ran2(idum) <= (ratio*ratio)) {
                 rOld[i] = rNew[i];
                 wave->acceptEvaluation(i);
+//                std::cout << "Accepted" << std::endl;
             } else {
                 rNew[i] = rOld[i]; // Move the particle back
                 wave->refuseEvaluation();
+//                std::cout << "Denied" << std::endl;
             }
+//            std::cout << "Move decided" << std::endl;
+//            for(int i = 0; i < nParticles; i++) {
+//                std::cout << "rNew[" << i << "] = " << rNew[i] << std::endl;
+//            }
             // compute local energy
-            localEnergy = config->hamiltonian()->energy(wave, rOld);
+            localEnergy = config->hamiltonian()->energy(wave, rNew);
             // save all energies on last variate
             //        if(variate==max_variations){
             if(terminalized) {

@@ -20,14 +20,15 @@ public:
     mat inverse();
     void calculateInverse(int movedParticle);
     void calculateInverseNumerically();
-    void setPreviousMovedParticle(int particleNumber);
+    void setPreviousMovedParticle(int movedParticle);
     double ratio(vec2 &particlePosition, int movedParticle);
     void acceptEvaluation(int movedParticle);
     void initialize(vec2 positions[]);
     double laplace(vec2 r[], int movedParticlea);
-    void gradient(const vec2 r[], int movedParticle, vec &rGradient) const;
+    void gradient(vec2 r[], int movedParticle, vec &rGradient) const;
     bool hasParticle(int particleNumber) const;
     void refuseEvaluation();
+    void updateMatrix(vec2 &particlePosition, int movedParticle);
 private:
     mat currentMatrix;
     mat previousMatrix;

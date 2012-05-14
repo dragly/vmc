@@ -29,7 +29,7 @@ public:
     virtual void setParameters(double *parameters);
     static WaveFunction* fromName(string waveClass, Config *config);
 //    virtual void setPreviousMovedParticle(int particleNumber);
-    virtual double ratio(vec2 &particlePosition, int particleNumber);
+    virtual double ratio(vec2 &particlePosition, int movedParticle);
     virtual void acceptEvaluation(int movedParticle);
     virtual void refuseEvaluation();
     virtual void initialize(vec2 r[]);

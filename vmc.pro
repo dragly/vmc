@@ -6,6 +6,7 @@
 
 
 QT       -= core
+QT       -= gui
 CONFIG   += console
 
 TARGET = vmc

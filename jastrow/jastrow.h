@@ -13,18 +13,21 @@ public:
     Jastrow(Config * config);
 
     double evaluate(vec2 r[]);
-    double ratio(vec2 &rNew, int particleNumber);
+    double ratio(vec2 &rNew, int movedParticle);
     void setParameters(double *parameters);
     void calculateDistances(vec2 r[]);
+    void initialize(vec2 positions[]);
     void acceptEvaluation(int movedParticle);
     double argument(int i, int j, mat &distances);
 
-    void gradient(const vec2 &r, vec2 &rGradient);
+    void gradient(vec2 r[], int movedParticle, vec &rGradient);
     void refuseEvaluation();
     ~Jastrow();
+    double laplace(vec2 r[], int movedParticle);
 private:
     int nParticles;
-    double m_beta;
+    int nDimensions;
+    double beta;
     mat a;
 
     mat distancesOld;
