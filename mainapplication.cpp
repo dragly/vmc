@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <stdlib.h>
 #include <stdio.h>
+
 // disable annoying unused parameter warnings from the MPI library which we don't have any control over
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <mpi.h>
@@ -40,10 +41,14 @@ MainApplication::MainApplication(int* argc, char*** argv) :
 
 void MainApplication::loadConfiguration()
 {
+    std::cout << "Loading ini reader" << std::endl;
     m_settings = new INIReader("config.ini");
+
+    std::cout << "Checking for parse errors" << std::endl;
     if(m_settings->ParseError()) {
         cerr << "Warning: " << __PRETTY_FUNCTION__ << ": Could not load configuration file 'config.ini'. Does it exist?" << endl;
     }
+    std::cout << "Creating config object" << std::endl;
 
     m_config = new Config(m_rank, m_nProcesses);
     m_config->loadConfiguration(m_settings);
@@ -68,7 +73,9 @@ void MainApplication::loadConfiguration()
 
 void MainApplication::runConfiguration()
 {
+    std::cout << "Loading config" << std::endl;
     loadConfiguration();
+    std::cout << "Config loaded" << std::endl;
     if(m_mode == MinimizerMode) {
         runMinimizer();
     } else if(m_mode== DensityMode) {

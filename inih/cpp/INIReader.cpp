@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
+#include <iostream>
 #include "../ini.h"
 #include "INIReader.h"
 
@@ -10,7 +11,9 @@ using std::string;
 
 INIReader::INIReader(string filename)
 {
+    std::cout << "In constructor" << std::endl;
     _error = ini_parse(filename.c_str(), ValueHandler, this);
+    std::cout << "In constructor" << std::endl;
 }
 
 int INIReader::ParseError()

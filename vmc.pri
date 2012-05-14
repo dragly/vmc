@@ -1,11 +1,20 @@
 myHome = $$system(echo $HOME)
-message(Assuming Armadillo is installed under $$myHome/apps/armadillo-2.4.4/include)
-INCLUDEPATH+=$$myHome/apps/armadillo-2.4.4/include
+UNAME = $$system(cat /proc/version | grep -o "Red Hat 4.1")
+message($$UNAME)
+contains(UNAME, Red) {
+    message(Old Red Hat Install)
+    armadilloDir = $$myHome/apps/armadillo-2.4.4-rhel5
+} else {
+    message(Newer distribution)
+    armadilloDir = $$myHome/apps/armadillo-2.4.4
+}
+message(Assuming Armadillo is installed under $$armadilloDir/include)
+INCLUDEPATH+=$$armadilloDir/include
 
 #LIBS += -llapack
 #LIBS += -lblas
 #LIBS += -lblas -llapack
-LIBS += -llapack -L/usr/lib64/atlas/ -L$$myHome/apps/libs -L$$myHome/apps/armadillo-2.4.4 -larmadillo
+LIBS += -llapack -L/usr/lib64/atlas/ -L$$armadilloDir -larmadillo
 
 QMAKE_CXX = mpicxx
 QMAKE_CXX_RELEASE = $$QMAKE_CXX
@@ -17,7 +26,7 @@ QMAKE_CFLAGS += $$system(mpicc --showme:compile)
 QMAKE_LFLAGS += $$system(mpicxx --showme:link)
 QMAKE_CXXFLAGS += $$system(mpicxx --showme:compile)
 QMAKE_CXXFLAGS += -DMPICH_IGNORE_CXX_SEEK
-QMAKE_CXXFLAGS += -std=c++0x
+#QMAKE_CXXFLAGS += -std=c++0x
 
 contains(CONFIG,debug) {
     message(Debug mode. Disabling optimization)

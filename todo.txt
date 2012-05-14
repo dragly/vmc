@@ -1,6 +1,11 @@
 Things to do:
 
-Implement orbital class that calculates the correct wave function for a given set of quantum numbers.
-Implement the slater determinant class so that it can be used in a wave function class, which again calls the orbital class for data.
-Implement a new wave function class that uses the slater determinant.
-Make the slater class smarter so that it can calculate ratios by only moving one particle at the time.
+Implement the evolutional algorithm
+Test the evolutional algorithm on minimization problems
+Look for DMC-like methods that utilize evolution
+
+Set up a scripting system that takes care of running different configurations at the same time. It should have the followin features:
+- read a folder of config files, where each config file has a distinctive name which will be used on subsequent data files and such
+- contain a list of available machines to run on
+- check whether the data for the given run already exists - if it does, the data should not be recreated
+- SSH into each machine and execute the program with the number of available processors or 1 if specified in the config file
