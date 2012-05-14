@@ -16,7 +16,7 @@
 using namespace std;
 
 #include "blocker.h"
-#include "inih/cpp/INIReader.h"
+#include "inih/ini.h"
 
 // TODO make sure that the Blocker class actually does what it is supposed to
 
@@ -24,7 +24,7 @@ Blocker::Blocker()
 {
 }
 
-void Blocker::loadConfiguration(INIReader *settings)
+void Blocker::loadConfiguration(ini *settings)
 {
     m_settings = settings;
     m_nProcesses = atoi(settings->Get("Blocker","nProcesses", "1").c_str());

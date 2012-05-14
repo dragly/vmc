@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <iostream>
 
-#include "inih/cpp/INIReader.h"
+//#include "inih/cpp/INIReader.h"
+#include "inih/ini.h"
 #include "wavefunction/waveslater.h"
 #include "hamiltonian/hamiltonianideal.h"
 #include "montecarlo/montecarlostandard.h"
@@ -26,7 +27,7 @@ Config::Config(int rank, int nProcesses) :
 {
 }
 
-void Config::loadConfiguration(INIReader* settings) {
+void Config::loadConfiguration(ini* settings) {
     m_nParticles = settings->GetInteger("General", "nParticles", m_nParticles);
     m_nDimensions = settings->GetInteger("General", "nDimensions", m_nDimensions);
     m_interactionEnabled = settings->GetBoolean("General", "interactionEnabled", m_interactionEnabled);

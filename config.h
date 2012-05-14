@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+
+class ini;
 using namespace std;
 
 class Config
@@ -54,7 +56,7 @@ public:
         return m_stepLength;
     }
 
-    void loadConfiguration(INIReader *settings);
+    void loadConfiguration(ini *settings);
 
     void setWave(WaveFunction* arg)
     {

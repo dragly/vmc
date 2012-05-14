@@ -15,7 +15,7 @@
 #include <typeinfo>
 
 // local stuff
-#include "../inih/cpp/INIReader.h"
+#include "../inih/ini.h"
 
 #include "../wavefunction/wavesimple.h"
 #include "../montecarlo/montecarlostandard.h"
@@ -32,7 +32,7 @@ MinimizerStandard::MinimizerStandard(Config *config) :
 {
 }
 
-void MinimizerStandard::loadConfiguration(INIReader *settings)
+void MinimizerStandard::loadConfiguration(ini *settings)
 {
     m_settings = settings;
     charge = atof(settings->Get("MinimizerStandard","charge", "1.0").c_str());

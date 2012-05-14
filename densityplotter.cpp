@@ -14,7 +14,7 @@
 #include "densityplotter.h"
 
 #include "wavefunction/wavefunction.h"
-#include "inih/cpp/INIReader.h"
+#include "inih/ini.h"
 #include "config.h"
 #include "montecarlo/montecarlostandard.h"
 #include "matrix.h"
@@ -42,7 +42,7 @@ DensityPlotter::~DensityPlotter()
     delete [] r_new;
 }
 
-void DensityPlotter::loadConfiguration(INIReader *settings)
+void DensityPlotter::loadConfiguration(ini *settings)
 {
     m_settings = settings;
     m_charge = atof(settings->Get("DensityPlotter", "charge", "1.0").c_str());

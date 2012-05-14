@@ -8,7 +8,7 @@
 
 #include "minimizer.h"
 
-class INIReader;
+class ini;
 class WaveFunction;
 class Hamiltonian;
 class MonteCarlo;
@@ -20,7 +20,7 @@ class MinimizerStandard : public Minimizer
 public:
     MinimizerStandard(Config *config);
     void runMinimizer();
-    void loadConfiguration(INIReader *settings);
+    void loadConfiguration(ini *settings);
 private:
 
     //  Here we define global variables  used in various functions
@@ -33,7 +33,7 @@ private:
     double alphaEnd;
     double betaStart;
     double betaEnd;
-    INIReader *m_settings;
+    ini *m_settings;
 
     WaveFunction *m_wave;
     MonteCarlo *m_monteCarlo;

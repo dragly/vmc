@@ -14,7 +14,7 @@
 #include "waveideal.h"
 #include "waveslater.h"
 #include "../config.h"
-#include "../inih/cpp/INIReader.h"
+#include "../inih/ini.h"
 
 WaveFunction::WaveFunction(Config *config) :
     config(config),
@@ -34,7 +34,7 @@ WaveFunction::WaveFunction(Config *config) :
     rOld = new vec2[nParticles];
 }
 
-void WaveFunction::loadConfiguration(INIReader *settings) {
+void WaveFunction::loadConfiguration(ini *settings) {
     useAnalyticalLaplace = settings->GetBoolean("Wave", "useAnalyticalLaplace", false);
     useAnalyticalGradient = settings->GetBoolean("Wave", "useAnalyticalGradient", false);
 }

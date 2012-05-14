@@ -11,7 +11,7 @@ using namespace std;
   Runs with multiple parameters and attempts to find the lowest possible value of the energy by adjusting the parameters.
   */
 
-class INIReader;
+class ini;
 
 class Minimizer
 {
@@ -20,7 +20,7 @@ public:
     virtual void runMinimizer() = 0;
     void runBlocking();
 
-    virtual void loadConfiguration(INIReader *settings) {
+    virtual void loadConfiguration(ini *settings) {
         (void)settings;
     }
     void writeBlockData();

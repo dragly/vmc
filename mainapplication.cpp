@@ -15,7 +15,8 @@
 // Enable warnings again
 #pragma GCC diagnostic warning "-Wunused-parameter"
 
-#include "inih/cpp/INIReader.h"
+//#include "inih/cpp/INIReader.h"
+#include "inih/ini.h"
 
 #include "mainapplication.h"
 
@@ -42,10 +43,10 @@ MainApplication::MainApplication(int* argc, char*** argv) :
 void MainApplication::loadConfiguration()
 {
     std::cout << "Loading ini reader" << std::endl;
-    m_settings = new INIReader("config.ini");
+    m_settings = new ini("config.ini");
 
     std::cout << "Checking for parse errors" << std::endl;
-    if(m_settings->ParseError()) {
+    if(!m_settings->Good()) {
         cerr << "Warning: " << __PRETTY_FUNCTION__ << ": Could not load configuration file 'config.ini'. Does it exist?" << endl;
     }
     std::cout << "Creating config object" << std::endl;

@@ -28,6 +28,7 @@ QMAKE_CXXFLAGS += $$system(mpicxx --showme:compile)
 QMAKE_CXXFLAGS += -DMPICH_IGNORE_CXX_SEEK
 #QMAKE_CXXFLAGS += -std=c++0x
 
+CONFIG -= debug
 contains(CONFIG,debug) {
     message(Debug mode. Disabling optimization)
     QMAKE_CXXFLAGS -= -O2
@@ -51,8 +52,6 @@ HEADERS += \
     wavefunction/wavesimple.h \
     utils.h \
     mainapplication.h \
-    inih/ini.h \
-    inih/cpp/INIReader.h \
     wavefunction/waveideal.h \
     hamiltonian/hamiltonianideal.h \
     hamiltonian/hamiltonian.h \
@@ -68,7 +67,8 @@ HEADERS += \
     minimizer/minimizerstandard.h \
     minimizer/minimizer.h \
     wavefunction/waveslater.h \
-    jastrow/jastrow.h
+    jastrow/jastrow.h \
+    inih/ini.h
 
 SOURCES += main.cpp \
     matrix.cpp \
@@ -78,8 +78,6 @@ SOURCES += main.cpp \
     random.cpp \
     wavefunction/wavesimple.cpp \
     mainapplication.cpp \
-    inih/ini.c \
-    inih/cpp/INIReader.cpp \
     wavefunction/waveideal.cpp \
     hamiltonian/hamiltonianideal.cpp \
     hamiltonian/hamiltoniansimple.cpp \
@@ -95,4 +93,5 @@ SOURCES += main.cpp \
     minimizer/minimizer.cpp \
     minimizer/minimizerstandard.cpp \
     wavefunction/waveslater.cpp \
-    jastrow/jastrow.cpp
+    jastrow/jastrow.cpp \
+    inih/ini.cpp
