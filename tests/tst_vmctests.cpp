@@ -110,7 +110,7 @@ void VmcTests::cleanupTestCase()
 void VmcTests::waveSimpleLaplaceTest()
 {
     waveSimple->setUseAnalyticalLaplace(true);
-    double analyticalLaplace = waveSimple->laplace(r_old);
+    double analyticalLaplace = waveSimple->laplace(r_old, 0);
     waveSimple->setUseAnalyticalLaplace(false);
     double numericalLaplace = waveSimple->laplaceNumerical(r_old);
     QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 0.001);
@@ -119,7 +119,7 @@ void VmcTests::waveSimpleLaplaceTest()
 void VmcTests::waveIdealLaplaceTest()
 {
     waveIdeal->setUseAnalyticalLaplace(true);
-    double analyticalLaplace = waveIdeal->laplace(r_old);
+    double analyticalLaplace = waveIdeal->laplace(r_old, 0);
     waveIdeal->setUseAnalyticalLaplace(false);
     double numericalLaplace = waveIdeal->laplaceNumerical(r_old);
     QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 0.001);

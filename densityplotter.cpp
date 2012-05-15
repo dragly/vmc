@@ -79,7 +79,6 @@ void DensityPlotter::makePlot()
     double **probability = 0;
     double **myProbability = 0;
     if(m_config->rank() == 0) {
-        plotFile.open("plot.dat");
         probability = (double**)matrix(aSteps, bSteps, sizeof(double));
     }
     StepConfig myStepConfig;
@@ -126,14 +125,21 @@ void DensityPlotter::makePlot()
     }
 
     if(m_config->rank() == 0) {
+        plotFile.open("density.dat");
+        params0File.open("params0.dat");
+        params1File.open("params1.dat");
         for(int aStep = 0; aStep < aSteps; aStep++) {
             for(int bStep = 0; bStep < bSteps; bStep++) {
                 plotFile << probability[aStep][bStep] << "\t";
-                //            printf("%.4f    ", probability[aStep][bStep]);
+                params0File << aMin + aStep * da << "\t";
+                params1File << bMin + bStep * db << "\t";
             }
             plotFile << "\n";
-            //        printf("\n");
+            params0File << "\n";
+            params1File << "\n";
         }
         plotFile.close();
+        params0File.close();
+        params1File.close();
     }
 }

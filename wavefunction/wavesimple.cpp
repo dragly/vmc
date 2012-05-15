@@ -28,7 +28,7 @@ double WaveSimple::evaluate(vec2 r[])
     return wf;
 }
 
-double WaveSimple::laplace(vec2 r[])
+double WaveSimple::laplace(vec2 r[], int movedParticle)
 {
     double alpha = parameters[0];
     if(useAnalyticalLaplace) {

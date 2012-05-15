@@ -9,3 +9,4 @@ Set up a scripting system that takes care of running different configurations at
 - contain a list of available machines to run on
 - check whether the data for the given run already exists - if it does, the data should not be recreated
 - SSH into each machine and execute the program with the number of available processors or 1 if specified in the config file
+- add lock mechanism so that the same run is not being performed by two processors at the same time

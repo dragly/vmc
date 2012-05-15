@@ -20,12 +20,12 @@ private:
     double stepLength;
     vec2 *rOld;
     vec2 *rNew;
-    vec waveGradientOld;
-    vec waveGradientNew;
+//    vec waveGradientOld;
+//    vec waveGradientNew;
     vec forceVectorNew;
     vec forceVectorOld;
-    vec forceVectorSum;
-    vec forceVectorDiff ;
+//    vec forceVectorSum;
+//    vec forceVectorDiff ;
     vec2 positionDiff ;
     WaveFunction* wave;
     Hamiltonian* hamiltonian;

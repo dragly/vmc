@@ -77,7 +77,7 @@ void WaveFunction::gradientNumerical(vec2 r[], vec &rGradient)
             rMinus[i][j] = r[i][j]-h;
             double wfminus = evaluate(rMinus);
             double wfplus  = evaluate(rPlus);
-            rGradient[i * nDimensions + j] = (wfplus - wfminus)/(2*h);
+            rGradient(i * nDimensions + j) = (wfplus - wfminus)/(2*h);
             rPlus[i][j] = r[i][j];
             rMinus[i][j] = r[i][j];
         }

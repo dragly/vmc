@@ -13,7 +13,6 @@ using namespace arma;
     general as possible with regards to the problem and could hopefully
     be used for a completely different problem.
 */
-
 class MinimizerEvolutionary : Minimizer
 {
 public:

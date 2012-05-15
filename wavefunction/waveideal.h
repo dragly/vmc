@@ -10,7 +10,7 @@ class WaveIdeal : public WaveFunction
 public:
     WaveIdeal(Config *config);
     double evaluate(vec2 r[]);
-    double laplace(vec2 r[]);
+    double laplace(vec2 r[], int movedParticle);
 private:
 };
 

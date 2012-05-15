@@ -46,17 +46,22 @@ FORMS +=
 #}
 #QMAKE_CXXFLAGS_RELEASE = $$QMAKE_CXXFLAGS
 
-# Copy config file to shadow build directory
-copyCommand = $(COPY_DIR) $$PWD/config.ini $$OUT_PWD/config.ini
-copyFiles.commands = $$copyCommand
-copyFiles.target = copyFiles
-# update todo list
-todoCommand = cd $$PWD; $$PWD/scripts_mytasks.pl > tasks.tasks; cd $$OUT_PWD
-todoStuff.commands = $$todoCommand
-todoStuff.target = todoStuff
-# add dependencies
-first.depends = $(first) copyFiles todoStuff
-export(first.depends)
-export(copyFiles.commands)
-export(todoStuff.commands)
-QMAKE_EXTRA_TARGETS += first copyFiles todoStuff
+!contains(CONFIG,nocopy) {
+    # Copy config file to shadow build directory
+    copyCommand = $(COPY_DIR) $$PWD/config.ini $$OUT_PWD/config.ini
+    copyFiles.commands = $$copyCommand
+    copyFiles.target = copyFiles
+    # update todo list
+    todoCommand = cd $$PWD; $$PWD/scripts_mytasks.pl > tasks.tasks; cd $$OUT_PWD
+    todoStuff.commands = $$todoCommand
+    todoStuff.target = todoStuff
+    # add dependencies
+    first.depends = $(first) copyFiles todoStuff
+    export(first.depends)
+    export(copyFiles.commands)
+    export(todoStuff.commands)
+    QMAKE_EXTRA_TARGETS += first copyFiles todoStuff
+}
+
+SOURCES += \
+    evolver/Evolver.cpp

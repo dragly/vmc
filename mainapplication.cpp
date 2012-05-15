@@ -42,41 +42,43 @@ MainApplication::MainApplication(int* argc, char*** argv) :
 
 void MainApplication::loadConfiguration()
 {
-    std::cout << "Loading ini reader" << std::endl;
-    m_settings = new INIParser("config.ini");
+    // Make sure the config is loaded by one processor at the time
+    for(int i = 0; i < m_nProcesses; i++) {
+        if(i == m_rank) {
+            std::cout << "Loading ini reader for rank " << m_rank << std::endl;
+            m_settings = new INIParser("config.ini");
 
-    std::cout << "Checking for parse errors" << std::endl;
-    if(!m_settings->Good()) {
-        cerr << "Warning: " << __PRETTY_FUNCTION__ << ": Could not load configuration file 'config.ini'. Does it exist?" << endl;
-    }
-    std::cout << "Creating config object" << std::endl;
+            if(!m_settings->Good()) {
+                cerr << "Warning: " << __PRETTY_FUNCTION__ << ": Could not load configuration file 'config.ini'. Does it exist?" << endl;
+            }
 
-    m_config = new Config(m_rank, m_nProcesses);
-    m_config->loadConfiguration(m_settings);
+            m_config = new Config(m_rank, m_nProcesses);
+            m_config->loadConfiguration(m_settings);
 
-    string modeString = m_settings->Get("General","mode","minimizer");
-    if(modeString == "minimizer") {
-        m_mode = MinimizerMode;
-    } else if(modeString == "density") {
-        m_mode = DensityMode;
-    } else if(modeString == "blocking") {
-        m_mode = BlockingMode;
-    } else {
-        cerr << __PRETTY_FUNCTION__ << ": Unknown mode '" << modeString << "'" << endl;
-        exit(460);
-    }
-    if(m_rank == 0) {
-        cout << __PRETTY_FUNCTION__ << ": Config loaded. Mode is " << modeString << "." << endl;
-        cout << __PRETTY_FUNCTION__ << ": Running with " << m_nProcesses << " process(es)." << endl;
-        flush(cout);
+            string modeString = m_settings->Get("General","mode","minimizer");
+            if(modeString == "minimizer") {
+                m_mode = MinimizerMode;
+            } else if(modeString == "density") {
+                m_mode = DensityMode;
+            } else if(modeString == "blocking") {
+                m_mode = BlockingMode;
+            } else {
+                cerr << __PRETTY_FUNCTION__ << ": Unknown mode '" << modeString << "'" << endl;
+                exit(460);
+            }
+            if(m_rank == 0) {
+                cout << __PRETTY_FUNCTION__ << ": Config loaded. Mode is " << modeString << "." << endl;
+                cout << __PRETTY_FUNCTION__ << ": Running with " << m_nProcesses << " process(es)." << endl;
+                flush(cout);
+            }
+        }
+        MPI_Barrier(MPI_COMM_WORLD);
     }
 }
 
 void MainApplication::runConfiguration()
 {
-    std::cout << "Loading config" << std::endl;
     loadConfiguration();
-    std::cout << "Config loaded" << std::endl;
     if(m_mode == MinimizerMode) {
         runMinimizer();
     } else if(m_mode== DensityMode) {
@@ -113,8 +115,5 @@ void MainApplication::runDensity()
 }
 
 void MainApplication::finalize() {
-#ifdef USE_MPI
-    // End MPI
     MPI_Finalize ();
-#endif
 }

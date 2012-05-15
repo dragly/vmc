@@ -58,6 +58,8 @@ private:
     int bSteps;
     int m_nCycles;
     ofstream plotFile;
+    ofstream params0File;
+    ofstream params1File;
 };
 
 #endif // DENSITYPLOTTER_H

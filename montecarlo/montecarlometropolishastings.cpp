@@ -15,6 +15,9 @@ MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(Config *config) :
     // allocate matrices which contain the position of the particles
     rOld = new vec2[ nParticles];
     rNew = new vec2[ nParticles];
+
+    forceVectorNew = zeros<vec>(nParticles * nDimensions);
+    forceVectorOld = zeros<vec>(nParticles * nDimensions);
 }
 
 MonteCarloMetropolisHastings::~MonteCarloMetropolisHastings()
@@ -41,7 +44,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
         }
     }
     wave->initialize(rOld);
-    wave->gradient(rOld, 0, waveGradientOld); // TODO add particle number
+//    wave->gradient(rOld, 0, waveGradientOld); // TODO add particle number
     quantumForce(rOld, forceVectorOld);
     // loop over monte carlo cycles
     for (int cycle = 1; cycle <= nCycles; cycle++){
