@@ -16,7 +16,7 @@ void DiffusionMonteCarlo::sample(int numberCycles)
     mat evaluations = zeros<mat>(nStartingPositions, nStartingPositions);
     // Initialize ensemble of particles from VMC best guess
     for(int i = 0; i < nStartingPositions; i++) {
-        for(int i = 0; i < nStartingPositions; j++) {
+        for(int j = 0; j < nStartingPositions; j++) {
             vec2 r;
             r[0] = -2 + 4 * i / (double)nStartingPositions;
             r[1] = -2 + 4 * j / (double)nStartingPositions;
@@ -27,7 +27,7 @@ void DiffusionMonteCarlo::sample(int numberCycles)
     }
 
     for(int i = 0; i < nStartingPositions; i++) {
-        for(int i = 0; i < nStartingPositions; j++) {
+        for(int j = 0; j < nStartingPositions; j++) {
             vec2 r;
             r[0] = -2 + 4 * i / (double)nStartingPositions;
             r[1] = -2 + 4 * j / (double)nStartingPositions;
