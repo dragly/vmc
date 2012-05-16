@@ -6,6 +6,8 @@ import inspect, os
 import ConfigParser
 from sys import argv
 
+from automatorsettings import *
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -21,21 +23,22 @@ currentDirectory = os.path.split(os.path.abspath(__file__))[0]
 if len(argv) > 2:
     runLocal = argv[2]
 
-servers = "multimeter laser geigerteller motstand signalgenerator likning kondensator spole kretskort hartreefock gran finite".split(" ")
-files = dircache.listdir("runs")
+servers = servers.split(" ")
+
+files = dircache.listdir(runFolder)
 i = 0
 
 if autoMode == "kill":
     for server in servers:
-	print "Calling: ssh " + server + ".uio.no 'killall vmc'"
-	subprocess.call("ssh " + server + ".uio.no 'killall vmc'", shell=True)
+	print "Calling: ssh " + server +  " 'killall vmc'"
+	subprocess.call("ssh " + server +  " 'killall vmc'", shell=True)
 elif autoMode == "status":
     for server in servers:
 	print server + ":"
-	nProcs = subprocess.check_output("ssh " + server + ".uio.no 'ps aux | grep generator.py | wc -l'", shell=True)
+	nProcs = subprocess.check_output("ssh " + server +  " 'ps aux | grep generator.py | wc -l'", shell=True)
 	if(int(nProcs) > 2):
 	    print bcolors.OKGREEN + "Running " + nProcs.replace("\n","") + bcolors.ENDC
-	users = subprocess.check_output("ssh " + server + ".uio.no 'users'", shell=True)
+	users = subprocess.check_output("ssh " + server +  " 'users'", shell=True)
 	if users != "":
 	    print bcolors.WARNING + users.replace("\n","") + bcolors.ENDC
 elif autoMode == "run":
@@ -43,7 +46,7 @@ elif autoMode == "run":
 	print "Found job in " + afile
 	configName = afile
 	
-	myDir = "runs/" + configName + "/"
+	myDir = runFolder + "/" + configName + "/"
 	
 	config = ConfigParser.ConfigParser()
 	configFileName = myDir + "config.ini"
@@ -52,7 +55,7 @@ elif autoMode == "run":
 	fileop = open(configFileName)
 	configData = fileop.read()
 	
-	prevConfigFile = myDir + "config.ini.prevrun"
+	prevConfigFile = myDir + prevrunConfigFileName
 	prevConfigData = ""
 	if os.path.exists(prevConfigFile):
 	    prevConfigFileOp = open(prevConfigFile)
@@ -60,8 +63,8 @@ elif autoMode == "run":
 	    
 	if prevConfigData == configData:
 	    print bcolors.WARNING + "Config is the same. No need to run again." + bcolors.ENDC
-	elif os.path.exists(myDir + "lock"):
-	    lockFileOp = open(myDir + "lock")
+	elif os.path.exists(myDir + lockFileName):
+	    lockFileOp = open(myDir + lockFileName)
 	    lockHost = lockFileOp.read()
 	    lockFileOp.close()
 	    print bcolors.WARNING + "Run is already locked by process on host " + lockHost + bcolors.ENDC
@@ -69,7 +72,7 @@ elif autoMode == "run":
 	    runCommand = "python generator.py " + configName
 	    serverOccupied = True
 	    while(serverOccupied):
-		nProcs = subprocess.check_output("ssh " + servers[i] + ".uio.no 'ps aux | grep generator.py | wc -l'", shell=True)
+		nProcs = subprocess.check_output("ssh " + servers[i] +  " 'ps aux | grep generator.py | wc -l'", shell=True)
 		if(int(nProcs) < 3):
 		    serverOccupied = False
 		else:
@@ -84,16 +87,17 @@ elif autoMode == "run":
 		subprocess.call(runCommand, shell=True)
 	    else:
 		print bcolors.OKGREEN + "Launching job for config " + configName + " on " + servers[i] + bcolors.ENDC
-		subprocess.Popen("ssh " + servers[i] + ".uio.no 'cd "+ currentDirectory + " && " + runCommand + " &> output-" + configName + " && echo " + servers[i] + " done'", shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+		subprocess.Popen("ssh " + servers[i] +  " 'cd "+ currentDirectory + " && " + runCommand + " &> output-" + configName + " && echo " + servers[i] + " done'", shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
 		i += 1
+            print "You may watch the output from the servers in the output-* files."
 elif autoMode == "plot":
     minimizerList = ""
     densityList = ""
     for afile in files:
 	configName = afile
-	myDir = "runs/" + configName + "/"
+	myDir = runFolder + "/" + configName + "/"
 	config = ConfigParser.ConfigParser()
-	configFileName = myDir + "config.ini"
+	configFileName = myDir + configFileName
 	config.read(configFileName)
 	mode = config.get("General", "mode")
 	if mode == "minimizer":
@@ -105,5 +109,4 @@ elif autoMode == "plot":
 	    
     subprocess.call("python minimizerplot.py " + minimizerList, shell=True)
     subprocess.call("python densityplot.py " + densityList, shell=True)
-    print "You may watch the output from the servers in the output-* files."
 print "Automator finished."

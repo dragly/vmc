@@ -62,6 +62,3 @@ FORMS +=
     export(todoStuff.commands)
     QMAKE_EXTRA_TARGETS += first copyFiles todoStuff
 }
-
-SOURCES += \
-    evolver/Evolver.cpp
