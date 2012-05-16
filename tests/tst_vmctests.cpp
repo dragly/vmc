@@ -825,9 +825,9 @@ void VmcTests::fullSlaterSixInteractionTest()
 void VmcTests::evolverTest()
 {
     QBENCHMARK {
-        FunctionEvolver *evolver = new FunctionEvolver(32, 32, 4);
+        FunctionEvolver *evolver = new FunctionEvolver(32, 32, 8);
         evolver->setScaleLimits(-4, 4);
-        evolver->evolve(2000,200);
+        evolver->evolve(1000,250);
 //        std::cout << evolver->fitnessResult << std::endl;
         evolver->calculate(evolver->allBestGenes);
 

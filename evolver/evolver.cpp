@@ -76,10 +76,11 @@ void Evolver::evolve(int nCycles, int populationMatching)
         cyclesSinceLastImprovement++;
         // Mating of the first two quarters of individuals and add to the third quarter
         for(int i = 0; i < nPopulations; i++) {
-            for(int j = 0; j < nIndividuals / 2; j += 2) {
-                uint parent1Index = bestIndices[i][j];
-                uint parent2Index = bestIndices[i][j + 1];
-                uint childIndex = bestIndices[i][j / 2 + nIndividuals / 4];
+            for(int j = 0; j < nIndividuals / 4; j++) {
+                uint parent1Index = bestIndices[i][j*2];
+                uint parent2Index = bestIndices[i][j*2 + 1];
+                uint childIndex = bestIndices[i][j + nIndividuals / 2];
+//                std::cout << j*2 << " " << j*2 + 1 << " " << j + nIndividuals / 2 << std::endl;
                 for(int k = 0; k < nGenes; k++) {
                     // a random selection of half of the genes comes from one parent
                     int parentIndex;
@@ -98,10 +99,12 @@ void Evolver::evolve(int nCycles, int populationMatching)
             for(int j = 0; j < nIndividuals / 2; j++) {
                 uint individualIndex = bestIndices[i][nIndividuals / 2 + j];
                 vec &genes = populations[i][individualIndex]; // note the use of reference!
-                int randomGene = ran2(&idum) * nGenes;
-//                double gauss = simpleGaussRandom(&idum);
-                double gauss = ran2(&idum);
-                genes[randomGene] += gauss * scale;
+                for(int k = 0; k < nGenes / 4; k++) {
+                    int randomGene = ran2(&idum) * nGenes;
+    //                double gauss = simpleGaussRandom(&idum);
+                    double gauss = ran2(&idum);
+                    genes[randomGene] += gauss * scale;
+                }
             }
         }
 
@@ -116,17 +119,16 @@ void Evolver::evolve(int nCycles, int populationMatching)
         // Merge populations every populationMatching step. Adds the best from one population to the other population.
         if(!(cycle % populationMatching)) {
             for(int i = 0; i < nPopulations / 2; i++) {
-                int population1Index = (int)(ran2(&idum) * nPopulations);
-                int population2Index = (int)(ran2(&idum) * nPopulations);
+                int population1Index = (int)(ran2(&idum) * (nPopulations/2));
+                int population2Index = (int)((nPopulations/2) + ran2(&idum) * (nPopulations/2));
                 if(population1Index != population2Index) {
                     for(int j = 0; j < nIndividuals / 2; j++) {
                         uint bestIndex1 = bestIndices[population1Index][j];
                         uint bestIndex2 = bestIndices[population2Index][j];
                         uint worstIndex1 = bestIndices[population1Index][j + nIndividuals/2];
                         uint worstIndex2 = bestIndices[population2Index][j + nIndividuals/2];
-                        vec tmpVector = populations[population1Index][bestIndex1];
                         populations[population1Index][worstIndex1] = populations[population2Index][bestIndex2];
-                        populations[population2Index][worstIndex2] = tmpVector;
+                        populations[population2Index][worstIndex2] = populations[population1Index][bestIndex1];
                     }
                 }
             }
@@ -135,11 +137,11 @@ void Evolver::evolve(int nCycles, int populationMatching)
         // Testing
         updateBest();
 
-        if(cyclesSinceLastImprovement > 20) {
+        if(cyclesSinceLastImprovement > 50) {
             double expScale = lowScaleLimit + (highScaleLimit - lowScaleLimit) * ran2(&idum);
             scale = pow(10,expScale);
-            cyclesSinceLastImprovement = 10;
-        } else if(cyclesSinceLastImprovement > 10) {
+            cyclesSinceLastImprovement = 30;
+        } else if(cyclesSinceLastImprovement > 35) {
             scale *= 2;
         }
 
