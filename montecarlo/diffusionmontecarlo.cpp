@@ -20,7 +20,7 @@ void DiffusionMonteCarlo::sample(int numberCycles)
             vec2 r;
             r[0] = -2 + 4 * i / (double)nStartingPositions;
             r[1] = -2 + 4 * j / (double)nStartingPositions;
-            double evaluation = wave->evaluate(r);
+            double evaluation = 0; //wave->evaluate(r);
             evaluations(i,j) = evaluation;
             sumEvaluation += evaluation;
         }

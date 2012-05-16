@@ -873,7 +873,7 @@ void VmcTests::diffusionMonteCarloTest() {
 
     WaveSlater *waveSlater = new WaveSlater(config);
     config->setWave(waveSlater);
-    waveSlater->setParameters();
+    waveSlater->setParameters(parameters);
 
     Hamiltonian *hamiltonianIdeal = new HamiltonianIdeal(config);
     config->setHamiltonian(hamiltonianIdeal);
