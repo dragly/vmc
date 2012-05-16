@@ -77,6 +77,11 @@ double ran2(long *idum)
 #undef EPS
 #undef RNMX
 
+/*!
+ * \brief simpleGaussRandom
+ * \param idum
+ * \return Number between -1 and 1 with a close to gaussian distribution
+ */
 double simpleGaussRandom(long *idum) {
     return (-1 + 2 * ran2(idum)) + (-1 + 2 * ran2(idum)) + (-1 + 2 * ran2(idum));
 }

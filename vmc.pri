@@ -67,8 +67,8 @@ HEADERS += \
     minimizer/minimizer.h \
     wavefunction/waveslater.h \
     jastrow/jastrow.h \
-    inih/ini.h#\
-    #evolver/evolver.h
+    inih/ini.h \
+    evolver/evolver.h
 
 SOURCES += main.cpp \
     matrix.cpp \
@@ -94,5 +94,5 @@ SOURCES += main.cpp \
     minimizer/minimizerstandard.cpp \
     wavefunction/waveslater.cpp \
     jastrow/jastrow.cpp \
-    inih/ini.cpp #\
-    #evolver/evolver.cpp
+    inih/ini.cpp \
+    evolver/evolver.cpp

@@ -24,9 +24,11 @@ MY_HEADERS =
 
 for(header, SOURCES):MY_HEADERS+=../$$header
 
-HEADERS = $$MY_HEADERS
+HEADERS = $$MY_HEADERS \
+    functionevolver.h
 
-SOURCES = $$MY_SOURCES
+SOURCES = $$MY_SOURCES \
+    functionevolver.cpp
 SOURCES -= ../main.cpp
 
 SOURCES += tst_vmctests.cpp

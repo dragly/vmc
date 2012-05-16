@@ -12,6 +12,7 @@
 #include "../wavefunction/waveslater.h"
 #include "../jastrow/jastrow.h"
 #include "../random.h"
+#include "functionevolver.h"
 
 #include "minimizerevolutionarytest.h"
 
@@ -34,9 +35,6 @@ public:
     VmcTests();
 
     void waveSimpleGradientTest(); // TODO - consider implementing this again
-    // quick tests
-    // slow tests
-private slots:
     // quick tests
     void initTestCase();
     void orbitalTest();
@@ -63,6 +61,10 @@ private slots:
     void fullIdealHastingsSlaterTest();
     void fullSlaterSixNoInteractionTest();
     void fullSlaterSixInteractionTest();
+private slots:
+    // quick tests
+    // slow tests
+    void evolverTest();
 
 private:
     Config *oldConfig;
@@ -817,7 +819,30 @@ void VmcTests::fullSlaterSixInteractionTest()
         cout << "Six interacting energy was " << fabs(energy) << endl;
         QVERIFY(fabs(energy - 20.190) < 1e-1);
     }
-        std::cout << "Benchmark used to be 51.328 seconds @ hyperon" << std::endl;
+    std::cout << "Benchmark used to be 51.328 seconds @ hyperon" << std::endl;
+}
+
+void VmcTests::evolverTest()
+{
+    QBENCHMARK {
+        FunctionEvolver *evolver = new FunctionEvolver(32, 32, 4);
+        evolver->setScaleLimits(-4, 4);
+        evolver->evolve(2000,200);
+//        std::cout << evolver->fitnessResult << std::endl;
+        evolver->calculate(evolver->allBestGenes);
+
+//        std::cout << "All best genes\n" << evolver->allBestGenes << std::endl;
+//        std::cout << "All best fitness\n" << evolver->fitnessResult << std::endl;
+
+        ofstream data;
+        data.open("fitness.dat");
+        for(uint i = 0; i < evolver->x.n_elem; i++) {
+            data << evolver->x[i] << "\t" << evolver->result[i] << "\t" << evolver->fitnessResult[i] << std::endl;
+        }
+        data.close();
+
+        delete evolver;
+    }
 }
 
 QTEST_APPLESS_MAIN(VmcTests)

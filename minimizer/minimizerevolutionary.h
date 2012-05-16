@@ -6,6 +6,7 @@
 using namespace arma;
 
 #include "minimizer.h"
+#include "../evolver/evolver.h"
 
 /*!
     An evolutionary approach to minimizing the energy by selection of
@@ -13,7 +14,7 @@ using namespace arma;
     general as possible with regards to the problem and could hopefully
     be used for a completely different problem.
 */
-class MinimizerEvolutionary : Minimizer
+class MinimizerEvolutionary : public Minimizer, public Evolver
 {
 public:
     MinimizerEvolutionary(Config *config);
@@ -35,7 +36,7 @@ private:
 
     // Keep track of the number of cycles
     int currentCycle;
-    int nCycles;
+    int nTotalCycles;
 
 
     // defines the scaling of the coefficients

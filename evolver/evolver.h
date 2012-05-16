@@ -9,21 +9,35 @@ class Evolver
 {
 public:
     Evolver();
+    Evolver(int nGenes, int nIndividuals, int nPopulations);
 
+    void constructor(int nGenes, int nIndividuals, int nPopulations);
+
+    void evolve(int nSteps, int populationMatching);
+
+    void setScaleLimits(double low, double high) {
+        lowScaleLimit = low;
+        highScaleLimit = high;
+    }
+
+    vec allBestGenes;
+
+    ~Evolver();
 private:
-    virtual double fitness(vec *coefficients);
+    virtual double fitness(vec &coefficients) = 0;
+    void updateBest();
 
     // defines the number of individuals in a population
     // and the size of the genome of each individual
     // read: The number of test functions and coefficients
-    double nIndividuals;
-    double nGenes;
-    double nPopulations;
+    int nIndividuals;
+    int nGenes;
+    int nPopulations;
 
     // Keep track of the number of cycles
     int currentCycle;
-    int nCycles;
 
+    long idum;
 
     // defines the scaling of the coefficients
     // and how this is limited. Could be coefficients from 1 to 1e6
@@ -39,9 +53,16 @@ private:
     vec **populations;
 
     // holds the scoreboard information
-    // which individual was best within each population?
-    int *bestIndex;
-    double *bestValue;
+    // which individuals are the best within each population
+    uvec *bestIndices;
+    vec *values;
+
+    double allBestValue;
+    int allBestIndex;
+    int allBestPopulationIndex;
+
+    // holds the number of cycles since last improvement
+    int cyclesSinceLastImprovement;
 };
 
 #endif // EVOLVER_H
