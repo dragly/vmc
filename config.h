@@ -68,9 +68,9 @@ public:
         m_hamiltonian = arg;
     }
 
-    void setMonteCarloClass(string arg)
+    void setMonteCarlo(MonteCarlo* arg)
     {
-        m_monteCarloClass = arg;
+        m_monteCarlo = arg;
     }
 
     double omega() const
@@ -103,6 +103,7 @@ private:
     int m_nParticles;
     int m_nDimensions;
     double m_stepLength;
+    MonteCarlo* m_monteCarlo;
     WaveFunction* m_wave;
     Hamiltonian* m_hamiltonian;
     string m_monteCarloClass;

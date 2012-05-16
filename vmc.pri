@@ -68,7 +68,8 @@ HEADERS += \
     wavefunction/waveslater.h \
     jastrow/jastrow.h \
     inih/ini.h \
-    evolver/evolver.h
+    evolver/evolver.h \
+    montecarlo/diffusionmontecarlo.h
 
 SOURCES += main.cpp \
     matrix.cpp \
@@ -95,4 +96,5 @@ SOURCES += main.cpp \
     wavefunction/waveslater.cpp \
     jastrow/jastrow.cpp \
     inih/ini.cpp \
-    evolver/evolver.cpp
+    evolver/evolver.cpp \
+    montecarlo/diffusionmontecarlo.cpp

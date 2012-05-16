@@ -58,11 +58,10 @@ void Config::loadConfiguration(INIParser* settings) {
     // Monte Carlo sampler
     m_monteCarloClass = settings->Get("MonteCarlo","class", "MonteCarloStandard");
     std::cout << m_monteCarloClass << std::endl;
-    MonteCarlo *monteCarlo = MonteCarlo::fromName(m_monteCarloClass, this);
+    m_monteCarlo = MonteCarlo::fromName(m_monteCarloClass, this);
 //    m_monteCarlo = new MonteCarloStandard(this);
-    if(monteCarlo == 0) {
+    if(m_monteCarlo == 0) {
         cerr << "Unknown Monte Carlo class '" << m_monteCarloClass << "'" << endl;
         exit(97);
     }
-    delete monteCarlo;
 }

@@ -27,7 +27,7 @@ public:
     void blocking(double *values, int nValues, int blockSize, double *result);
     double mean(double *values, double nValues);
 protected:
-    Config *m_config;
+    Config *config;
     int m_rank;
     int m_nProcesses;
     int m_nParticles;

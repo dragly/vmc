@@ -41,6 +41,7 @@ void Evolver::constructor(int nGenes, int nIndividuals, int nPopulations) {
     allBestPopulationIndex = -1;
     allBestValue = INFINITY;
     cyclesSinceLastImprovement = 0;
+    cyclesSinceLastRescale = 0;
 
     std::cout << "Done constructing" << std::endl;
 }
@@ -69,18 +70,25 @@ void Evolver::updateBest()
     }
 }
 
+void Evolver::rescale()
+{
+    double expScale = lowScaleLimit + (highScaleLimit - lowScaleLimit) * ran2(&idum);
+    scale = pow(10,expScale);
+}
+
 void Evolver::evolve(int nCycles, int populationMatching)
 {
     updateBest();
     for(int cycle = 0; cycle < nCycles; cycle++) {
         cyclesSinceLastImprovement++;
+        cyclesSinceLastRescale++;
         // Mating of the first two quarters of individuals and add to the third quarter
         for(int i = 0; i < nPopulations; i++) {
-            for(int j = 0; j < nIndividuals / 4; j++) {
-                uint parent1Index = bestIndices[i][j*2];
-                uint parent2Index = bestIndices[i][j*2 + 1];
-                uint childIndex = bestIndices[i][j + nIndividuals / 2];
-//                std::cout << j*2 << " " << j*2 + 1 << " " << j + nIndividuals / 2 << std::endl;
+            for(int j = 0; j < nIndividuals / 2; j += 2) {
+                uint parent1Index = bestIndices[i][j];
+                uint parent2Index = bestIndices[i][j + 1];
+                uint childIndex = bestIndices[i][j / 2 + nIndividuals / 2];
+//                std::cout << j << " " << j + 1 << " " << j / 2 + nIndividuals / 2 << std::endl;
                 for(int k = 0; k < nGenes; k++) {
                     // a random selection of half of the genes comes from one parent
                     int parentIndex;
@@ -138,12 +146,19 @@ void Evolver::evolve(int nCycles, int populationMatching)
         updateBest();
 
         if(cyclesSinceLastImprovement > 50) {
-            double expScale = lowScaleLimit + (highScaleLimit - lowScaleLimit) * ran2(&idum);
-            scale = pow(10,expScale);
-            cyclesSinceLastImprovement = 30;
-        } else if(cyclesSinceLastImprovement > 35) {
-            scale *= 2;
+            rescale();
+            cyclesSinceLastImprovement = 20;
+            cyclesSinceLastRescale = 0;
+        } else if(cyclesSinceLastImprovement > 45) {
+            scale = lastWorkingScale;
+        } else if(cyclesSinceLastImprovement > 25) {
+            scale *= 1.2;
         }
+        if(cyclesSinceLastRescale > 100) {
+            lastWorkingScale = scale;
+            rescale();
+        }
+
 
         std::cout << "All best value " << currentCycle << " " << allBestValue << " " << scale << std::endl;
         currentCycle++;

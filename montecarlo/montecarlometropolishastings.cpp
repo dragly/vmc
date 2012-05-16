@@ -9,7 +9,6 @@ MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(Config *config) :
     MonteCarlo(config),
     rank(config->rank()),
     stepLength(config->stepLength()),
-    wave(config->wave()),
     hamiltonian(config->hamiltonian())
 {
     // allocate matrices which contain the position of the particles

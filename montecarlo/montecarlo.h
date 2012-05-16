@@ -23,6 +23,9 @@ public:
     double energySquared() {
         return m_energySquared;
     }
+    void setTerminalizationEnabled(bool arg) {
+        terminalized = !arg;
+    }
 
     void checkTerminalization(double localEnergy);
 protected:
@@ -43,6 +46,7 @@ protected:
 
     int terminalizationTrials;
 
+    WaveFunction* wave;
 
     int cycle;
 

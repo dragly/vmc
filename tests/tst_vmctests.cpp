@@ -12,6 +12,7 @@
 #include "../wavefunction/waveslater.h"
 #include "../jastrow/jastrow.h"
 #include "../random.h"
+#include "../montecarlo/diffusionmontecarlo.h"
 #include "functionevolver.h"
 
 #include "minimizerevolutionarytest.h"
@@ -42,7 +43,6 @@ public:
     void waveSimpleLaplaceTest();
     void waveIdealLaplaceTest();
     void hermiteTest();
-    void minimizerEvolutionaryTest();
     void twoOrbitalsOneWavefunctionTest();
     void slaterFourParticleTest();
     void waveSlaterSixParticleTest();
@@ -61,10 +61,12 @@ public:
     void fullIdealHastingsSlaterTest();
     void fullSlaterSixNoInteractionTest();
     void fullSlaterSixInteractionTest();
+    void evolverTest();
+    void minimizerEvolutionaryTest();
 private slots:
     // quick tests
     // slow tests
-    void evolverTest();
+    void diffusionMonteCarloTest();
 
 private:
     Config *oldConfig;
@@ -323,10 +325,6 @@ void VmcTests::hermiteTest() {
     QVERIFY(Hermite::evaluate(2,4) - (4*4*4 - 2) < 1e-20);
     QVERIFY(Hermite::evaluate(3,5) - (8*5*5*5 - 12) < 1e-20);
     QVERIFY(Hermite::evaluate(4,3) - (16*3*3*3*3 - 48*3*3 + 12) < 1e-20);
-}
-
-void VmcTests::minimizerEvolutionaryTest() {
-    cout << "minimizerEvolutionaryTest not implemented" << endl;
 }
 
 /*!
@@ -825,8 +823,8 @@ void VmcTests::fullSlaterSixInteractionTest()
 void VmcTests::evolverTest()
 {
     QBENCHMARK {
-        FunctionEvolver *evolver = new FunctionEvolver(32, 32, 8);
-        evolver->setScaleLimits(-4, 4);
+        FunctionEvolver *evolver = new FunctionEvolver(16, 32, 4);
+        evolver->setScaleLimits(-1, 1);
         evolver->evolve(1000,250);
 //        std::cout << evolver->fitnessResult << std::endl;
         evolver->calculate(evolver->allBestGenes);
@@ -843,6 +841,46 @@ void VmcTests::evolverTest()
 
         delete evolver;
     }
+}
+
+void VmcTests::minimizerEvolutionaryTest() {
+    QBENCHMARK {
+        Config *config = new Config(0, 1);
+        config->setNParticles(2);
+        config->setNDimensions(2);
+        WaveFunction *wave = new WaveSlater(config);
+        wave->setUseAnalyticalGradient(true);
+        wave->setUseAnalyticalLaplace(true);
+        config->setWave(wave);
+        config->setHamiltonian(new HamiltonianIdeal(config));
+        config->setMonteCarlo(new MonteCarloStandard(config));
+        MinimizerEvolutionary *evolver = new MinimizerEvolutionary(config);
+        evolver->setScaleLimits(-1, 1);
+        evolver->runMinimizer();
+
+        delete evolver;
+    }
+}
+
+void VmcTests::diffusionMonteCarloTest() {
+    Config *config = new Config(0, 1);
+    config->setNParticles(2);
+    config->setNDimensions(2);
+
+    double parameters[2];
+    parameters[0] = 0.8;
+    parameters[1] = 0.8; // Provide better guess
+
+    WaveSlater *waveSlater = new WaveSlater(config);
+    config->setWave(waveSlater);
+    waveSlater->setParameters();
+
+    Hamiltonian *hamiltonianIdeal = new HamiltonianIdeal(config);
+    config->setHamiltonian(hamiltonianIdeal);
+
+    DiffusionMonteCarlo *diffusionMonteCarlo = new DiffusionMonteCarlo(config);
+    double energy = diffusionMonteCarlo->energy();
+    QVERIFY(fabs(energy - 3.000) < 1e-2);
 }
 
 QTEST_APPLESS_MAIN(VmcTests)

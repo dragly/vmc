@@ -27,7 +27,6 @@ private:
 //    vec forceVectorSum;
 //    vec forceVectorDiff ;
     vec2 positionDiff ;
-    WaveFunction* wave;
     Hamiltonian* hamiltonian;
 };
 

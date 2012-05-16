@@ -11,7 +11,6 @@ MonteCarloStandard::MonteCarloStandard(Config *config) :
     MonteCarlo(config),
     rank(config->rank()),
     stepLength(config->stepLength()),
-    wave(config->wave()),
     recordMoves(false)
 {
     // allocate matrices which contain the position of the particles
@@ -112,6 +111,6 @@ void MonteCarloStandard::sample(int nCycles)
     }
     m_energy /= (nCycles * nParticles);
     m_energySquared /= (nCycles * nParticles);
-    std::cout << "Done sampling. Had " << terminalizationTrials << " terminalization trials with the last diff at " << diffAverage << std::endl;
+//    std::cout << "Done sampling. Had " << terminalizationTrials << " terminalization trials with the last diff at " << diffAverage << std::endl;
 }
 

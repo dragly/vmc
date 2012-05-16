@@ -14,7 +14,8 @@ MonteCarlo::MonteCarlo(Config *config) :
     terminalizationNum(0),
     terminalized(false),
     prevTerminalizationAverage(999999),
-    terminalizationTrials(0)
+    terminalizationTrials(0),
+    wave(config->wave())
 {
 }
 

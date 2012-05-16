@@ -21,7 +21,7 @@ using namespace std;
 
 
 Minimizer::Minimizer(Config *config) :
-    m_config(config),
+    config(config),
     m_rank(config->rank()),
     m_nProcesses(config->nProcesses())
 {

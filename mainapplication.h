@@ -15,13 +15,15 @@ public:
     enum Mode {
         BlockingMode,
         DensityMode,
-        MinimizerMode
+        MinimizerMode,
+        DiffusionMode
     };
 
     void loadConfiguration();
     void runConfiguration();
 
     void runMinimizer();
+    void runDiffusion();
     void runBlocking();
     void runDensity();
     void finalize();

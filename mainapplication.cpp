@@ -85,6 +85,8 @@ void MainApplication::runConfiguration()
         runDensity();
     } else if(m_mode == BlockingMode) {
         runBlocking();
+    } else if(m_mode == DiffusionMode) {
+        runDiffusion();
     } else {
         cerr << __PRETTY_FUNCTION__ << ": Unknown mode" << endl;
         exit(459);
@@ -96,6 +98,12 @@ void MainApplication::runMinimizer()
     Minimizer *minimizer = new MinimizerStandard(m_config);
     minimizer->loadConfiguration(m_settings);
     minimizer->runMinimizer();
+}
+
+void MainApplication::runDiffusion()
+{
+    // DiffusionMonteCarlo *diffMC = new DiffusionMonteCarlo();
+    // ...
 }
 
 void MainApplication::runBlocking()

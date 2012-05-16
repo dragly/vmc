@@ -30,6 +30,8 @@ using namespace std;
 MinimizerStandard::MinimizerStandard(Config *config) :
     Minimizer(config)
 {
+    m_wave = config->wave();
+    m_hamiltonian = config->hamiltonian();
 }
 
 void MinimizerStandard::loadConfiguration(INIParser *settings)
@@ -43,8 +45,6 @@ void MinimizerStandard::loadConfiguration(INIParser *settings)
     alphaEnd= settings->GetDouble("MinimizerStandard","alphaEnd", 1);    //  default number of variations
     betaStart = settings->GetDouble("MinimizerStandard","betaStart", 0);    //  default number of variations
     betaEnd = settings->GetDouble("MinimizerStandard","betaEnd", 1);    //  default number of variations
-    m_wave = m_config->wave();
-    m_hamiltonian = m_config->hamiltonian();
 }
 
 void MinimizerStandard::runMinimizer()
@@ -78,7 +78,7 @@ void MinimizerStandard::runMinimizer()
     parameter0Map = zeros<mat>(nVariations, nVariations);
     parameter1Map = zeros<mat>(nVariations, nVariations);
 
-    total_number_cycles = m_nCycles*m_config->nProcesses();
+    total_number_cycles = m_nCycles*config->nProcesses();
 
     // array to store all energies for last variation of alpha
 
@@ -93,7 +93,7 @@ void MinimizerStandard::runMinimizer()
     for (int i=0; i < nVariations; i++){
         parameters[1] = betaStart;
         for (int j=0; j < nVariations; j++){
-            m_monteCarlo = MonteCarlo::fromName(m_config->monteCarloClass(), m_config);
+            m_monteCarlo = MonteCarlo::fromName(config->monteCarloClass(), config);
             std::cout << "Testing parameters " << parameters[0] << " " << parameters[1] << std::endl;
             std::cout << "with " << m_nCycles << " cycles" << std::endl;
             m_wave->setParameters(parameters);
@@ -129,23 +129,7 @@ void MinimizerStandard::runMinimizer()
     }
     timeEnd = MPI_Wtime();
     totalTime = timeEnd-timeStart;
-    // Print out results
-    //    if ( m_config->rank() == 0) {
-    //        cout << "Time = " <<  totalTime  << " on number of processors: "  << m_config->nProcesses()  << endl;
-    //        parameters[0] = 0.5*charge;
-    //        for( i=1; i <= m_nVariations; i++){
-    //            energy = totalCumulativeEnergy[i]/total_number_cycles;
-    //            variance = totalCumulativeEnergySquared[i]/total_number_cycles-energy*energy;
-    //            error=sqrt(variance/(total_number_cycles-1));
-    //            ofile << setiosflags(ios::showpoint | ios::uppercase);
-    //            ofile << setw(15) << setprecision(8) << parameters[0];
-    //            ofile << setw(15) << setprecision(8) << energy;
-    //            ofile << setw(15) << setprecision(8) << variance;
-    //            ofile << setw(15) << setprecision(8) << error << endl;
-    //            parameters[0] += 0.1;
-    //        }
-    //        ofile.close();  // close output file
-    //    }
+
     // Print out results
     if ( m_rank == 0) {
 
@@ -166,7 +150,7 @@ void MinimizerStandard::runMinimizer()
         varianceFile.open(outfilename.c_str());
         outfilename = "errors.dat";
         errorFile.open(outfilename.c_str());
-        cout << "Time = " <<  totalTime  << " on number of processors: "  << m_config->nProcesses()  << endl;
+        cout << "Time = " <<  totalTime  << " on number of processors: "  << config->nProcesses()  << endl;
         for(int i=0; i < nVariations; i++){
             for(int j=0; j < nVariations; j++){
                 double energy = totalCumulativeEnergy(i,j) ;

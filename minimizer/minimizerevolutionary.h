@@ -25,37 +25,12 @@ public:
     void startEvolution();
 
 private:
-    double value(vec *coefficients);
+    double fitness(vec &coefficients);
 
-    // defines the number of individuals in a population
-    // and the size of the genome of each individual
-    // read: The number of test functions and coefficients
-    double nIndividuals;
-    double nGenes;
-    double nPopulations;
-
-    // Keep track of the number of cycles
-    int currentCycle;
-    int nTotalCycles;
-
-
-    // defines the scaling of the coefficients
-    // and how this is limited. Could be coefficients from 1 to 1e6
-    // or from 1e3 to 1e4 for example
-    double scale;
-    double lowScaleLimit;
-    double highScaleLimit;
-    // at what precision should we start calling for rescales?
-    double rescalePrecisionLimit;
-
-    // holds the populations, which each is a vector of genes
-    // read: the functions, holding their coefficients
-    vec **populations;
-
-    // holds the scoreboard information
-    // which individual was best within each population?
-    int *bestIndex;
-    double *bestValue;
+    // Monte Carlo stuff
+    WaveFunction *wave;
+    MonteCarlo *monteCarlo;
+    Hamiltonian *hamiltonian;
 };
 
 #endif // MINIMIZEREVOLUTIONARY_H

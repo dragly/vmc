@@ -23,7 +23,8 @@ public:
     vec allBestGenes;
 
     ~Evolver();
-private:
+    void rescale();
+protected:
     virtual double fitness(vec &coefficients) = 0;
     void updateBest();
 
@@ -63,6 +64,9 @@ private:
 
     // holds the number of cycles since last improvement
     int cyclesSinceLastImprovement;
+    int cyclesSinceLastRescale;
+
+    double lastWorkingScale;
 };
 
 #endif // EVOLVER_H
