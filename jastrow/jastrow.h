@@ -34,6 +34,8 @@ private:
     mat distancesNew;
     mat jastrowArgumentsOld;
     mat jastrowArgumentsNew;
+    vec jastrowGradient;
+    vec2 rpiVec;
 
     vec2 *rOld;
     vec2 *rNew;

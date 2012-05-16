@@ -60,13 +60,13 @@ public:
     void fullIdealHastingsTest();
     void fullIdealHastingsSlaterTest();
     void fullSlaterSixNoInteractionTest();
-    void fullSlaterSixInteractionTest();
     void evolverTest();
     void minimizerEvolutionaryTest();
+    void diffusionMonteCarloTest();
 private slots:
     // quick tests
     // slow tests
-    void diffusionMonteCarloTest();
+    void fullSlaterSixInteractionTest();
 
 private:
     Config *oldConfig;
@@ -802,7 +802,7 @@ void VmcTests::fullSlaterSixInteractionTest()
         config1->setHamiltonian(hamiltonian);
         config1->setInteractionEnabled(true);
         int nCycles = 50000;
-
+//        int nCycles = 500; // using few cycles for profiling
         WaveSlater *waveSlater2 = new WaveSlater(config1);
         waveSlater2->setUseAnalyticalGradient(true);
         waveSlater2->setUseAnalyticalLaplace(true);
@@ -818,6 +818,8 @@ void VmcTests::fullSlaterSixInteractionTest()
         QVERIFY(fabs(energy - 20.190) < 1e-1);
     }
     std::cout << "Benchmark used to be 51.328 seconds @ hyperon" << std::endl;
+    std::cout << "Benchmark used to be 6.835 seconds @ home after first optimizations" << std::endl;
+    std::cout << "Benchmark used to be ? seconds @ home after profiling optimizations" << std::endl;
 }
 
 void VmcTests::evolverTest()
