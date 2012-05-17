@@ -35,7 +35,16 @@ class VmcTests : public QObject
 public:
     VmcTests();
 
+    // old tests
     void waveSimpleGradientTest(); // TODO - consider implementing this again
+    // quick tests
+    // slow tests
+
+    // unfinished tests
+    void diffusionMonteCarloTest();
+    void minimizerEvolutionaryTest();
+    void evolverTest();
+private slots:
     // quick tests
     void initTestCase();
     void orbitalTest();
@@ -56,17 +65,11 @@ public:
     void waveSlaterLaplaceTest();
     void waveSlaterGradientTest();
     // slow tests
+    void fullSlaterSixInteractionTest();
     void fullIdealTest();
     void fullIdealHastingsTest();
     void fullIdealHastingsSlaterTest();
     void fullSlaterSixNoInteractionTest();
-    void evolverTest();
-    void minimizerEvolutionaryTest();
-    void diffusionMonteCarloTest();
-private slots:
-    // quick tests
-    // slow tests
-    void fullSlaterSixInteractionTest();
 
 private:
     Config *oldConfig;
