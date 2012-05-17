@@ -48,21 +48,27 @@ void Orbital::gradient(const vec2 &r, vec2 &rGradient) const {
 double Orbital::laplace(const vec2 &r) {
     double x = r[0];
     double y = r[1];
-    double sqrtAlphaOmega = sqrt(omega * alpha);
-    double evaluation = exp(-alpha*omega*(x*x + y*y)/2);
-    double Hx = Hermite::evaluate(m_nx, sqrtAlphaOmega * x);
-    double Hy = Hermite::evaluate(m_ny, sqrtAlphaOmega * y);
-    double dHx = Hermite::derivative(m_nx, sqrtAlphaOmega * x);
-    double dHy = Hermite::derivative(m_ny, sqrtAlphaOmega * y);
-    double ddHx = Hermite::doubleDerivative(m_nx, sqrtAlphaOmega * x);
-    double ddHy = Hermite::doubleDerivative(m_ny, sqrtAlphaOmega * y);
-    double doubleDerivativeX = Hy * evaluation * ( alpha * omega * ddHx - sqrtAlphaOmega * dHx * alpha * omega * x
-                                                   - sqrtAlphaOmega * dHx * alpha * omega * x
-                                                   - Hx * alpha*omega + Hx * alpha * alpha * omega * omega * x * x);
+    // Optimizing calculations that are much reused (23 % self cost decrease)
+    double alphaOmega = omega * alpha;
+    double sqrtAlphaOmega = sqrt(alphaOmega);
+    double sqrtAlphaOmegax = sqrtAlphaOmega * x;
+    double sqrtAlphaOmegay = sqrtAlphaOmega * y;
+    double alphaOmegaalphaOmega = alphaOmega * alphaOmega;
+    // All calculations
+    double evaluation = exp(-alphaOmega*(x*x + y*y)/2);
+    double Hx = Hermite::evaluate(m_nx, sqrtAlphaOmegax);
+    double Hy = Hermite::evaluate(m_ny, sqrtAlphaOmegay);
+    double dHx = Hermite::derivative(m_nx, sqrtAlphaOmegax);
+    double dHy = Hermite::derivative(m_ny, sqrtAlphaOmegay);
+    double ddHx = Hermite::doubleDerivative(m_nx, sqrtAlphaOmegax);
+    double ddHy = Hermite::doubleDerivative(m_ny, sqrtAlphaOmegay);
+    double doubleDerivativeX = Hy * evaluation * ( alphaOmega * ddHx - sqrtAlphaOmegax * dHx * alphaOmega
+                                                   - sqrtAlphaOmegax * dHx * alphaOmega
+                                                   - Hx * alphaOmega + Hx * alphaOmegaalphaOmega * x * x);
 //    std::cout << doubleDerivativeX << std::endl;
-    double doubleDerivativeY = Hx * evaluation * ( alpha * omega * ddHy - sqrtAlphaOmega * dHy * alpha * omega * y
-                                                   - sqrtAlphaOmega * dHy * alpha * omega * y
-                                                   - Hy * alpha*omega + Hy * alpha * alpha * omega * omega * y * y);
+    double doubleDerivativeY = Hx * evaluation * ( alphaOmega * ddHy - sqrtAlphaOmegay * dHy * alphaOmega
+                                                   - sqrtAlphaOmegay * dHy * alphaOmega
+                                                   - Hy * alphaOmega + Hy * alphaOmegaalphaOmega * y * y);
 //    std::cout << doubleDerivativeY << std::endl;
     return doubleDerivativeX + doubleDerivativeY;
 }

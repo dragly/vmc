@@ -23,7 +23,7 @@ public:
     void gradient(vec2 r[], int movedParticle, vec &rGradient);
     void refuseEvaluation();
     ~Jastrow();
-    double laplace(vec2 r[], int movedParticle);
+    double laplacePartial(vec2 r[], int movedParticle);
 private:
     int nParticles;
     int nDimensions;

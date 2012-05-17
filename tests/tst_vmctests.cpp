@@ -819,7 +819,7 @@ void VmcTests::fullSlaterSixInteractionTest()
     }
     std::cout << "Benchmark used to be 51.328 seconds @ hyperon" << std::endl;
     std::cout << "Benchmark used to be 6.835 seconds @ home after first optimizations" << std::endl;
-    std::cout << "Benchmark used to be ? seconds @ home after profiling optimizations" << std::endl;
+    std::cout << "Benchmark used to be 4.045 seconds @ home after profiling optimizations" << std::endl;
 }
 
 void VmcTests::evolverTest()

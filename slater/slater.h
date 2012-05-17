@@ -25,7 +25,7 @@ public:
     void acceptEvaluation(int movedParticle);
     void initialize(vec2 positions[]);
     double laplace(vec2 r[], int movedParticlea);
-    void gradient(vec2 r[], int movedParticle, vec &rGradient) const;
+    void gradient(vec2 r[], int movedParticle, vec &rGradient);
     bool hasParticle(int particleNumber) const;
     void refuseEvaluation();
     void updateMatrix(vec2 &particlePosition, int movedParticle);
@@ -35,6 +35,8 @@ private:
 
     mat currentInverse;
     mat previousInverse;
+
+    vec2 orbitalGradient;
 
     int nDimensions;
     int nParticles;

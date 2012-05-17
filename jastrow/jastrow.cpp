@@ -77,12 +77,12 @@ double Jastrow::argument(int i, int j, mat &distances) {
     return (a(i,j) * distances.at(i,j)) / (1 + beta * distances.at(i,j));
 }
 
-double Jastrow::laplace(vec2 r[], int movedParticlea) {
+/*!
+  Note: Partial because it does not include the square gradient term. (8.46 in Leirvåg's thesis) This must be included manually.
+  */
+double Jastrow::laplacePartial(vec2 r[], int movedParticlea) {
+    // Optimized by removing square gradient term. Reduced inclusive cost by 80 % !
     double laplaceSum = 0;
-
-    gradient(r, movedParticlea, jastrowGradient);
-
-    laplaceSum += dot(jastrowGradient, jastrowGradient);
     for(int movedParticle = 0; movedParticle < nParticles; movedParticle++) {
         int p = movedParticle;
         for(int i = 0; i < nParticles; i++) {

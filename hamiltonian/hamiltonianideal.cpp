@@ -30,6 +30,7 @@ double HamiltonianIdeal::energy(WaveFunction *wave, vec2 r[])
         }
         ePotential += 0.5 * omega * omega * rSingleParticle;
     }
+    // TODO Optimization - store an array of potential energies between particles and only update necessary parts (reduces use of sqrt)
     if(m_interactionEnabled) {
         //     contribution from electron-electron potential
         for (int i = 0; i < m_nParticles-1; i++) {

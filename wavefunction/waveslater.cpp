@@ -139,7 +139,6 @@ double WaveSlater::laplace(vec2 r[], int movedParticle) {
     if(interactionEnabled) {
 //    std::cout << "down " << slaterDown->laplace(r, movedParticle) << std::endl;
 //        jastrow->calculateDistances(r);
-        laplaceSum += jastrow->laplace(r, movedParticle);
 
         vec slaterUpGradient = zeros<vec>(nParticles * nDimensions);
         vec slaterDownGradient = zeros<vec>(nParticles * nDimensions);
@@ -147,6 +146,10 @@ double WaveSlater::laplace(vec2 r[], int movedParticle) {
         slaterUp->gradient(r, movedParticle, slaterUpGradient);
         slaterDown->gradient(r, movedParticle, slaterDownGradient);
         jastrow->gradient(r, movedParticle, jastrowGradient);
+
+        laplaceSum += dot(jastrowGradient, jastrowGradient);
+        laplaceSum += jastrow->laplacePartial(r, movedParticle);
+
         laplaceSum += 2 * dot(slaterUpGradient + slaterDownGradient, jastrowGradient);
     }
     return laplaceSum;
