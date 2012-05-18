@@ -888,8 +888,9 @@ void VmcTests::diffusionMonteCarloTest() {
     config->setHamiltonian(hamiltonianIdeal);
 
     DiffusionMonteCarlo *diffusionMonteCarlo = new DiffusionMonteCarlo(config);
-    diffusionMonteCarlo->sample(10000);
+    diffusionMonteCarlo->sample(100);
     double energy = diffusionMonteCarlo->energy();
+    std::cout << "Diffusion monte carlo returned energy of " << energy << std::endl;
     QVERIFY(fabs(energy - 3.000) < 1e-2);
 }
 

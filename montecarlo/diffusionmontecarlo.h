@@ -13,8 +13,14 @@ public:
     vec2 **rNew;
     WaveFunction **waves;
 
-    int nTotalWalkers;
+    bool *aliveOld;
+    bool *aliveMid;
+    bool *aliveNew;
+
+    int nWalkersMax;
+    int nWalkersIdeal;
     int correlationStep;
+    int nWalkersAlive;
 
     // TODO replace these names with their proper meanings
     double tau;

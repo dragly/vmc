@@ -15,7 +15,8 @@ MonteCarlo::MonteCarlo(Config *config) :
     terminalized(false),
     prevTerminalizationAverage(999999),
     terminalizationTrials(0),
-    wave(config->wave())
+    wave(config->wave()),
+    hamiltonian(config->hamiltonian())
 {
 }
 

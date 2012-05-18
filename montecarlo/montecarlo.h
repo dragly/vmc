@@ -47,6 +47,7 @@ protected:
     int terminalizationTrials;
 
     WaveFunction* wave;
+    Hamiltonian *hamiltonian;
 
     int cycle;
 

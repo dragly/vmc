@@ -99,7 +99,7 @@ void MonteCarloStandard::sample(int nCycles)
                 //                std::cout << "rNew[" << i << "] = " << rNew[i] << std::endl;
                 //            }
                 // compute local energy
-                localEnergy = config->hamiltonian()->energy(wave, rNew);
+                localEnergy = hamiltonian->energy(wave, rNew);
                 // save all energies on last variate
                 //        if(variate==max_variations){
                 if(terminalized) {
