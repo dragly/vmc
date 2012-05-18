@@ -14,6 +14,11 @@ public:
     WaveSimple(Config *config);
     double evaluate(vec2 r[]);
     double laplace(vec2 r[], int movedParticle);
+    WaveFunction* clone() {
+        std::cerr << "Clone not implemented for WaveSimple" << std::endl;
+        exit(978);
+        return 0;
+    }
 private:
     bool useAnalytical;
     vec2 rPlus[];

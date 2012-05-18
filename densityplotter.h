@@ -42,7 +42,7 @@ public:
 
     void divideSteps(int rank, int nProcesses, int totalSteps, StepConfig *stepConfig);
 private:
-    Config *m_config;
+    Config *config;
     WaveFunction *m_wave;
     INIParser *m_settings;
     long idum;

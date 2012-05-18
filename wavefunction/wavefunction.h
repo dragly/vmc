@@ -23,6 +23,7 @@ public:
         (void)movedParticle;
         return laplaceNumerical(r);
     }
+    virtual WaveFunction* clone() = 0;
     virtual void loadConfiguration(INIParser *settings);
     virtual double laplaceNumerical(vec2 r[]);
     virtual void gradientNumerical(vec2 r[], vec &rGradient);
@@ -30,8 +31,8 @@ public:
     static WaveFunction* fromName(string waveClass, Config *config);
 //    virtual void setPreviousMovedParticle(int particleNumber);
     virtual double ratio(vec2 &particlePosition, int movedParticle);
-    virtual void acceptEvaluation(int movedParticle);
-    virtual void refuseEvaluation();
+    virtual void acceptMove(int movedParticle);
+    virtual void rejectMove();
     virtual void initialize(vec2 r[]);
     void setUseAnalyticalLaplace(bool val) {
         useAnalyticalLaplace = val;

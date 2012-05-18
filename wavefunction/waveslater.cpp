@@ -49,6 +49,13 @@ WaveSlater::WaveSlater(Config *config) :
     slaterDown = new Slater(config, orbitals, false);
 }
 
+WaveSlater::~WaveSlater() {
+    delete slaterUp;
+    delete slaterDown;
+    delete [] orbitals;
+    delete jastrow;
+}
+
 /*!
   Sets the alpha and beta parameters. This could also point to more parameters
   if needed at a later time.
@@ -107,15 +114,15 @@ void WaveSlater::initialize(vec2 positions[]) {
 //    // TODO Set last moved particle for slater or something
 //}
 // TODO update matrices with new values for moved particle
-void WaveSlater::acceptEvaluation(int movedParticle) {
-    WaveFunction::acceptEvaluation(movedParticle);
+void WaveSlater::acceptMove(int movedParticle) {
+    WaveFunction::acceptMove(movedParticle);
     slaterUp->acceptEvaluation(movedParticle);
     slaterDown->acceptEvaluation(movedParticle);
     jastrow->acceptEvaluation(movedParticle);
 }
 
-void WaveSlater::refuseEvaluation() {
-    WaveFunction::refuseEvaluation();
+void WaveSlater::rejectMove() {
+    WaveFunction::rejectMove();
     slaterUp->refuseEvaluation();
     slaterDown->refuseEvaluation();
     jastrow->refuseEvaluation();
@@ -169,4 +176,15 @@ void WaveSlater::gradient(vec2 r[], int movedParticle, vec &rGradient) {
     }
     rGradient = slaterUpGradient + slaterDownGradient + jastrowGradient;
 //    gradientNumerical(r, movedParticle, rGradient);
+}
+
+/*!
+ * \brief WaveSlater::clone is an harsh and simple function that creates a new WaveSlater object with the same config and initializes it
+ * with the same positions as this object.
+ * \return A WaveSlater object that will have most properties equal with this object.
+ */
+WaveFunction* WaveSlater::clone() {
+    WaveSlater *myCopy = new WaveSlater(config);
+    myCopy->initialize(rNew);
+    return myCopy;
 }

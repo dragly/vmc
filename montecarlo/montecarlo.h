@@ -11,7 +11,7 @@ class MonteCarlo
 public:
     MonteCarlo(Config *config);
 
-    virtual void sample(int numberCycles) = 0;
+    virtual void sample(int nCycles) = 0;
     virtual void loadConfiguration(INIParser *settings) {
         (void)settings;
     }

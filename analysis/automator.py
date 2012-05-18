@@ -97,8 +97,8 @@ elif autoMode == "plot":
 	configName = afile
 	myDir = runFolder + "/" + configName + "/"
 	config = ConfigParser.ConfigParser()
-	configFileName = myDir + configFileName
-	config.read(configFileName)
+	configFilePath = myDir + configFileName
+	config.read(configFilePath)
 	mode = config.get("General", "mode")
 	if mode == "minimizer":
 	    minimizerList += myDir + " "

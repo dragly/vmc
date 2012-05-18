@@ -133,7 +133,7 @@ double WaveFunction::ratio(vec2 &particlePosition, int movedParticle)
     return ratio;
 }
 
-void WaveFunction::acceptEvaluation(int movedParticle) {
+void WaveFunction::acceptMove(int movedParticle) {
     (void)movedParticle;
     previousEvaluation = currentEvaluation;
     for(int i = 0; i < nParticles; i++) {
@@ -141,7 +141,7 @@ void WaveFunction::acceptEvaluation(int movedParticle) {
     }
 }
 
-void WaveFunction::refuseEvaluation() {
+void WaveFunction::rejectMove() {
     currentEvaluation = previousEvaluation;
     for(int i = 0; i < nParticles; i++) {
         rNew[i] = rOld[i];

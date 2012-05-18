@@ -28,19 +28,21 @@ void Orbital::setParameters(double *parameters)
 {
     alpha = parameters[0];
     beta = parameters[1];
+    alphaOmega = omega * alpha;
+    sqrtAlphaOmega = sqrt(alphaOmega);
+    alphaOmegaalphaOmega = alphaOmega * alphaOmega;
 }
 
 void Orbital::gradient(const vec2 &r, vec2 &rGradient) const {
     double x = r[0];
     double y = r[1];
-    double sqrtAlphaOmega = sqrt(omega * alpha);
-    double evaluation = exp(-alpha*omega*(x*x + y*y)/2);
+    double evaluation = exp(-alphaOmega*(x*x + y*y)/2);
     double Hx = Hermite::evaluate(m_nx, sqrtAlphaOmega * x);
     double Hy = Hermite::evaluate(m_ny, sqrtAlphaOmega * y);
     double dHx = Hermite::derivative(m_nx, sqrtAlphaOmega * x);
     double dHy = Hermite::derivative(m_ny, sqrtAlphaOmega * y);
-    rGradient[0] = Hy * (sqrtAlphaOmega * dHx - Hx * omega * alpha * x);
-    rGradient[1] = Hx * (sqrtAlphaOmega * dHy - Hy * omega * alpha * y);
+    rGradient[0] = Hy * (sqrtAlphaOmega * dHx - Hx * alphaOmega * x);
+    rGradient[1] = Hx * (sqrtAlphaOmega * dHy - Hy * alphaOmega * y);
     rGradient[0] *= evaluation;
     rGradient[1] *= evaluation;
 }
@@ -49,11 +51,8 @@ double Orbital::laplace(const vec2 &r) {
     double x = r[0];
     double y = r[1];
     // Optimizing calculations that are much reused (23 % self cost decrease)
-    double alphaOmega = omega * alpha;
-    double sqrtAlphaOmega = sqrt(alphaOmega);
     double sqrtAlphaOmegax = sqrtAlphaOmega * x;
     double sqrtAlphaOmegay = sqrtAlphaOmega * y;
-    double alphaOmegaalphaOmega = alphaOmega * alphaOmega;
     // All calculations
     double evaluation = exp(-alphaOmega*(x*x + y*y)/2);
     double Hx = Hermite::evaluate(m_nx, sqrtAlphaOmegax);

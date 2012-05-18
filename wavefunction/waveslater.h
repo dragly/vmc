@@ -24,12 +24,14 @@ public:
     double evaluate(vec2 r[]);
     void setParameters(double *parameters);
 //    void setPreviousMovedParticle(int particleNumber);
-    void acceptEvaluation(int movedParticle);
+    void acceptMove(int movedParticle);
     double ratio(vec2 &particlePosition, int movedParticle);
     void initialize(vec2 positions[]);
     double laplace(vec2 r[], int movedParticle);
     void gradient(vec2 r[], int movedParticle, vec &rGradient);
-    void refuseEvaluation();
+    void rejectMove();
+    WaveFunction *clone();
+    ~WaveSlater();
 private:
     Slater *slaterDown;
     Slater *slaterUp;

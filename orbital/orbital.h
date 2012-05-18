@@ -29,6 +29,9 @@ private:
 
     Config *config;
     double omega;
+    double alphaOmega;
+    double sqrtAlphaOmega;
+    double alphaOmegaalphaOmega;
 
     double alpha;
     double beta;

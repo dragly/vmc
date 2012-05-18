@@ -22,8 +22,8 @@
 
 using namespace std;
 
-DensityPlotter::DensityPlotter(Config *config) :
-    m_config(config)
+DensityPlotter::DensityPlotter(Config *config_) :
+    config(config_)
 {
     if(config->nDimensions() != 2) {
         cerr << "Density plots only implemented for two dimensions!" << endl;
@@ -47,7 +47,7 @@ void DensityPlotter::loadConfiguration(INIParser *settings)
     m_settings = settings;
     m_charge = atof(settings->Get("DensityPlotter", "charge", "1.0").c_str());
     m_stepLength = atof(settings->Get("DensityPlotter", "stepLength", "1.0").c_str());
-    m_wave = WaveFunction::fromName(settings->Get("Wave", "class", "WaveSimple"), m_config);
+    m_wave = WaveFunction::fromName(settings->Get("Wave", "class", "WaveSimple"), config);
     //    m_hamiltonian = Hamiltonian::fromName(settings->Get("Hamiltonian", "class", "HamiltonianSimple"), m_config, 1.0);
     m_nCycles = settings->GetInteger("DensityPlotter", "nCycles", 1000);
     double alpha = atof(settings->Get("DensityPlotter", "alpha", "1.0").c_str());
@@ -78,14 +78,14 @@ void DensityPlotter::makePlot()
     double db = (bMax - bMin) / bSteps;
     double **probability = 0;
     double **myProbability = 0;
-    if(m_config->rank() == 0) {
+    if(config->rank() == 0) {
         probability = (double**)matrix(aSteps, bSteps, sizeof(double));
     }
     StepConfig myStepConfig;
     // split up the data for each process
-    divideSteps(m_config->rank(), m_config->nProcesses(), aSteps, &myStepConfig);
-    for(int i = 0; i < m_config->nProcesses(); i++) {
-        if(m_config->rank() == i) {
+    divideSteps(config->rank(), config->nProcesses(), aSteps, &myStepConfig);
+    for(int i = 0; i < config->nProcesses(); i++) {
+        if(config->rank() == i) {
             cout << myStepConfig.firstStep << " " << myStepConfig.lastStep << " " << myStepConfig.nSteps << endl;
             cout.flush();
         }
@@ -102,7 +102,7 @@ void DensityPlotter::makePlot()
             // loop over monte carlo cycles
             for (int cycle = 1; cycle <= m_nCycles; cycle++){
                 // new positions for all particles
-                for (int i = 1; i < m_config->nParticles(); i++) {
+                for (int i = 1; i < config->nParticles(); i++) {
                     r_new[i][0] = aMin + (aMax - aMin) * ran2(&idum);
                     r_new[i][1] = bMin + (bMax - bMin) * ran2(&idum);
                 }  //  end of loop over particles
@@ -112,11 +112,11 @@ void DensityPlotter::makePlot()
             myProbability[aStep][bStep] = prob / m_nCycles;
         }
     }
-    if(m_config->rank() == 0) {
+    if(config->rank() == 0) {
         // collect all the data in the main matrix
-        for(int i = 1; i < m_config->nProcesses(); i++) {
+        for(int i = 1; i < config->nProcesses(); i++) {
             StepConfig stepConfig;
-            divideSteps(i, m_config->nProcesses(), aSteps, &stepConfig);
+            divideSteps(i, config->nProcesses(), aSteps, &stepConfig);
             MPI_Recv(probability[stepConfig.firstStep], stepConfig.nSteps * bSteps, MPI_DOUBLE, i, 100, MPI_COMM_WORLD, &status);
         }
         memcpy(probability, myProbability, myStepConfig.nSteps * sizeof(double));
@@ -124,7 +124,7 @@ void DensityPlotter::makePlot()
         MPI_Send(myProbability[0], myStepConfig.nSteps * bSteps, MPI_DOUBLE, 0, 100, MPI_COMM_WORLD);
     }
 
-    if(m_config->rank() == 0) {
+    if(config->rank() == 0) {
         plotFile.open("density.dat");
         params0File.open("params0.dat");
         params1File.open("params1.dat");

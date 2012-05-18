@@ -38,14 +38,6 @@ public:
     // old tests
     void waveSimpleGradientTest(); // TODO - consider implementing this again
     // quick tests
-    // slow tests
-
-    // unfinished tests
-    void diffusionMonteCarloTest();
-    void minimizerEvolutionaryTest();
-    void evolverTest();
-private slots:
-    // quick tests
     void initTestCase();
     void orbitalTest();
     void cleanupTestCase();
@@ -65,11 +57,20 @@ private slots:
     void waveSlaterLaplaceTest();
     void waveSlaterGradientTest();
     // slow tests
-    void fullSlaterSixInteractionTest();
     void fullIdealTest();
     void fullIdealHastingsTest();
     void fullIdealHastingsSlaterTest();
     void fullSlaterSixNoInteractionTest();
+    void fullSlaterSixInteractionTest();
+
+    // unfinished tests
+    void minimizerEvolutionaryTest();
+    void evolverTest();
+private slots:
+    // quick tests
+    // slow tests
+    // unfinished tests
+    void diffusionMonteCarloTest();
 
 private:
     Config *oldConfig;
@@ -820,9 +821,9 @@ void VmcTests::fullSlaterSixInteractionTest()
         cout << "Six interacting energy was " << fabs(energy) << endl;
         QVERIFY(fabs(energy - 20.190) < 1e-1);
     }
-    std::cout << "Benchmark used to be 51.328 seconds @ hyperon" << std::endl;
-    std::cout << "Benchmark used to be 6.835 seconds @ home after first optimizations" << std::endl;
-    std::cout << "Benchmark used to be 4.045 seconds @ home after profiling optimizations" << std::endl;
+//    std::cout << "Benchmark used to be 51.328 seconds @ hyperon" << std::endl;
+//    std::cout << "Benchmark used to be 6.835 seconds @ home after first optimizations" << std::endl;
+//    std::cout << "Benchmark used to be 4.045 seconds @ home after profiling optimizations" << std::endl;
 }
 
 void VmcTests::evolverTest()
@@ -871,6 +872,7 @@ void VmcTests::diffusionMonteCarloTest() {
     Config *config = new Config(0, 1);
     config->setNParticles(2);
     config->setNDimensions(2);
+    config->setInteractionEnabled(true);
 
     double parameters[2];
     parameters[0] = 0.8;
@@ -879,11 +881,14 @@ void VmcTests::diffusionMonteCarloTest() {
     WaveSlater *waveSlater = new WaveSlater(config);
     config->setWave(waveSlater);
     waveSlater->setParameters(parameters);
+    waveSlater->setUseAnalyticalGradient(true);
+    waveSlater->setUseAnalyticalLaplace(true);
 
     Hamiltonian *hamiltonianIdeal = new HamiltonianIdeal(config);
     config->setHamiltonian(hamiltonianIdeal);
 
     DiffusionMonteCarlo *diffusionMonteCarlo = new DiffusionMonteCarlo(config);
+    diffusionMonteCarlo->sample(10000);
     double energy = diffusionMonteCarlo->energy();
     QVERIFY(fabs(energy - 3.000) < 1e-2);
 }

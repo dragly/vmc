@@ -78,11 +78,11 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
             double ratio = wave->ratio(rNew[i], i);
             if(ran2(idum) <= (ratio*ratio)) {
                 rOld[i] = rNew[i];
-                wave->acceptEvaluation(i);
+                wave->acceptMove(i);
 //                std::cout << "Accepted" << std::endl;
             } else {
                 rNew[i] = rOld[i]; // Move the particle back
-                wave->refuseEvaluation();
+                wave->rejectMove();
             }
             localEnergy = hamiltonian->energy(wave, rOld);
             if(terminalized) {
