@@ -10,9 +10,7 @@
 MonteCarloStandard::MonteCarloStandard(Config *config) :
     MonteCarlo(config),
     rank(config->rank()),
-    stepLength(config->stepLength()),
-    recordMoves(false),
-    nMoves(1)
+    stepLength(config->stepLength())
 {
     // allocate matrices which contain the position of the particles
     rOld = new vec2[ nParticles];
@@ -31,19 +29,7 @@ MonteCarloStandard::~MonteCarloStandard()
 {
     delete [] rOld;
     delete [] rNew;
-    delete [] m_moves;
 }
-
-void MonteCarloStandard::setRecordMoves(bool arg, int nMoves) {
-    this->recordMoves = arg;
-    this->nMoves = nMoves;
-    delete [] m_moves;
-    m_moves = new vec2*[nMoves];
-    for(int i = 0; i < nMoves; i++) {
-        m_moves[i] = new vec2[nParticles];
-    }
-}
-
 void MonteCarloStandard::sample(int nCycles)
 {
     m_energy = 0;
@@ -93,35 +79,36 @@ void MonteCarloStandard::sample(int nCycles)
                 wave->rejectMove();
                 //                std::cout << "Denied" << std::endl;
             }
-            if(!recordMoves) {
-                //            std::cout << "Move decided" << std::endl;
-                //            for(int i = 0; i < nParticles; i++) {
-                //                std::cout << "rNew[" << i << "] = " << rNew[i] << std::endl;
-                //            }
-                // compute local energy
-                localEnergy = hamiltonian->energy(wave, rNew);
-                // save all energies on last variate
-                //        if(variate==max_variations){
-                if(terminalized) {
-                    if(storeEnergies) {
-                        m_allEnergies[cycle] = localEnergy;
+            //            std::cout << "Move decided" << std::endl;
+            //            for(int i = 0; i < nParticles; i++) {
+            //                std::cout << "rNew[" << i << "] = " << rNew[i] << std::endl;
+            //            }
+            // compute local energy
+            localEnergy = hamiltonian->energy(wave, rNew);
+            // save all energies on last variate
+            //        if(variate==max_variations){
+            if(terminalized) {
+                if(storeEnergies) {
+                    m_allEnergies[cycle] = localEnergy;
+                }
+                //        }
+                // update energies
+                m_energy += localEnergy;
+                m_energySquared += localEnergy*localEnergy;
+                if(recordMoves) {
+                    if(!(cycle % nthMove)) {
+                        //                    std::cout << "Recording move " << move << " @ " << cycle << std::endl;
+                        m_moves[move][i] = rOld[i];
+                        if(i == nParticles - 1) {
+                            move++;
+                        }
                     }
-                    //        }
-                    // update energies
-                    m_energy += localEnergy;
-                    m_energySquared += localEnergy*localEnergy;
-                } else {
-                    checkTerminalization(localEnergy);
                 }
             } else {
-                if(!(cycle % nthMove)) {
-//                    std::cout << "Recording move " << move << " @ " << cycle << std::endl;
-                    m_moves[move][i] = rOld[i];
-                    if(i == nParticles - 1) {
-                        move++;
-                    }
-                }
+                checkTerminalization(localEnergy);
             }
+
+
         }   // end of loop over MC trials
     }  //  end of loop over particles
     m_energy /= (nCycles * nParticles);

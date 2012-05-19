@@ -185,6 +185,6 @@ void WaveSlater::gradient(vec2 r[], int movedParticle, vec &rGradient) {
  */
 WaveFunction* WaveSlater::clone() {
     WaveSlater *myCopy = new WaveSlater(config);
-    myCopy->initialize(rNew);
+//    myCopy->initialize(rNew);
     return myCopy;
 }

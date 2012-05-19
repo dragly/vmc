@@ -58,10 +58,10 @@ public:
     void waveSlaterGradientTest();
     // slow tests
     void fullIdealTest();
-    void fullIdealHastingsTest();
-    void fullIdealHastingsSlaterTest();
     void fullSlaterSixNoInteractionTest();
     void fullSlaterSixInteractionTest();
+    void fullIdealHastingsTest();
+    void fullIdealHastingsSlaterTest();
 
     // unfinished tests
     void minimizerEvolutionaryTest();
@@ -301,7 +301,7 @@ void VmcTests::jastrowRatioTest() {
 
 void VmcTests::fullIdealHastingsTest()
 {
-    int nCycles = 500000;
+    int nCycles = 1000000;
     Config *config1 = new Config(1,1);
     config1->setNDimensions(2);
     config1->setNParticles(2);
@@ -412,8 +412,9 @@ void VmcTests::fullIdealHastingsSlaterTest()
     Config *config1 = new Config(0,1);
     config1->setNDimensions(2);
     config1->setNParticles(2);
-    config1->setHamiltonian(hamiltonianIdeal);
     WaveSlater *waveSlater1 = new WaveSlater(config1);
+    HamiltonianIdeal *hamiltonian1 = new HamiltonianIdeal(config1);
+    config1->setHamiltonian(hamiltonian1);
     config1->setWave(waveSlater1);
     double parameters[2];
     parameters[0] = 1.0;
@@ -875,8 +876,10 @@ void VmcTests::diffusionMonteCarloTest() {
     config->setInteractionEnabled(true);
 
     double parameters[2];
-    parameters[0] = 0.8;
-    parameters[1] = 0.8; // Provide better guess
+    parameters[0] = 0.989;
+    parameters[1] = 0.4;
+//    parameters[0] = 0.92;
+//    parameters[1] = 0.565;
 
     WaveSlater *waveSlater = new WaveSlater(config);
     config->setWave(waveSlater);
@@ -888,7 +891,7 @@ void VmcTests::diffusionMonteCarloTest() {
     config->setHamiltonian(hamiltonianIdeal);
 
     DiffusionMonteCarlo *diffusionMonteCarlo = new DiffusionMonteCarlo(config);
-    diffusionMonteCarlo->sample(100);
+    diffusionMonteCarlo->sample(3000);
     double energy = diffusionMonteCarlo->energy();
     std::cout << "Diffusion monte carlo returned energy of " << energy << std::endl;
     QVERIFY(fabs(energy - 3.000) < 1e-2);

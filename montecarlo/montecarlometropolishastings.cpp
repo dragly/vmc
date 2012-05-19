@@ -15,17 +15,12 @@ MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(Config *config) :
     rOld = new vec2[ nParticles];
     rNew = new vec2[ nParticles];
 
-    forceVectorNew = zeros<vec>(nParticles * nDimensions);
-    forceVectorOld = zeros<vec>(nParticles * nDimensions);
+    quantumForceNew = zeros<vec>(nParticles * nDimensions);
+    quantumForceOld = zeros<vec>(nParticles * nDimensions);
 }
 
 MonteCarloMetropolisHastings::~MonteCarloMetropolisHastings()
 {
-}
-
-void MonteCarloMetropolisHastings::quantumForce(vec2 rPosition[], vec &forceVector) {
-    wave->gradient(rPosition, 0, forceVector); // TODO add particle number
-    forceVector *= 2;
 }
 
 void MonteCarloMetropolisHastings::sample(int nCycles)
@@ -35,54 +30,68 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
     terminalizationSum = 0;
     terminalizationNum = 1;
     double localEnergy = 0;
-    double diffConstant = 1;
+    double diffConstant = 0.5;
+    int nthMove = 0;
+    if(storeEnergies) {
+        m_allEnergies = new double[nCycles];
+    }
+    if(recordMoves) {
+        nthMove = nCycles * nParticles / (nMoves);
+    }
     //  initial trial position, note calling with alpha
     for (int i = 0; i < nParticles; i++) {
         for (int j=0; j < nDimensions; j++) {
             rOld[i][j] = stepLength*(ran2(idum)-0.5);
         }
+        rNew[i] = rOld[i];
     }
     wave->initialize(rOld);
-//    wave->gradient(rOld, 0, waveGradientOld); // TODO add particle number
-    quantumForce(rOld, forceVectorOld);
+    //    wave->gradient(rOld, 0, waveGradientOld); // TODO add particle number
+    wave->gradient(rOld, 0, quantumForceOld); // TODO add particle number
+    quantumForceOld *= 2;
+    int acceptances = 0;
+    int rejections = 0;
+    stepLength = 0.01;
     // loop over monte carlo cycles
-    for (int cycle = 1; cycle <= nCycles; cycle++){
+    for (int cycle = 0; cycle <= nCycles; cycle++){
         // new trial position
         for (int i = 0; i < nParticles; i++) {
-            quantumForce(rOld, forceVectorNew);
-            vec2 particleQuantumForce;
-            particleQuantumForce(0) = forceVectorNew(i);
-            particleQuantumForce(1) = forceVectorNew(i+1);
-            rNew[i] = rOld[i] + diffConstant*particleQuantumForce*stepLength;
-            for (int j=0; j < nDimensions; j++) {
-                rNew[i][j] += simpleGaussRandom(idum) * sqrt(stepLength);
+            wave->gradient(rOld, 0, quantumForceOld); // TODO add particle number
+            quantumForceOld *= 2;
+            for (int k=0; k < nDimensions; k++) {
+                int qfIndex = i * nDimensions + k;
+                rNew[i][k]= rOld[i][k] +  diffConstant * quantumForceOld[qfIndex] * stepLength + sqrt(2 * diffConstant * stepLength) * simpleGaussRandom(idum);
             }
-            //  for the other particles we need to set the position to the old position since
-            //  we move only one particle at the time
-            for (int k = 0; k < nParticles; k++) {
-                if ( k != i) {
-                    rNew[k] = rOld[k];
+
+            // The Metropolis test is performed by moving one particle at the time
+            wave->gradient(rNew, 0, quantumForceNew); // TODO add particle number
+            quantumForceNew *= 2;
+            double argSum = 0;
+            for(int j = 0; j < nParticles; j++) {
+                for(int k = 0; k < nDimensions; k++) {
+                    int qfIndex = j * nDimensions + k;
+                    double quantumForceSum = quantumForceOld[qfIndex] + quantumForceNew[qfIndex];
+                    double qfPositionDiff = 0.5 * diffConstant * stepLength * (quantumForceOld[qfIndex] - quantumForceNew[qfIndex]) - (rNew[j][k] - rOld[j][k]);
+                    argSum += 0.5 * quantumForceSum * qfPositionDiff;
                 }
             }
-//            wfnew = wave->evaluate(rNew);
-//            wave->gradient(rNew, i, waveGradientNew);
-//            double argument = 0;
-//            for( int j = 0; j < nDimensions; j++) {
-//                forceVectorSum[j] = forceVectorNew[j] + forceVectorOld[j];
-//                forceVectorDiff[j] = forceVectorOld[j] - forceVectorNew[j];
-//                positionDiff[j] = rNew[i][j] - rOld[i][j];
-//                argument += 0.5 * forceVectorSum[j] * (diffConstant * stepLength / 2 * forceVectorDiff[j] - positionDiff[j]);
-//            }
-//            double waveFrac = wfnew*wfnew/(wfold*wfold);
-            // The Metropolis test is performed by moving one particle at the time
+            double greensRatio = exp(argSum);
+
             double ratio = wave->ratio(rNew[i], i);
-            if(ran2(idum) <= (ratio*ratio)) {
+            double weight = ratio*ratio * greensRatio;
+            if(ran2(idum) <= weight) {
                 rOld[i] = rNew[i];
                 wave->acceptMove(i);
-//                std::cout << "Accepted" << std::endl;
+                if(terminalized) {
+                acceptances++;
+                }
+                //                std::cout << "Accepted" << std::endl;
             } else {
                 rNew[i] = rOld[i]; // Move the particle back
                 wave->rejectMove();
+                if(terminalized) {
+                rejections++;
+                }
             }
             localEnergy = hamiltonian->energy(wave, rOld);
             if(terminalized) {
@@ -93,11 +102,21 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
                 // update energies
                 m_energy += localEnergy;
                 m_energySquared += localEnergy*localEnergy;
+                if(recordMoves) {
+                    if(!(cycle % nthMove)) {
+                        //                    std::cout << "Recording move " << move << " @ " << cycle << std::endl;
+                        m_moves[move][i] = rOld[i];
+                        if(i == nParticles - 1) {
+                            move++;
+                        }
+                    }
+                }
             } else {
                 checkTerminalization(localEnergy);
             }
         }  //  end of loop over particles
     }
+    std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
     m_energy /= (nCycles * nParticles);
     m_energySquared /= (nCycles * nParticles);
 }

@@ -12,13 +12,8 @@ class MonteCarloStandard : public MonteCarlo
 {
 public:
     MonteCarloStandard(Config* config);
-    void setRecordMoves(bool arg, int nMoves = 0);
 
     void sample(int nCycles);
-
-    vec2 **moves() {
-        return m_moves;
-    }
 
     ~MonteCarloStandard();
 private:
@@ -26,10 +21,6 @@ private:
     double stepLength;
     vec2 *rOld;
     vec2 *rNew;
-
-    bool recordMoves;
-    int nMoves;
-    vec2 **m_moves;
 };
 
 #endif // MONTECARLOSTANDARD_H

@@ -14,7 +14,6 @@ public:
     void sample(int nCycles);
 
     ~MonteCarloMetropolisHastings();
-    void quantumForce(vec2 rPosition[], vec &forceVector);
 private:
     int rank;
     double stepLength;
@@ -22,8 +21,8 @@ private:
     vec2 *rNew;
 //    vec waveGradientOld;
 //    vec waveGradientNew;
-    vec forceVectorNew;
-    vec forceVectorOld;
+    vec quantumForceNew;
+    vec quantumForceOld;
 //    vec forceVectorSum;
 //    vec forceVectorDiff ;
     vec2 positionDiff ;

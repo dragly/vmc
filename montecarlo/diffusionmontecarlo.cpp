@@ -3,13 +3,14 @@
 #include "../wavefunction/wavefunction.h"
 #include "../wavefunction/waveslater.h"
 #include "../random.h"
+#include "montecarlometropolishastings.h"
 
 DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config) :
     MonteCarlo(config),
-    tau(1)
+    tau(0.01)
 {
     nWalkersMax = 10000;
-    nWalkersIdeal = 100;
+    nWalkersIdeal = 500;
     nWalkersAlive = nWalkersIdeal;
     correlationStep = 200;
 
@@ -44,10 +45,12 @@ DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config) :
 void DiffusionMonteCarlo::sample(int nCycles)
 {
     // Initialize ensemble of walkers from VMC best guess
-    MonteCarloStandard *monteCarloStandard = new MonteCarloStandard(config);
-    monteCarloStandard->setRecordMoves(true, nWalkersMax * nParticles);
-    monteCarloStandard->sample(nWalkersMax * correlationStep);
-    double trialEnergy = monteCarloStandard->energy();
+    MonteCarloMetropolisHastings *monteCarlo = new MonteCarloMetropolisHastings(config);
+    monteCarlo->setRecordMoves(true, nWalkersAlive * nParticles);
+    monteCarlo->setTerminalizationEnabled(true);
+    monteCarlo->sample(nWalkersAlive * correlationStep);
+    double trialEnergy = monteCarlo->energy();
+    std::cout << "Initial trial energy was " << trialEnergy << std::endl;
 
     vec *quantumForceNew = new vec[nWalkersMax];
     vec *quantumForceOld = new vec[nWalkersMax];
@@ -57,13 +60,13 @@ void DiffusionMonteCarlo::sample(int nCycles)
 
     ofstream scatterfile;
     scatterfile.open("positions-init.dat");
-    for(int j = 0; j < nWalkersMax; j++) {
+    for(int j = 0; j < nWalkersAlive; j++) {
         for(int i = 0; i < nParticles; i++) {
-            vec2 **moves = monteCarloStandard->moves();
+            vec2 **moves = monteCarlo->moves();
             rOld[j][i] = moves[j][i];
             rNew[j][i] = moves[j][i];
             if(aliveOld[j]) {
-            scatterfile << moves[j][i][0] << "\t" << moves[j][i][1] << std::endl;
+                scatterfile << moves[j][i][0] << "\t" << moves[j][i][1] << std::endl;
             }
         }
         quantumForceNew[j] = zeros<vec>(nDimensions * nParticles);
@@ -76,6 +79,10 @@ void DiffusionMonteCarlo::sample(int nCycles)
     }
     scatterfile.close();
 
+    int blockLength = 100;
+    double energySum = 0;
+    int nEnergySamples = 0;
+    double diffConstant = 0.5;
     // For every cycle:
     for(int cycle = 0; cycle < nCycles; cycle++) {
         // For every walker (configuration)
@@ -83,12 +90,13 @@ void DiffusionMonteCarlo::sample(int nCycles)
             if(aliveOld[walker]) {
                 // For every particle
                 for(int i = 0; i < nParticles; i++) {
-                    waves[walker]->gradient(rNew[walker], i, quantumForceNew[walker]);
+                    waves[walker]->gradient(rOld[walker], i, quantumForceOld[walker]);
 
                     // Propose move (with quantum force)
                     for(int k = 0; k < nDimensions; k++) {
                         // TODO per cartesian component tau?
-                        rNew[walker][i][k] = rOld[walker][i][k] + tau * quantumForceNew[walker][i * nDimensions + k] + simpleGaussRandom(idum);
+                        int qfIndex = i * nDimensions + k;
+                        rNew[walker][i][k] = rOld[walker][i][k] + tau * diffConstant * quantumForceOld[walker][qfIndex] + tau * diffConstant * simpleGaussRandom(idum);
     //                    std::cout << "i ndim k " << i * nDimensions + k << " " << quantumForceNew->n_elem << std::endl;
     //                    std::cout << "Quantum force " << j << " " << i << " " << k << " " << quantumForceNew[j][i * nDimensions + k] << std::endl;
     //                    std::cout << "Old/New: " << rOld[j][i][k] << " " << rNew[j][i][k] << std::endl;
@@ -97,16 +105,21 @@ void DiffusionMonteCarlo::sample(int nCycles)
                     // Apply fixed node approximation (keep sign or reject move)
                     if(ratio > 0) {
                         // Compute weight function
+
+                        waves[walker]->gradient(rNew[walker], i, quantumForceNew[walker]);
                         double argSum = 0;
-                        for(int k = 0; k < nDimensions; k++) {
-                            double argument = rNew[walker][i][k] - rOld[walker][i][k] - tau * quantumForceOld[walker][i * nDimensions + k];
-                            argSum += argument * argument;
+                        for(int j = 0; j < nParticles; j++) {
+                            for(int k = 0; k < nDimensions; k++) {
+                                int qfIndex = j * nDimensions + k;
+                                double quantumForceSum = quantumForceOld[walker][qfIndex] + quantumForceNew[walker][qfIndex];
+                                double qfPositionDiff = 0.5 * tau * diffConstant * (quantumForceOld[walker][qfIndex] - quantumForceNew[walker][qfIndex]) - (rNew[walker][j][k] - rOld[walker][j][k]);
+                                argSum += 0.5 * quantumForceSum * qfPositionDiff;
+                            }
                         }
-                        argSum *= 1 / 4.;
-                        double greensRatio = pow((2 * M_PI * tau),(-3*nParticles / 2)) * exp(-(argSum) / 2 * tau);
+                        double greensRatio = exp(argSum);
                         double weight = ratio*ratio * greensRatio;
                         // Accept move according to Metropolis probability
-                        if(weight > ran2(idum) - 0.5) {
+                        if(weight > ran2(idum)) {
                             waves[walker]->acceptMove(i);
                             rOld[walker][i] = rNew[walker][i];
                         } else {
@@ -116,68 +129,79 @@ void DiffusionMonteCarlo::sample(int nCycles)
                     } else {
                         waves[walker]->rejectMove();
                     }
-                } // END for every particle
-                // Compute branching factor PB
-                localEnergyNew[walker] = hamiltonian->energy(waves[walker], rNew[walker]);
-                double branchingFactor = exp(- tau * (1 / 2. * (localEnergyOld[walker] + localEnergyNew[walker]) - trialEnergy));
-                // Accumulate the energy and any observables weighted by PB
-                // Make int(PB + u) copies
-                if(branchingFactor + ran2(idum) > 1) {
-//                    std::cout << "Good choice!" << std::endl;
-                    bool foundDeadWalker = false;
-                    for(int walker2 = 0; walker2 < nWalkersMax; walker2++) {
-                        // find a dead walker to ressurect
-                        if(!aliveNew[walker2]) {
-                            nWalkersAlive++;
-                            aliveNew[walker2] = true;
-                            foundDeadWalker = true;
-                            for(int i = 0; i < nParticles; i++) {
-                                rNew[walker2][i] = rNew[walker][i];
-                                rOld[walker2][i] = rOld[walker][i];
-                            }
-                            quantumForceNew[walker2] = quantumForceNew[walker];
-                            quantumForceOld[walker2] = quantumForceOld[walker];
-                            waves[walker2]->initialize(rNew[walker2]);
-                            localEnergyNew[walker2] = localEnergyNew[walker];
-                            localEnergyOld[walker2] = localEnergyOld[walker];
 
-                            break;
+                    // Compute branching factor PB
+                    localEnergyNew[walker] = hamiltonian->energy(waves[walker], rNew[walker]);
+                    double branchingFactor = exp(- tau * (0.5 * (localEnergyOld[walker] + localEnergyNew[walker]) - trialEnergy));
+                    // Make int(PB + u) copies
+    //                std::cout << "PB: " << branchingFactor << " " << trialEnergy << " " << localEnergyOld[walker] << " " << localEnergyNew[walker] << std::endl;
+                    int reproductions = (int) (branchingFactor + ran2(idum));
+    //                std::cout << reproductions << std::endl;
+                    if(reproductions == 0) {
+    //                    std::cout << "Killing walker" << std::endl;
+                        nWalkersAlive--;
+                        aliveNew[walker] = false;
+                    } else {
+                        // Accumulate the energy and any observables weighted by PB
+                        energySum += localEnergyNew[walker] * branchingFactor;
+                        nEnergySamples++;
+                        if(reproductions > 1) {
+                            for(int repro = 0; repro < reproductions; repro++) {
+    //                            std::cout << "Good choice!" << std::endl;
+                                bool foundDeadWalker = false;
+                                for(int walker2 = 0; walker2 < nWalkersMax; walker2++) {
+                                    // find a dead walker to ressurect
+                                    if(!aliveNew[walker2] && !foundDeadWalker) {
+                                        nWalkersAlive++;
+                                        aliveNew[walker2] = true;
+                                        foundDeadWalker = true;
+                                        for(int i = 0; i < nParticles; i++) {
+                                            rNew[walker2][i] = rNew[walker][i];
+                                            rOld[walker2][i] = rOld[walker][i];
+                                        }
+                                        quantumForceNew[walker2] = quantumForceNew[walker];
+                                        quantumForceOld[walker2] = quantumForceOld[walker];
+                                        waves[walker2]->initialize(rNew[walker2]);
+                                        localEnergyNew[walker2] = localEnergyNew[walker];
+                                        localEnergyOld[walker2] = localEnergyOld[walker];
+
+                                        break;
+                                    }
+                                }
+                                if(!foundDeadWalker) {
+            //                        std::cout << "Could not find an available spot to clone walker" << std::endl;
+                                }
+                            }
                         }
-                    }
-                    if(!foundDeadWalker) {
-                        std::cout << "Could not find an available spot to clone walker" << std::endl;
-                    }
-                } else {
-//                    std::cout << "Didn't reproduce" << std::endl;
-                    nWalkersAlive--;
-                    aliveNew[walker] = false;
-                } // END if branching
-//                std::cout << "Alive walkers: " << nWalkersAlive << std::endl;
-    //            std::cout << "Should make " << (int) (branchingFactor + ran2(idum)) << " copies" << std::endl;
-                localEnergyOld[walker] = localEnergyNew[walker];
+                    } // END if branching
+    //                std::cout << "Alive walkers: " << nWalkersAlive << std::endl;
+        //            std::cout << "Should make " << (int) (branchingFactor + ran2(idum)) << " copies" << std::endl;
+                    localEnergyOld[walker] = localEnergyNew[walker];
+                } // END for every particle
             } // END if walker alive
         } // END for each walker
+//        std::cout << "Alive walkers: " << nWalkersAlive << "\xd" << std::endl;
         // Repeat configuration moves for about 100 - 1000 steps
-        if(!(cycle % 10)) {
+        if(cycle < 400 || !(cycle % blockLength)) {
             // Update trial energy ET to bring it closer to the current ensemble
-            double energySum = 0;
-            for(int walker = 0; walker < nWalkersMax; walker++) {
-                energySum += localEnergyNew[walker];
-            }
-            trialEnergy = energySum / nWalkersMax;
-            std::cout << "Trial energy is now " << trialEnergy << std::endl;
-            std::cout << "Alive walkers: " << nWalkersAlive << std::endl;
+            trialEnergy = energySum / nEnergySamples;
+            std::cout << "Trial energy is now " << trialEnergy << " with " << nWalkersAlive << " walkers at cycle " << cycle << std::endl;
             // Renormalise the number of walkers to the target number by creating or deleting walkers
-            while(nWalkersAlive > nWalkersIdeal) {
-                int randomWalker = ran2(idum) * nWalkersMax;
-                if(aliveNew[randomWalker]) {
-                    aliveNew[randomWalker] = false;
-                    nWalkersAlive--;
-                }
-            }
+//            while(nWalkersAlive > nWalkersIdeal) {
+//                int randomWalker = ran2(idum) * nWalkersMax;
+//                if(aliveNew[randomWalker]) {
+//                    aliveNew[randomWalker] = false;
+//                    nWalkersAlive--;
+//                }
+//            }
+
+            energySum = 0;
+            nEnergySamples = 0;
         }
         for(int walker = 0; walker < nWalkersMax; walker++) {
+//            std::cout << "Walkers alive " << aliveOld[walker] << " " << aliveNew[walker] << std::endl;
             aliveOld[walker] = aliveNew[walker];
+//            std::cout << "Walkers alive after " << aliveOld[walker] << " " << aliveNew[walker] << std::endl;
         }
         // Repeat and rinse
     }
@@ -191,9 +215,5 @@ void DiffusionMonteCarlo::sample(int nCycles)
     }
     scatterfile.close();
 
-    double energySum = 0;
-    for(int walker = 0; walker < nWalkersMax; walker++) {
-        energySum += localEnergyNew[walker];
-    }
-    m_energy = energySum / nWalkersMax;
+    m_energy = trialEnergy;
 }

@@ -10,6 +10,7 @@ class MonteCarlo
 {
 public:
     MonteCarlo(Config *config);
+    ~MonteCarlo();
 
     virtual void sample(int nCycles) = 0;
     virtual void loadConfiguration(INIParser *settings) {
@@ -27,7 +28,13 @@ public:
         terminalized = !arg;
     }
 
+    vec2 **moves() {
+        return m_moves;
+    }
+
     void checkTerminalization(double localEnergy);
+    void setRecordMoves(bool arg, int nMoves);
+    void recordMove(int i, int nthMove);
 protected:
     Config *config;
     int nParticles;
@@ -48,6 +55,11 @@ protected:
 
     WaveFunction* wave;
     Hamiltonian *hamiltonian;
+
+    bool recordMoves;
+    int nMoves;
+    vec2 **m_moves;
+    int move;
 
     int cycle;
 
