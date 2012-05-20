@@ -2,6 +2,7 @@
 #define DIFFUSIONMONTECARLO_H
 
 #include "montecarlo.h"
+#include "../walker/diffusionwalker.h"
 
 class DiffusionMonteCarlo : public MonteCarlo
 {
@@ -9,13 +10,15 @@ public:
     DiffusionMonteCarlo(Config *config);
 
     void sample(int nCycles);
-    vec2 **rOld;
-    vec2 **rNew;
-    WaveFunction **waves;
+//    vec2 **rOld;
+//    vec2 **rNew;
+//    WaveFunction **waves;
 
-    bool *aliveOld;
-    bool *aliveMid;
-    bool *aliveNew;
+    DiffusionWalker **walkers;
+
+//    bool *aliveOld;
+//    bool *aliveMid;
+//    bool *aliveNew;
 
     int nWalkersMax;
     int nWalkersIdeal;

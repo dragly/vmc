@@ -69,7 +69,11 @@ HEADERS += \
     jastrow/jastrow.h \
     inih/ini.h \
     evolver/evolver.h \
-    montecarlo/diffusionmontecarlo.h
+    montecarlo/diffusionmontecarlo.h \
+    montecarlo/evolutionarymontecarlo.h \
+    walker/walker.h \
+    walker/evolutionarywalker.h \
+    walker/diffusionwalker.h
 
 SOURCES += main.cpp \
     matrix.cpp \
@@ -97,4 +101,8 @@ SOURCES += main.cpp \
     jastrow/jastrow.cpp \
     inih/ini.cpp \
     evolver/evolver.cpp \
-    montecarlo/diffusionmontecarlo.cpp
+    montecarlo/diffusionmontecarlo.cpp \
+    montecarlo/evolutionarymontecarlo.cpp \
+    walker/walker.cpp \
+    walker/evolutionarywalker.cpp \
+    walker/diffusionwalker.cpp

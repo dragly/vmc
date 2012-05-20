@@ -13,6 +13,7 @@
 #include "../jastrow/jastrow.h"
 #include "../random.h"
 #include "../montecarlo/diffusionmontecarlo.h"
+#include "../montecarlo/evolutionarymontecarlo.h"
 #include "functionevolver.h"
 
 #include "minimizerevolutionarytest.h"
@@ -71,6 +72,7 @@ private slots:
     // slow tests
     // unfinished tests
     void diffusionMonteCarloTest();
+    void evolutionaryMonteCarloTest();
 
 private:
     Config *oldConfig;
@@ -874,6 +876,8 @@ void VmcTests::diffusionMonteCarloTest() {
     config->setNParticles(2);
     config->setNDimensions(2);
     config->setInteractionEnabled(true);
+    config->setDiffusionConstant(0.5);
+    config->setTau(0.01);
 
     double parameters[2];
     parameters[0] = 0.989;
@@ -894,6 +898,34 @@ void VmcTests::diffusionMonteCarloTest() {
     diffusionMonteCarlo->sample(3000);
     double energy = diffusionMonteCarlo->energy();
     std::cout << "Diffusion monte carlo returned energy of " << energy << std::endl;
+    QVERIFY(fabs(energy - 3.000) < 1e-2);
+}
+
+void VmcTests::evolutionaryMonteCarloTest() {
+    Config *config = new Config(0, 1);
+    config->setNParticles(2);
+    config->setNDimensions(2);
+    config->setInteractionEnabled(true);
+
+    double parameters[2];
+    parameters[0] = 0.989;
+    parameters[1] = 0.4;
+//    parameters[0] = 0.92;
+//    parameters[1] = 0.565;
+
+    WaveSlater *waveSlater = new WaveSlater(config);
+    config->setWave(waveSlater);
+    waveSlater->setParameters(parameters);
+    waveSlater->setUseAnalyticalGradient(true);
+    waveSlater->setUseAnalyticalLaplace(true);
+
+    Hamiltonian *hamiltonianIdeal = new HamiltonianIdeal(config);
+    config->setHamiltonian(hamiltonianIdeal);
+
+    EvolutionaryMonteCarlo *evolutionary = new EvolutionaryMonteCarlo(config, 64, 32, 2);
+    evolutionary->sample(10);
+    double energy = evolutionary->energy();
+    std::cout << "Evolutionary monte carlo returned energy of " << energy << std::endl;
     QVERIFY(fabs(energy - 3.000) < 1e-2);
 }
 

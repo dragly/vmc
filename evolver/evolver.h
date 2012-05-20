@@ -13,7 +13,7 @@ public:
 
     void constructor(int nGenes, int nIndividuals, int nPopulations);
 
-    void evolve(int nSteps, int populationMatching);
+    void evolve(int nSteps, int populationMatchingPeriod);
 
     void setScaleLimits(double low, double high) {
         lowScaleLimit = low;

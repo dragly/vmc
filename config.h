@@ -83,6 +83,22 @@ public:
         m_omega = arg;
     }
 
+    void setTau(double arg) {
+        m_tau = arg;
+    }
+
+    double tau() {
+        return m_tau;
+    }
+
+    void setDiffusionConstant(double arg) {
+        m_diffusionConstant = arg;
+    }
+
+    double diffusionConstant() {
+        return m_diffusionConstant;
+    }
+
     bool interactionEnabled() const
     {
         return m_interactionEnabled;
@@ -110,6 +126,8 @@ private:
     double m_omega;
     bool m_interactionEnabled;
     long m_idum;
+    double m_tau;
+    double m_diffusionConstant;
 };
 
 #endif // CONFIG_H

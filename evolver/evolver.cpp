@@ -76,7 +76,7 @@ void Evolver::rescale()
     scale = pow(10,expScale);
 }
 
-void Evolver::evolve(int nCycles, int populationMatching)
+void Evolver::evolve(int nCycles, int populationMatchingPeriod)
 {
     updateBest();
     for(int cycle = 0; cycle < nCycles; cycle++) {
@@ -125,7 +125,7 @@ void Evolver::evolve(int nCycles, int populationMatching)
         }
 
         // Merge populations every populationMatching step. Adds the best from one population to the other population.
-        if(!(cycle % populationMatching)) {
+        if(!(cycle % populationMatchingPeriod)) {
             for(int i = 0; i < nPopulations / 2; i++) {
                 int population1Index = (int)(ran2(&idum) * (nPopulations/2));
                 int population2Index = (int)((nPopulations/2) + ran2(&idum) * (nPopulations/2));
