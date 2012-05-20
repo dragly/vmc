@@ -9,7 +9,7 @@ MonteCarlo::MonteCarlo(Config *config) :
     nDimensions(config->nDimensions()),
     m_energy(0),
     m_energySquared(0),
-    idum(config->idum()),
+    idumMC(config->idum()),
     terminalizationSum(0),
     terminalizationNum(0),
     terminalized(false),

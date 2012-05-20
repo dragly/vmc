@@ -13,7 +13,7 @@ public:
     vec result;
     void calculate(vec &coefficients);
 private:
-    double fitness(vec &coefficients);
+    double fitness(vec &coefficients, int population, int individual);
 
 
     vec myFunction();

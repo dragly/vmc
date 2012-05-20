@@ -67,12 +67,12 @@ public:
     // unfinished tests
     void minimizerEvolutionaryTest();
     void evolverTest();
+    void evolutionaryMonteCarloTest();
 private slots:
     // quick tests
     // slow tests
     // unfinished tests
     void diffusionMonteCarloTest();
-    void evolutionaryMonteCarloTest();
 
 private:
     Config *oldConfig;
@@ -228,7 +228,7 @@ void VmcTests::slaterInverse() {
                         QCOMPARE(analyticalInverse.at(i,j), numericalInverse.at(i,j));
                     }
                 }
-                slater1->acceptEvaluation(movedParticle);
+                slater1->acceptMove(movedParticle);
             }
         }
     }
@@ -880,8 +880,10 @@ void VmcTests::diffusionMonteCarloTest() {
     config->setTau(0.01);
 
     double parameters[2];
-    parameters[0] = 0.989;
-    parameters[1] = 0.4;
+    parameters[0] = 0.987;
+    parameters[1] = 0.398;
+//        parameters[0] = 0.92;
+//        parameters[1] = 0.4;
 //    parameters[0] = 0.92;
 //    parameters[1] = 0.565;
 
@@ -895,7 +897,7 @@ void VmcTests::diffusionMonteCarloTest() {
     config->setHamiltonian(hamiltonianIdeal);
 
     DiffusionMonteCarlo *diffusionMonteCarlo = new DiffusionMonteCarlo(config);
-    diffusionMonteCarlo->sample(3000);
+    diffusionMonteCarlo->sample(40000);
     double energy = diffusionMonteCarlo->energy();
     std::cout << "Diffusion monte carlo returned energy of " << energy << std::endl;
     QVERIFY(fabs(energy - 3.000) < 1e-2);
@@ -909,7 +911,7 @@ void VmcTests::evolutionaryMonteCarloTest() {
 
     double parameters[2];
     parameters[0] = 0.989;
-    parameters[1] = 0.4;
+    parameters[1] = 0.45;
 //    parameters[0] = 0.92;
 //    parameters[1] = 0.565;
 
@@ -922,8 +924,14 @@ void VmcTests::evolutionaryMonteCarloTest() {
     Hamiltonian *hamiltonianIdeal = new HamiltonianIdeal(config);
     config->setHamiltonian(hamiltonianIdeal);
 
-    EvolutionaryMonteCarlo *evolutionary = new EvolutionaryMonteCarlo(config, 64, 32, 2);
-    evolutionary->sample(10);
+    int nWalkers = 4;
+    int nGenes = nWalkers * config->nParticles() * config->nDimensions();
+    int nIndividuals = 16;
+    int nPopulations = 1;
+    EvolutionaryMonteCarlo *evolutionary = new EvolutionaryMonteCarlo(config, nGenes, nIndividuals, nPopulations);
+    evolutionary->setScaleLimits(-2, 0.1);
+    evolutionary->setRescaleCycles(20);
+    evolutionary->sample(100000);
     double energy = evolutionary->energy();
     std::cout << "Evolutionary monte carlo returned energy of " << energy << std::endl;
     QVERIFY(fabs(energy - 3.000) < 1e-2);

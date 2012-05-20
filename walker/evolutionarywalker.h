@@ -11,6 +11,12 @@ public:
     void advance();
 
 private:
+    int nWalkersMax;
+
+    double diffConstant;
+    double tau;
+    bool m_aliveNew;
+    bool m_aliveOld;
 
 };
 

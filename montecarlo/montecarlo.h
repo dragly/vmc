@@ -42,7 +42,7 @@ protected:
     double m_energy;
     double m_energySquared;
     double *m_allEnergies;
-    long *idum;
+    long *idumMC;
 
     double terminalizationSum;
     int terminalizationNum;

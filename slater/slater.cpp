@@ -144,7 +144,7 @@ bool Slater::hasParticle(int particleNumber) const {
     return (spinUp && particleNumber < nParticles / 2) || (!spinUp && particleNumber >= nParticles / 2);
 }
 
-void Slater::acceptEvaluation(int movedParticle)
+void Slater::acceptMove(int movedParticle)
 {
     previousMatrix = currentMatrix;
     previousRatio = currentRatio;
@@ -152,7 +152,7 @@ void Slater::acceptEvaluation(int movedParticle)
     previousInverse = currentInverse;
 }
 
-void Slater::refuseEvaluation() {
+void Slater::rejectMove() {
     currentMatrix = previousMatrix;
     // TODO might not need to copy back the inverse
     currentInverse = previousInverse;

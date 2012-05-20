@@ -3,6 +3,7 @@
 
 #include "montecarlo.h"
 #include "../evolver/evolver.h"
+#include "../walker/evolutionarywalker.h"
 
 class Config;
 
@@ -11,10 +12,17 @@ class EvolutionaryMonteCarlo : public MonteCarlo, public Evolver
 public:
     EvolutionaryMonteCarlo(Config *config, int nGenes, int nIndividuals, int nPopulations);
     void sample(int nCycles);
-    double fitness(vec &coefficients);
+    double fitness(vec &genes, int population, int individual);
 
 private:
     int nWalkers;
+    EvolutionaryWalker **walkers;
+    vec2 *positions;
+    int correlationStep;
+    double trialEnergy;
+    double energySum;
+    int nEnergyUpdates;
+    vec *meanEnergies;
 };
 
 #endif // EVOLUTIONARYMONTECARLO_H

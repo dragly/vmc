@@ -29,7 +29,7 @@ void FunctionEvolver::calculate(vec &coefficients) {
     }
 }
 
-double FunctionEvolver::fitness(vec &coefficients)
+double FunctionEvolver::fitness(vec &coefficients, int population, int individual)
 {
     calculate(coefficients);
     double diffSum = 0;

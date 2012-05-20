@@ -16,10 +16,17 @@ public:
     virtual void progressToNextStep();
     virtual void initialize(vec2 *positions);
 
-    virtual void copyFromOther(Walker *otherWalker);
+    virtual void copyOtherWalker(Walker *otherWalker);
 
     vec2 *positionsNew() {
         return rNew;
+    }
+    double energy() {
+        return m_energy;
+    }
+
+    int changeInEnergySamples() {
+        return m_changeInEnergySamples;
     }
 
 protected:
@@ -29,7 +36,6 @@ protected:
     vec quantumForceOld;
     vec quantumForceNew;
 
-
     double localEnergyNew;
     double localEnergyOld;
 
@@ -37,6 +43,9 @@ protected:
     int nDimensions;
     WaveFunction *wave;
     Hamiltonian *hamiltonian;
+    double m_energy;
+    long *idum;
+    int m_changeInEnergySamples;
 };
 
 #endif // WALKER_H

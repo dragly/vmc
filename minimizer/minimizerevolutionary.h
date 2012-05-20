@@ -25,7 +25,7 @@ public:
     void startEvolution();
 
 private:
-    double fitness(vec &coefficients);
+    double fitness(vec &coefficients, int population, int individual);
 
     // Monte Carlo stuff
     WaveFunction *wave;

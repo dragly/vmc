@@ -13,37 +13,24 @@ public:
     void setAliveNew(bool arg) {
         m_aliveNew = arg;
     }
+    void setAliveOld(bool arg) {
+        m_aliveOld = arg;
+    }
 
     bool aliveOld() {
         return m_aliveOld;
     }
     void progressToNextStep();
 
-    double energy() {
-        return m_energy;
-    }
-
-    int changeInWalkersAlive() {
-        return m_changeInWalkersAlive;
-    }
-
-    int changeInEnergySamples() {
-        return m_changeInEnergySamples;
-    }
-
     void advance(double trialEnergy);
 private:
-    bool m_aliveNew;
-    bool m_aliveOld;
     DiffusionWalker** otherWalkers;
     int nWalkersMax;
 
     double diffConstant;
     double tau;
-    long *idum;
-    int m_changeInWalkersAlive;
-    int m_changeInEnergySamples;
-    double m_energy;
+    bool m_aliveNew;
+    bool m_aliveOld;
 };
 
 #endif // DIFFUSIONWALKER_H

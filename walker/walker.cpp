@@ -3,9 +3,13 @@
 Walker::Walker(Config *config) :
     nParticles(config->nParticles()),
     nDimensions(config->nDimensions()),
-    wave(config->wave()),
-    hamiltonian(config->hamiltonian())
+    hamiltonian(config->hamiltonian()),
+    m_energy(0),
+    idum(config->idum())
 {
+    wave = config->wave()->clone();
+//    wave = config->wave();
+
     rNew = new vec2[nParticles];
     rOld = new vec2[nParticles];
 
@@ -16,11 +20,12 @@ Walker::Walker(Config *config) :
 
 void Walker::progressToNextStep()
 {
-    for(int i = 0; i < nParticles; i++) {
-        rOld[i] = rNew[i];
-    }
-    localEnergyOld = localEnergyNew;
-    quantumForceOld = quantumForceNew;
+//    std::cout << "NextStep" << std::endl;
+//    for(int i = 0; i < nParticles; i++) {
+//        rOld[i] = rNew[i];
+//    }
+//    localEnergyOld = localEnergyNew;
+//    quantumForceOld = quantumForceNew;
 }
 
 void Walker::initialize(vec2 *positions)
@@ -36,14 +41,14 @@ void Walker::initialize(vec2 *positions)
     localEnergyNew = localEnergyOld;
 }
 
-void Walker::copyFromOther(Walker *otherWalker) {
+void Walker::copyOtherWalker(Walker *otherWalker) {
     for(int i = 0; i < nParticles; i++) {
         rNew[i] = otherWalker->rNew[i];
         rOld[i] = otherWalker->rOld[i];
     }
     quantumForceNew = otherWalker->quantumForceNew;
     quantumForceOld = otherWalker->quantumForceOld;
-    wave->initialize(otherWalker->rNew);
+    wave->initialize(rNew);
     localEnergyNew = otherWalker->localEnergyNew;
     localEnergyOld = otherWalker->localEnergyOld;
 }

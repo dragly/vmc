@@ -18,6 +18,11 @@ public:
     void setScaleLimits(double low, double high) {
         lowScaleLimit = low;
         highScaleLimit = high;
+        rescale();
+    }
+
+    void setRescaleCycles(int rescaleCycles) {
+        this->rescaleCycles = rescaleCycles;
     }
 
     vec allBestGenes;
@@ -25,7 +30,7 @@ public:
     ~Evolver();
     void rescale();
 protected:
-    virtual double fitness(vec &coefficients) = 0;
+    virtual double fitness(vec &coefficients, int population, int individual) = 0;
     void updateBest();
 
     // defines the number of individuals in a population
@@ -61,6 +66,8 @@ protected:
     double allBestValue;
     int allBestIndex;
     int allBestPopulationIndex;
+
+    int rescaleCycles;
 
     // holds the number of cycles since last improvement
     int cyclesSinceLastImprovement;

@@ -50,7 +50,7 @@ void MonteCarloStandard::sample(int nCycles)
     //  initial trial position, note calling with alpha
     for (int i = 0; i < nParticles; i++) {
         for (int j=0; j < nDimensions; j++) {
-            rOld[i][j] = stepLength*(ran2(idum)-0.5);
+            rOld[i][j] = stepLength*(ran2(idumMC)-0.5);
         }
         rNew[i] = rOld[i];
     }
@@ -62,7 +62,7 @@ void MonteCarloStandard::sample(int nCycles)
         // new position
         for (int i = 0; i < nParticles; i++) {
             for (int j=0; j < nDimensions; j++) {
-                rNew[i][j] = rOld[i][j]+stepLength*(ran2(idum)-0.5);
+                rNew[i][j] = rOld[i][j]+stepLength*(ran2(idumMC)-0.5);
             }
             double ratio = wave->ratio(rNew[i], i);
             //            std::cout << "Ratio calculated " << std::endl;
@@ -70,7 +70,7 @@ void MonteCarloStandard::sample(int nCycles)
             //                std::cout << "rNew[" << i << "] = " << rNew[i] << std::endl;
             //            }
             // The Metropolis test is performed by moving one particle at the time
-            if(ran2(idum) <= (ratio*ratio)) {
+            if(ran2(idumMC) <= (ratio*ratio)) {
                 rOld[i] = rNew[i];
                 wave->acceptMove(i);
                 //                std::cout << "Accepted" << std::endl;

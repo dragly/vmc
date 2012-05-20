@@ -29,7 +29,7 @@ void MinimizerEvolutionary::startEvolution()
 {
 }
 
-double MinimizerEvolutionary::fitness(vec &coefficients)
+double MinimizerEvolutionary::fitness(vec &coefficients, int population, int individual)
 {
     double parameters[2];
     parameters[0] = coefficients[0];

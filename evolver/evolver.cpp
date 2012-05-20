@@ -12,12 +12,13 @@ Evolver::Evolver()
 
 Evolver::Evolver(int nGenes, int nIndividuals, int nPopulations)
 {
-    constructor(nIndividuals, nGenes, nPopulations);
+    constructor(nGenes, nIndividuals, nPopulations);
 }
 
 void Evolver::constructor(int nGenes, int nIndividuals, int nPopulations) {
     idum = -1;
     currentCycle = 0;
+    rescaleCycles = 50;
     this->nIndividuals = nIndividuals;
     this->nGenes = nGenes;
     this->nPopulations = nPopulations;
@@ -57,7 +58,10 @@ void Evolver::updateBest()
     for(int i = 0; i < nPopulations; i++) {
         for(int j = 0; j < nIndividuals; j++) {
             vec &genes = populations[i][j];
-            double value = fitness(genes);
+            double value = fitness(genes, i, j);
+            if(isnan(value)) {
+                value = INFINITY;
+            }
             values[i][j] = value;
             if(value < allBestValue) {
                 allBestValue = value;
@@ -145,16 +149,16 @@ void Evolver::evolve(int nCycles, int populationMatchingPeriod)
         // Testing
         updateBest();
 
-        if(cyclesSinceLastImprovement > 50) {
+        if(cyclesSinceLastImprovement > rescaleCycles) {
             rescale();
-            cyclesSinceLastImprovement = 20;
+            cyclesSinceLastImprovement = rescaleCycles * 4. / 10.;
             cyclesSinceLastRescale = 0;
-        } else if(cyclesSinceLastImprovement > 45) {
+        } else if(cyclesSinceLastImprovement > rescaleCycles * 9. / 10.) {
             scale = lastWorkingScale;
-        } else if(cyclesSinceLastImprovement > 25) {
+        } else if(cyclesSinceLastImprovement > rescaleCycles / 2.) {
             scale *= 1.2;
         }
-        if(cyclesSinceLastRescale > 100) {
+        if(cyclesSinceLastRescale > rescaleCycles * 2) {
             lastWorkingScale = scale;
             rescale();
         }
