@@ -17,7 +17,6 @@ private:
     double tau;
     bool m_aliveNew;
     bool m_aliveOld;
-
 };
 
 #endif // EVOLUTIONARYWALKER_H

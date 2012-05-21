@@ -169,10 +169,8 @@ void Evolver::evolve(int nCycles, int populationMatchingPeriod)
         }
 
 
-        std::cout << "All best value @ cycle " << cycle << ": " << allBestValue << " with scale " << scale << std::endl;
+//        std::cout << "All best value @ cycle " << cycle << ": " << allBestValue << " with scale " << scale << std::endl;
         cycle++;
     }
-//    std::cout << "All best genes " << populations[allBestPopulationIndex][allBestIndex] << std::endl;
-    std::cout << "All best value " << allBestValue << std::endl;
     allBestGenes = populations[allBestPopulationIndex][allBestIndex];
 }

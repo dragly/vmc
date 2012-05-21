@@ -12,15 +12,6 @@ void EvolutionaryWalker::advance() {
     m_changeInEnergySamples = 0;
     m_energy = 0;
     for(int i = 0; i < nParticles; i++) {
-        // TODO Remove the forced init
-//                wave->initialize(rOld);
-//        WaveSlater* waveSlater = (WaveSlater*)wave;
-////        waveSlater->evaluate(rOld);
-//        waveSlater->slaterDown->initialize(rOld);
-//        waveSlater->slaterUp->initialize(rOld);
-//        waveSlater->jastrow->calculateDistances(rOld);
-//        wave->gradient(rOld, i, quantumForceOld);
-//        localEnergyOld = hamiltonian->energy(wave, rOld);
 
         // Propose move (with quantum force)
         for(int k = 0; k < nDimensions; k++) {
@@ -60,9 +51,7 @@ void EvolutionaryWalker::advance() {
             wave->rejectMove();
             rNew[i] = rOld[i];
         }
-        localEnergyNew = hamiltonian->energy(wave, rNew);
-        m_energy += localEnergyNew;
+        m_energy += hamiltonian->energy(wave, rNew);;
         m_changeInEnergySamples++;
-        localEnergyOld = localEnergyNew;
     } // END for every particle
 }

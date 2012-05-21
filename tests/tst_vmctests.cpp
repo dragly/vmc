@@ -883,9 +883,9 @@ void VmcTests::diffusionMonteCarloTest() {
 
     double parameters[2];
     parameters[0] = 0.987;
-    parameters[1] = 0.398;
-//        parameters[0] = 0.92;
-//        parameters[1] = 0.4;
+    parameters[1] = 0.4;
+//        parameters[0] = 0.928;
+//        parameters[1] = 0.55;
 //    parameters[0] = 0.92;
 //    parameters[1] = 0.565;
 
@@ -914,8 +914,8 @@ void VmcTests::evolutionaryMonteCarloTest() {
     double parameters[2];
     parameters[0] = 0.987;
     parameters[1] = 0.398;
-//    parameters[0] = 0.92;
-//    parameters[1] = 0.565;
+//    parameters[0] = 0.928;
+//    parameters[1] = 0.55;
 
     WaveSlater *waveSlater = new WaveSlater(config);
     config->setWave(waveSlater);

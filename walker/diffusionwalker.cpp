@@ -21,15 +21,6 @@ void DiffusionWalker::advance(double trialEnergy) {
     m_changeInEnergySamples = 0;
     m_energy = 0;
     for(int i = 0; i < nParticles; i++) {
-        // TODO Remove the forced init
-//                wave->initialize(rOld);
-//        WaveSlater* waveSlater = (WaveSlater*)wave;
-////        waveSlater->evaluate(rOld);
-//        waveSlater->slaterDown->initialize(rOld);
-//        waveSlater->slaterUp->initialize(rOld);
-//        waveSlater->jastrow->calculateDistances(rOld);
-//        wave->gradient(rOld, i, quantumForceOld);
-//        localEnergyOld = hamiltonian->energy(wave, rOld);
 
         // Propose move (with quantum force)
         for(int k = 0; k < nDimensions; k++) {
@@ -44,7 +35,6 @@ void DiffusionWalker::advance(double trialEnergy) {
         // Apply fixed node approximation (keep sign or reject move)
         if(ratio > 0) {
             // Compute weight function
-
             wave->gradient(rNew, i, quantumForceNew);
             double argSum = 0;
             for(int j = 0; j < nParticles; j++) {

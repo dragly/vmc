@@ -31,7 +31,7 @@ EvolutionaryMonteCarlo::EvolutionaryMonteCarlo(Config *config, int nGenes_, int 
 }
 
 double EvolutionaryMonteCarlo::fitness(vec &genes, int population, int individual) {
-    int nWalkerSamples = 500;
+    int nWalkerSamples = 200;
     // take all the coefficients, spawn particles in these positions
     for(int i = 0; i < nWalkers; i++) {
         for(int j = 0; j < nParticles; j++) {
@@ -45,16 +45,27 @@ double EvolutionaryMonteCarlo::fitness(vec &genes, int population, int individua
     // sample energies around these positions
     double totalEnergy = 0;
     int nTotalSamples = 0;
+    double branchingSum = 0;
     for(int sample = 0; sample < nWalkerSamples; sample++) {
         for(int i = 0; i < nWalkers; i++) {
+
             EvolutionaryWalker* walker = walkers[i];
+            double oldEnergy = walker->energy();
             walker->advance();
-            double energy = walker->energy();
-            if(!isnan(energy)) {
-                totalEnergy += walker->energy();
-                nTotalSamples += walker->changeInEnergySamples();
-            }
+//            if(sample > nWalkerSamples / 10) {
+                double newEnergy = walker->energy();
+                if(!isnan(newEnergy)) {
+                    totalEnergy += walker->energy();
+                    nTotalSamples += walker->changeInEnergySamples();
+                }
+
+                double branchingFactor = -exp(- 0.001 * (0.5 * (oldEnergy + newEnergy) - trialEnergy));
+                branchingSum += (int)( branchingFactor + ran2(idum));
+//            }
         }
+    }
+    for(int i = 0; i < nWalkers; i++) {
+        walkers[i]->advance();
     }
     // Set the new genes to the new positions (think of this as an individual keeping it's new properties after some time)
     for(int k = 0; k < nGenes; k++) {
@@ -67,13 +78,17 @@ double EvolutionaryMonteCarlo::fitness(vec &genes, int population, int individua
     }
     double meanEnergy = totalEnergy / (nTotalSamples);
     if(nTotalSamples > 0) {
-        meanEnergies[population][individual] += meanEnergy;
+//        meanEnergies[population][individual] += meanEnergy;
+        meanEnergies[population][individual] = meanEnergy;
         meanEnergyCycles[population][individual] += 1;
     } else {
         meanEnergy = INFINITY;
     }
+
+//    return exp(- 0.1 * (fabs(meanEnergy - trialEnergy)));
     // return difference between trial energy and this individuals energy
-    return fabs(meanEnergy - trialEnergy);
+    return fabs(meanEnergy - trialEnergy) * (1 - 0.5 *ran2(idum));
+//    return -branchingSum;
 }
 
 void EvolutionaryMonteCarlo::sample(int nCycles)
@@ -112,11 +127,11 @@ void EvolutionaryMonteCarlo::sample(int nCycles)
             nEnergyUpdates = 0;
             for(int i = 0; i < nPopulations; i++) {
                 // Avoid the random newcomers by selecting the first three quarters (the best and their children)
-                for(uint j = 0; j < bestIndices[i].size() * 3. / 4.; j++) {
+                for(uint j = 0; j < bestIndices[i].size() * 2. / 4.; j++) {
                     int index = bestIndices[i][j];
 //                    int index = j;
-                    double meanEnergy = meanEnergies[i][index] / meanEnergyCycles[i][index];
-                    std::cout << "Mean energies: " << index << "\t" << meanEnergy <<  "\tdiff: " << values[i][index] << std::endl;
+                    double meanEnergy = meanEnergies[i][index] /*/ meanEnergyCycles[i][index]*/;
+//                    std::cout << "Mean energies: " << index << "\t" << meanEnergy <<  "\tdiff: " << values[i][index] << std::endl;
                     energySum += meanEnergy;
                     nEnergyUpdates++;
                     meanEnergies[i][index] = 0;
