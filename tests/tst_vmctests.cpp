@@ -926,7 +926,7 @@ void VmcTests::evolutionaryMonteCarloTest() {
     Hamiltonian *hamiltonianIdeal = new HamiltonianIdeal(config);
     config->setHamiltonian(hamiltonianIdeal);
 
-    int nWalkers = 40;
+    int nWalkers = 4;
     int nGenes = nWalkers * config->nParticles() * config->nDimensions();
     int nIndividuals = 16;
     int nPopulations = 1;

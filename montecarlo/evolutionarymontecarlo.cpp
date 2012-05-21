@@ -31,7 +31,7 @@ EvolutionaryMonteCarlo::EvolutionaryMonteCarlo(Config *config, int nGenes_, int 
 }
 
 double EvolutionaryMonteCarlo::fitness(vec &genes, int population, int individual) {
-    int nWalkerSamples = 200;
+    int nWalkerSamples = 1;
     // take all the coefficients, spawn particles in these positions
     for(int i = 0; i < nWalkers; i++) {
         for(int j = 0; j < nParticles; j++) {
@@ -45,23 +45,24 @@ double EvolutionaryMonteCarlo::fitness(vec &genes, int population, int individua
     // sample energies around these positions
     double totalEnergy = 0;
     int nTotalSamples = 0;
-    double branchingSum = 0;
+    int branchingSum = 0;
     for(int sample = 0; sample < nWalkerSamples; sample++) {
         for(int i = 0; i < nWalkers; i++) {
 
             EvolutionaryWalker* walker = walkers[i];
             double oldEnergy = walker->energy();
             walker->advance();
-//            if(sample > nWalkerSamples / 10) {
-                double newEnergy = walker->energy();
-                if(!isnan(newEnergy)) {
-                    totalEnergy += walker->energy();
-                    nTotalSamples += walker->changeInEnergySamples();
-                }
+            //            if(sample > nWalkerSamples * 5 / 10) {
+            double newEnergy = walker->energy();
+            if(!isnan(newEnergy)) {
+                totalEnergy += walker->energy();
+                nTotalSamples += walker->changeInEnergySamples();
+            }
 
-                double branchingFactor = -exp(- 0.001 * (0.5 * (oldEnergy + newEnergy) - trialEnergy));
-                branchingSum += (int)( branchingFactor + ran2(idum));
-//            }
+//            double branchingFactor = -exp(- 0.01 * (0.5 * (oldEnergy + newEnergy) - trialEnergy));
+//            std::cout << branchingFactor << std::endl;
+//            branchingSum += (int)( branchingFactor - ran2(idum));
+            //            }
         }
     }
     for(int i = 0; i < nWalkers; i++) {
@@ -78,17 +79,18 @@ double EvolutionaryMonteCarlo::fitness(vec &genes, int population, int individua
     }
     double meanEnergy = totalEnergy / (nTotalSamples);
     if(nTotalSamples > 0) {
-//        meanEnergies[population][individual] += meanEnergy;
+        //        meanEnergies[population][individual] += meanEnergy;
         meanEnergies[population][individual] = meanEnergy;
         meanEnergyCycles[population][individual] += 1;
     } else {
         meanEnergy = INFINITY;
     }
 
-//    return exp(- 0.1 * (fabs(meanEnergy - trialEnergy)));
+//        return exp(- 0.1 * (fabs(meanEnergy - trialEnergy)));
     // return difference between trial energy and this individuals energy
-    return fabs(meanEnergy - trialEnergy) * (1 - 0.5 *ran2(idum));
-//    return -branchingSum;
+    return fabs(meanEnergy - trialEnergy);
+//        return -branchingSum;
+//    return ran2(idum);
 }
 
 void EvolutionaryMonteCarlo::sample(int nCycles)
@@ -113,35 +115,40 @@ void EvolutionaryMonteCarlo::sample(int nCycles)
                 int positionIndex = k % nDimensions;
                 int moveIndex = walkerIndex + nWalkers * j;
                 populations[i][j][k] = moves[moveIndex][particleIndex][positionIndex];
-//                populations[i][j][k] = ran2(idum) * 8;
+                //                populations[i][j][k] = ran2(idum) * 8;
             }
         }
     }
-//    trialEnergy = 2;
+    //    trialEnergy = 2;
+    double totalSum = 0;
+    int totalSamples = 0;
     for(int cycle = 0; cycle < nCycles; cycle++) {
         allBestValue = INFINITY;
-        evolve(10, 100);
+        evolve(1000, 100);
+        energySum = 0;
+        nEnergyUpdates = 0;
         std::cout << "All best value was " << allBestValue << " found in " << meanEnergies[allBestPopulationIndex][allBestIndex] << std::endl;
-//        if(allBestValue < 1e-3 || cycle < 5) {
-            energySum = 0;
-            nEnergyUpdates = 0;
-            for(int i = 0; i < nPopulations; i++) {
-                // Avoid the random newcomers by selecting the first three quarters (the best and their children)
-                for(uint j = 0; j < bestIndices[i].size() * 2. / 4.; j++) {
-                    int index = bestIndices[i][j];
-//                    int index = j;
-                    double meanEnergy = meanEnergies[i][index] /*/ meanEnergyCycles[i][index]*/;
-//                    std::cout << "Mean energies: " << index << "\t" << meanEnergy <<  "\tdiff: " << values[i][index] << std::endl;
-                    energySum += meanEnergy;
-                    nEnergyUpdates++;
-                    meanEnergies[i][index] = 0;
-                    meanEnergyCycles[i][index] = 0;
-                }
+        //        if(allBestValue < 1e-3 || cycle < 5) {
+        for(int i = 0; i < nPopulations; i++) {
+            // Avoid the random newcomers by selecting the first three quarters (the best and their children)
+            for(uint j = 0; j < bestIndices[i].size() * 3. / 4.; j++) {
+                int index = bestIndices[i][j];
+                //                    int index = j;
+                double meanEnergy = meanEnergies[i][index] /*/ meanEnergyCycles[i][index]*/;
+                //                    std::cout << "Mean energies: " << index << "\t" << meanEnergy <<  "\tdiff: " << values[i][index] << std::endl;
+                energySum += meanEnergy;
+                nEnergyUpdates++;
+                totalSum += meanEnergy;
+                totalSamples++;
+                meanEnergies[i][index] = 0;
+                meanEnergyCycles[i][index] = 0;
             }
-            trialEnergy = energySum / nEnergyUpdates;
-//            trialEnergy = lowestEnergy;
-            std::cout << "New trial energy " << trialEnergy << std::endl;
-//        }
+        }
+        trialEnergy = energySum / nEnergyUpdates;
+        //            trialEnergy = lowestEnergy;
+        std::cout << "New trial energy " << trialEnergy << std::endl;
+        std::cout << "Total average " << totalSum / totalSamples << std::endl;
+        //        }
     }
     m_energy = trialEnergy;
 }
