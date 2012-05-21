@@ -45,12 +45,12 @@ double EvolutionaryMonteCarlo::fitness(vec &genes, int population, int individua
     // sample energies around these positions
     double totalEnergy = 0;
     int nTotalSamples = 0;
-    int branchingSum = 0;
+//    int branchingSum = 0;
     for(int sample = 0; sample < nWalkerSamples; sample++) {
         for(int i = 0; i < nWalkers; i++) {
 
             EvolutionaryWalker* walker = walkers[i];
-            double oldEnergy = walker->energy();
+//            double oldEnergy = walker->energy();
             walker->advance();
             //            if(sample > nWalkerSamples * 5 / 10) {
             double newEnergy = walker->energy();

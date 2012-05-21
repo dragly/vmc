@@ -116,7 +116,7 @@ void Evolver::evolve(int nCycles, int populationMatchingPeriod)
             for(int j = 0; j < nIndividuals / 2; j++) {
                 uint individualIndex = bestIndices[i][nIndividuals / 2 + j];
                 vec &genes = populations[i][individualIndex]; // note the use of reference!
-                for(int k = 0; k < nGenes / 4; k++) {
+                for(int k = 0; k < nGenes; k++) {
                     int randomGene = ran2(idum) * nGenes;
     //                double gauss = simpleGaussRandom(idum);
                     double gauss = ran2(idum);

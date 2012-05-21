@@ -41,6 +41,7 @@ void Orbital::gradient(const vec2 &r, vec2 &rGradient) const {
     double Hy = Hermite::evaluate(m_ny, sqrtAlphaOmega * y);
     double dHx = Hermite::derivative(m_nx, sqrtAlphaOmega * x);
     double dHy = Hermite::derivative(m_ny, sqrtAlphaOmega * y);
+//    std::cout << x<< " " << y << " " << evaluation << " " << Hx << " " << Hy << " " << dHx << " " << dHy << std::endl;
     rGradient[0] = Hy * (sqrtAlphaOmega * dHx - Hx * alphaOmega * x);
     rGradient[1] = Hx * (sqrtAlphaOmega * dHy - Hy * alphaOmega * y);
     rGradient[0] *= evaluation;

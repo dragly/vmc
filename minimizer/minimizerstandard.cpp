@@ -32,6 +32,7 @@ MinimizerStandard::MinimizerStandard(Config *config) :
 {
     m_wave = config->wave();
     m_hamiltonian = config->hamiltonian();
+    m_monteCarlo = config->monteCarlo();
 }
 
 void MinimizerStandard::loadConfiguration(INIParser *settings)
@@ -93,7 +94,6 @@ void MinimizerStandard::runMinimizer()
     for (int i=0; i < nVariations; i++){
         parameters[1] = betaStart;
         for (int j=0; j < nVariations; j++){
-            m_monteCarlo = MonteCarlo::fromName(config->monteCarloClass(), config);
             std::cout << "Testing parameters " << parameters[0] << " " << parameters[1] << std::endl;
             std::cout << "with " << m_nCycles << " cycles" << std::endl;
             m_wave->setParameters(parameters);

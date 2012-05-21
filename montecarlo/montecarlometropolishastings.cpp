@@ -9,7 +9,8 @@ MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(Config *config) :
     MonteCarlo(config),
     rank(config->rank()),
     stepLength(config->stepLength()),
-    hamiltonian(config->hamiltonian())
+    hamiltonian(config->hamiltonian()),
+    firstSample(true)
 {
     // allocate matrices which contain the position of the particles
     rOld = new vec2[ nParticles];
@@ -38,12 +39,15 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
     if(recordMoves) {
         nthMove = nCycles * nParticles / (nMoves);
     }
-    //  initial trial position, note calling with alpha
-    for (int i = 0; i < nParticles; i++) {
-        for (int j=0; j < nDimensions; j++) {
-            rOld[i][j] = stepLength*(ran2(idumMC)-0.5);
+    if(firstSample) {
+        //  initial trial position, note calling with alpha
+        for (int i = 0; i < nParticles; i++) {
+            for (int j=0; j < nDimensions; j++) {
+                rOld[i][j] = stepLength*(ran2(idumMC)-0.5);
+            }
+            rNew[i] = rOld[i];
         }
-        rNew[i] = rOld[i];
+//        firstSample = false;
     }
     wave->initialize(rOld);
     //    wave->gradient(rOld, 0, waveGradientOld); // TODO add particle number
@@ -116,7 +120,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
             }
         }  //  end of loop over particles
     }
-    std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
+//    std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
     m_energy /= (nCycles * nParticles);
     m_energySquared /= (nCycles * nParticles);
 }

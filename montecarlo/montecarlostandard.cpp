@@ -10,7 +10,8 @@
 MonteCarloStandard::MonteCarloStandard(Config *config) :
     MonteCarlo(config),
     rank(config->rank()),
-    stepLength(config->stepLength())
+    stepLength(config->stepLength()),
+    firstSample(true)
 {
     // allocate matrices which contain the position of the particles
     rOld = new vec2[ nParticles];
@@ -47,7 +48,8 @@ void MonteCarloStandard::sample(int nCycles)
     }
     // initialisations of variational parameters and energies
     m_energy = m_energySquared = 0; localEnergy=0;
-    //  initial trial position, note calling with alpha
+
+    //  initial trial position
     for (int i = 0; i < nParticles; i++) {
         for (int j=0; j < nDimensions; j++) {
             rOld[i][j] = stepLength*(ran2(idumMC)-0.5);

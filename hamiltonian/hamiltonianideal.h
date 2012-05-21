@@ -11,6 +11,7 @@ class HamiltonianIdeal : public Hamiltonian
 public:
     HamiltonianIdeal(Config *config);
     double energy(WaveFunction *wave, vec2 r[]);
+    double omega;
 };
 
 #endif // HAMILTONIANIDEAL_H

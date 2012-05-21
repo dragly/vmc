@@ -21,6 +21,7 @@ private:
     double stepLength;
     vec2 *rOld;
     vec2 *rNew;
+    bool firstSample;
 };
 
 #endif // MONTECARLOSTANDARD_H

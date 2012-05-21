@@ -12,7 +12,6 @@ void EvolutionaryWalker::advance() {
     m_changeInEnergySamples = 0;
     m_energy = 0;
     for(int i = 0; i < nParticles; i++) {
-
         // Propose move (with quantum force)
         for(int k = 0; k < nDimensions; k++) {
             // TODO per cartesian component tau?

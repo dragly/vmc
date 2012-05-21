@@ -29,8 +29,8 @@ Jastrow::Jastrow(Config *config) :
 }
 
 Jastrow::~Jastrow() {
-    delete rOld;
-    delete rNew;
+    delete [] rOld;
+    delete [] rNew;
 }
 
 void Jastrow::initialize(vec2 positions[]) {
@@ -158,6 +158,7 @@ double Jastrow::ratio(vec2 &r, int movedParticle)
 //    }
     // we only need to update the elements in the matrix that are affected by the move of one particle
     double argumentChange = 0;
+    vec2 diff;
     for(int i = 0; i < nParticles; i++) {
         if(i != movedParticle) {
             int row = -1;
@@ -169,7 +170,7 @@ double Jastrow::ratio(vec2 &r, int movedParticle)
                 row = movedParticle;
                 col = i;
             }
-            vec2 diff = rNew[i] - r;
+            diff = rNew[i] - r;
             distancesNew.at(row,col) = norm(diff,2);
             jastrowArgumentsNew.at(row,col) = argument(row,col,distancesNew);
             argumentChange += jastrowArgumentsNew.at(row,col) - jastrowArgumentsOld.at(row,col);

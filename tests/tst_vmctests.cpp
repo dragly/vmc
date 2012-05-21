@@ -39,6 +39,7 @@ public:
     // old tests
     void waveSimpleGradientTest(); // TODO - consider implementing this again
     // quick tests
+    void orbitalGradientTest();
     void initTestCase();
     void orbitalTest();
     void cleanupTestCase();
@@ -49,7 +50,6 @@ public:
     void slaterFourParticleTest();
     void waveSlaterSixParticleTest();
     void slaterRatioTest();
-    void orbitalGradientTest();
     void orbitalLaplaceTest();
     void jastrowTest();
     void jastrowRatioTest();
@@ -67,12 +67,12 @@ public:
     // unfinished tests
     void evolverTest();
     void diffusionMonteCarloTest();
-    void minimizerEvolutionaryTest();
+    void evolutionaryMonteCarloTest();
 private slots:
     // quick tests
     // slow tests
     // unfinished tests
-    void evolutionaryMonteCarloTest();
+    void minimizerEvolutionaryTest();
 
 private:
     Config *oldConfig;
@@ -677,6 +677,7 @@ void VmcTests::orbitalGradientTest()
                 config1->setOmega(0.23 * p);
                 //                            std::cout << std::endl << "Orbital " << nx  << " " << ny << std::endl;
                 Orbital *orbital = new Orbital(nx,ny,config1);
+                orbital->setParameters(parameters);
 
                 vec2 rPlus;
                 vec2 rMinus;
@@ -698,8 +699,8 @@ void VmcTests::orbitalGradientTest()
                         double wfminus = orbital->evaluate(rMinus);
                         double wfplus  = orbital->evaluate(rPlus);
                         simpleGradient[j] = (wfplus - wfminus)/(2*hstep);
-                        //                                            std::cout << analyticalGradient[j] << " " << simpleGradient[j] << std::endl;
-                        QVERIFY(fabs(analyticalGradient[j] - simpleGradient[j]) < 1e-6);
+//                        std::cout << analyticalGradient[j] << " " << simpleGradient[j] << std::endl;
+                        QVERIFY(fabs(analyticalGradient[j] - simpleGradient[j]) < 1e-4);
                     }
                 }
                 delete orbital;
@@ -855,17 +856,21 @@ void VmcTests::evolverTest()
 void VmcTests::minimizerEvolutionaryTest() {
     QBENCHMARK {
         Config *config = new Config(0, 1);
-        config->setNParticles(2);
+        config->setNParticles(6);
         config->setNDimensions(2);
+        config->setOmega(1);
         WaveFunction *wave = new WaveSlater(config);
         wave->setUseAnalyticalGradient(true);
         wave->setUseAnalyticalLaplace(true);
         config->setWave(wave);
         config->setHamiltonian(new HamiltonianIdeal(config));
         config->setMonteCarlo(new MonteCarloStandard(config));
+//        config->setMonteCarlo(new MonteCarloMetropolisHastings(config));
         MinimizerEvolutionary *evolver = new MinimizerEvolutionary(config);
-        evolver->constructor(2, 8, 2);
-        evolver->setRescaleLimits(log(0.5), log(1.0));
+        evolver->setNSamples(100, 2000);
+        evolver->constructor(2, 16, 2);
+        evolver->setRescaleLimits(log(0.1), log(2));
+        evolver->setRescaleCycles(2);
 //        evolver->setGeneLimits(0.3, 1.2);
         evolver->runMinimizer();
 

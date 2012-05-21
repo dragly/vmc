@@ -2,10 +2,12 @@
 #include "../matrix.h"
 #include "../utils.h"
 #include "../wavefunction/wavefunction.h"
+#include "../config.h"
 #include <math.h>
 
 HamiltonianIdeal::HamiltonianIdeal(Config *config) :
-    Hamiltonian(config)
+    Hamiltonian(config),
+    omega(config->omega())
 {
 }
 int ntries = 0;
@@ -13,7 +15,6 @@ double HamiltonianIdeal::energy(WaveFunction *wave, vec2 r[])
 {
     double eLocal, eKinetic, ePotential,
             rSingleParticle;
-    double omega = 1;
     // compute the kinetic energy
     // TODO: Create a derivative-finder function that uses interpolation to approximate the derivative
     // TODO: Add the number of the particle that has been moved

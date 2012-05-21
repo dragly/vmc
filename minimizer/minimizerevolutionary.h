@@ -24,6 +24,12 @@ public:
 
     void startEvolution();
 
+    void setNSamples(int nStart, int nEnd) {
+        nSamples = nStart;
+        nSamplesStart = nStart;
+        nSamplesEnd = nEnd;
+    }
+
 private:
     double fitness(vec &coefficients, int population, int individual);
 
@@ -31,6 +37,13 @@ private:
     WaveFunction *wave;
     MonteCarlo *monteCarlo;
     Hamiltonian *hamiltonian;
+
+    double nSamples;
+
+    vec* energies;
+
+    int nSamplesStart;
+    int nSamplesEnd;
 };
 
 #endif // MINIMIZEREVOLUTIONARY_H

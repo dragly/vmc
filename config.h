@@ -46,9 +46,9 @@ public:
         return m_hamiltonian;
     }
 
-    string monteCarloClass() const
+    MonteCarlo* monteCarlo() const
     {
-        return m_monteCarloClass;
+        return m_monteCarlo;
     }
 
     double stepLength() const

@@ -27,6 +27,7 @@ private:
 //    vec forceVectorDiff ;
     vec2 positionDiff ;
     Hamiltonian* hamiltonian;
+    bool firstSample;
 };
 
 #endif // MONTECARLOMETROPOLISHASTINGS_H
