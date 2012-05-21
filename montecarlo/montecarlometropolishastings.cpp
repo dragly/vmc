@@ -39,15 +39,12 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
     if(recordMoves) {
         nthMove = nCycles * nParticles / (nMoves);
     }
-    if(firstSample) {
-        //  initial trial position, note calling with alpha
-        for (int i = 0; i < nParticles; i++) {
-            for (int j=0; j < nDimensions; j++) {
-                rOld[i][j] = stepLength*(ran2(idumMC)-0.5);
-            }
-            rNew[i] = rOld[i];
+    //  initial trial position, note calling with alpha
+    for (int i = 0; i < nParticles; i++) {
+        for (int j=0; j < nDimensions; j++) {
+            rOld[i][j] = stepLength*(ran2(idumMC)-0.5);
         }
-//        firstSample = false;
+        rNew[i] = rOld[i];
     }
     wave->initialize(rOld);
     //    wave->gradient(rOld, 0, waveGradientOld); // TODO add particle number

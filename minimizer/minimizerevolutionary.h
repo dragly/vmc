@@ -8,6 +8,8 @@ using namespace arma;
 #include "minimizer.h"
 #include "../evolver/evolver.h"
 
+class EvolutionaryWalker;
+
 /*!
     An evolutionary approach to minimizing the energy by selection of
     the parameters. This class is written with the intention to be as
@@ -36,6 +38,7 @@ private:
     // Monte Carlo stuff
     WaveFunction *wave;
     MonteCarlo *monteCarlo;
+    EvolutionaryWalker *walker;
     Hamiltonian *hamiltonian;
 
     double nSamples;
@@ -44,6 +47,10 @@ private:
 
     int nSamplesStart;
     int nSamplesEnd;
+    int nParticles;
+    int nDimensions;
+    double stepLength;
+    int nCycles;
 };
 
 #endif // MINIMIZEREVOLUTIONARY_H

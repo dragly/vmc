@@ -10,3 +10,11 @@ Set up a scripting system that takes care of running different configurations at
 - check whether the data for the given run already exists - if it does, the data should not be recreated
 - SSH into each machine and execute the program with the number of available processors or 1 if specified in the config file
 - add lock mechanism so that the same run is not being performed by two processors at the same time
+
+Evolutionary algorithm:
+Create a walker that is based on brute force monte carlo
+Use this walker instead of MonteCarloStandard
+(Make MonteCarloStandard use this walker)
+Give an walker to each individual
+Let each individual reuse its walker's positions
+Let the other coefficients/genes determine the new walker's initial positions?

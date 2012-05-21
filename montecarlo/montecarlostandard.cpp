@@ -18,7 +18,7 @@ MonteCarloStandard::MonteCarloStandard(Config *config) :
     rNew = new vec2[ nParticles];
     for (int i = 0; i < nParticles; i++) {
         for (int j=0; j < nDimensions; j++) {
-            rOld[i][j] = rNew[i][j] = 0;
+            rOld[i][j] = rNew[i][j] = stepLength*(ran2(idumMC)-0.5);
         }
     }
     m_allEnergies = new double[1]; // dummy array that can be deleted when sampling with energy storage
@@ -50,11 +50,14 @@ void MonteCarloStandard::sample(int nCycles)
     m_energy = m_energySquared = 0; localEnergy=0;
 
     //  initial trial position
-    for (int i = 0; i < nParticles; i++) {
-        for (int j=0; j < nDimensions; j++) {
-            rOld[i][j] = stepLength*(ran2(idumMC)-0.5);
+    if(firstSample) {
+        for (int i = 0; i < nParticles; i++) {
+            for (int j=0; j < nDimensions; j++) {
+                rOld[i][j] = stepLength*(ran2(idumMC)-0.5);
+            }
+            rNew[i] = rOld[i];
         }
-        rNew[i] = rOld[i];
+//        firstSample = false;
     }
     wave->initialize(rOld);
     // TODO Optimize step length by Newton's method

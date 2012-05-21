@@ -56,6 +56,10 @@ public:
         return m_stepLength;
     }
 
+    void setStepLength(double arg) {
+        m_stepLength = arg;
+    }
+
     void loadConfiguration(INIParser *settings);
 
     void setWave(WaveFunction* arg)

@@ -119,17 +119,20 @@ void Evolver::evolve(int nCycles, int populationMatchingPeriod)
                 for(int k = 0; k < nGenes; k++) {
                     int randomGene = ran2(idum) * nGenes;
     //                double gauss = simpleGaussRandom(idum);
-                    double gauss = ran2(idum);
+                    double gauss = 2 * ran2(idum) - 1;
                     genes[randomGene] += gauss * scale;
                 }
             }
         }
 
-        // Introduction of completely new individuals
+        // Introduction of completely new individuals, generated from the best but with random additions
         for(int i = 0; i < nPopulations; i++) {
             for(int j = 0; j < nIndividuals / 4; j++) {
                 uint individualIndex = bestIndices[i][3 * nIndividuals / 4 + j];
-                populations[i][individualIndex] = randu<vec>(nGenes) * scale;
+                for(int k = 0; k < nGenes; k++) {
+                    double gauss = 2 * ran2(idum) - 1;
+                    populations[i][individualIndex][k] = allBestGenes[k] + gauss * scale;
+                }
             }
         }
 

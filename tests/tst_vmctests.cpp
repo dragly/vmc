@@ -856,10 +856,15 @@ void VmcTests::evolverTest()
 void VmcTests::minimizerEvolutionaryTest() {
     QBENCHMARK {
         Config *config = new Config(0, 1);
-        config->setNParticles(6);
+        config->setNParticles(12);
         config->setNDimensions(2);
         config->setOmega(1);
+        config->setStepLength(2.0);
         WaveFunction *wave = new WaveSlater(config);
+        double parameters[2];
+        parameters[0] = 999;
+        parameters[1] = 999;
+        wave->setParameters(parameters);
         wave->setUseAnalyticalGradient(true);
         wave->setUseAnalyticalLaplace(true);
         config->setWave(wave);
@@ -867,7 +872,7 @@ void VmcTests::minimizerEvolutionaryTest() {
         config->setMonteCarlo(new MonteCarloStandard(config));
 //        config->setMonteCarlo(new MonteCarloMetropolisHastings(config));
         MinimizerEvolutionary *evolver = new MinimizerEvolutionary(config);
-        evolver->setNSamples(100, 2000);
+        evolver->setNSamples(100, 1000000);
         evolver->constructor(2, 16, 2);
         evolver->setRescaleLimits(log(0.1), log(2));
         evolver->setRescaleCycles(2);
