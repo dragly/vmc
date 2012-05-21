@@ -65,13 +65,13 @@ public:
     void fullIdealHastingsSlaterTest();
 
     // unfinished tests
-    void minimizerEvolutionaryTest();
     void evolverTest();
+    void diffusionMonteCarloTest();
+    void minimizerEvolutionaryTest();
 private slots:
     // quick tests
     // slow tests
     // unfinished tests
-    void diffusionMonteCarloTest();
     void evolutionaryMonteCarloTest();
 
 private:
@@ -228,7 +228,7 @@ void VmcTests::slaterInverse() {
                         QCOMPARE(analyticalInverse.at(i,j), numericalInverse.at(i,j));
                     }
                 }
-                slater1->acceptEvaluation(movedParticle);
+                slater1->acceptMove(movedParticle);
             }
         }
     }
@@ -833,7 +833,7 @@ void VmcTests::evolverTest()
 {
     QBENCHMARK {
         FunctionEvolver *evolver = new FunctionEvolver(16, 32, 4);
-        evolver->setScaleLimits(-1, 1);
+        evolver->setRescaleLimits(-1, 1);
         evolver->evolve(1000,250);
 //        std::cout << evolver->fitnessResult << std::endl;
         evolver->calculate(evolver->allBestGenes);
@@ -864,7 +864,9 @@ void VmcTests::minimizerEvolutionaryTest() {
         config->setHamiltonian(new HamiltonianIdeal(config));
         config->setMonteCarlo(new MonteCarloStandard(config));
         MinimizerEvolutionary *evolver = new MinimizerEvolutionary(config);
-        evolver->setScaleLimits(-1, 1);
+        evolver->constructor(2, 8, 2);
+        evolver->setRescaleLimits(log(0.5), log(1.0));
+//        evolver->setGeneLimits(0.3, 1.2);
         evolver->runMinimizer();
 
         delete evolver;
@@ -880,8 +882,10 @@ void VmcTests::diffusionMonteCarloTest() {
     config->setTau(0.01);
 
     double parameters[2];
-    parameters[0] = 0.989;
-    parameters[1] = 0.4;
+    parameters[0] = 0.987;
+    parameters[1] = 0.398;
+//        parameters[0] = 0.92;
+//        parameters[1] = 0.4;
 //    parameters[0] = 0.92;
 //    parameters[1] = 0.565;
 
@@ -895,7 +899,7 @@ void VmcTests::diffusionMonteCarloTest() {
     config->setHamiltonian(hamiltonianIdeal);
 
     DiffusionMonteCarlo *diffusionMonteCarlo = new DiffusionMonteCarlo(config);
-    diffusionMonteCarlo->sample(3000);
+    diffusionMonteCarlo->sample(40000);
     double energy = diffusionMonteCarlo->energy();
     std::cout << "Diffusion monte carlo returned energy of " << energy << std::endl;
     QVERIFY(fabs(energy - 3.000) < 1e-2);
@@ -908,8 +912,8 @@ void VmcTests::evolutionaryMonteCarloTest() {
     config->setInteractionEnabled(true);
 
     double parameters[2];
-    parameters[0] = 0.989;
-    parameters[1] = 0.4;
+    parameters[0] = 0.987;
+    parameters[1] = 0.398;
 //    parameters[0] = 0.92;
 //    parameters[1] = 0.565;
 
@@ -922,8 +926,14 @@ void VmcTests::evolutionaryMonteCarloTest() {
     Hamiltonian *hamiltonianIdeal = new HamiltonianIdeal(config);
     config->setHamiltonian(hamiltonianIdeal);
 
-    EvolutionaryMonteCarlo *evolutionary = new EvolutionaryMonteCarlo(config, 64, 32, 2);
-    evolutionary->sample(10);
+    int nWalkers = 40;
+    int nGenes = nWalkers * config->nParticles() * config->nDimensions();
+    int nIndividuals = 16;
+    int nPopulations = 1;
+    EvolutionaryMonteCarlo *evolutionary = new EvolutionaryMonteCarlo(config, nGenes, nIndividuals, nPopulations);
+    evolutionary->setRescaleLimits(-2, 0);
+    evolutionary->setRescaleCycles(5);
+    evolutionary->sample(100000);
     double energy = evolutionary->energy();
     std::cout << "Evolutionary monte carlo returned energy of " << energy << std::endl;
     QVERIFY(fabs(energy - 3.000) < 1e-2);

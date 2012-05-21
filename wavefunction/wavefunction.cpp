@@ -149,7 +149,7 @@ void WaveFunction::rejectMove() {
 }
 
 void WaveFunction::initialize(vec2 r[]) {
-    previousEvaluation = evaluate(r);
+//    previousEvaluation = evaluate(r);
     for(int i = 0; i < nParticles; i++) {
         rNew[i] = r[i];
         rOld[i] = r[i];

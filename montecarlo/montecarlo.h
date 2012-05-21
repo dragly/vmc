@@ -26,6 +26,7 @@ public:
     }
     void setTerminalizationEnabled(bool arg) {
         terminalized = !arg;
+        terminalizationTrials = 0;
     }
 
     vec2 **moves() {
@@ -42,7 +43,7 @@ protected:
     double m_energy;
     double m_energySquared;
     double *m_allEnergies;
-    long *idum;
+    long *idumMC;
 
     double terminalizationSum;
     int terminalizationNum;

@@ -45,7 +45,7 @@ private:
     Config *config;
     WaveFunction *m_wave;
     INIParser *m_settings;
-    long idum;
+    long *idum;
     vec2 *r_old;
     vec2 *r_new;
     double m_charge;

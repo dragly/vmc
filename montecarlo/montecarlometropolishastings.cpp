@@ -41,7 +41,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
     //  initial trial position, note calling with alpha
     for (int i = 0; i < nParticles; i++) {
         for (int j=0; j < nDimensions; j++) {
-            rOld[i][j] = stepLength*(ran2(idum)-0.5);
+            rOld[i][j] = stepLength*(ran2(idumMC)-0.5);
         }
         rNew[i] = rOld[i];
     }
@@ -60,7 +60,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
             quantumForceOld *= 2;
             for (int k=0; k < nDimensions; k++) {
                 int qfIndex = i * nDimensions + k;
-                rNew[i][k]= rOld[i][k] +  diffConstant * quantumForceOld[qfIndex] * stepLength + sqrt(2 * diffConstant * stepLength) * simpleGaussRandom(idum);
+                rNew[i][k]= rOld[i][k] +  diffConstant * quantumForceOld[qfIndex] * stepLength + sqrt(2 * diffConstant * stepLength) * simpleGaussRandom(idumMC);
             }
 
             // The Metropolis test is performed by moving one particle at the time
@@ -79,7 +79,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
 
             double ratio = wave->ratio(rNew[i], i);
             double weight = ratio*ratio * greensRatio;
-            if(ran2(idum) <= weight) {
+            if(ran2(idumMC) <= weight) {
                 rOld[i] = rNew[i];
                 wave->acceptMove(i);
                 if(terminalized) {

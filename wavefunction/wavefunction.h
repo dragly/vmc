@@ -45,7 +45,6 @@ public:
     ~WaveFunction();
 protected:
     Config *config;
-    int previousMovedParticle;
     int nParticles;
     int nDimensions;
     double *parameters;

@@ -1,6 +1,9 @@
 #include "diffusionwalker.h"
 
 #include "../random.h"
+#include "../wavefunction/waveslater.h"
+#include "../slater/slater.h"
+#include "../jastrow/jastrow.h"
 
 DiffusionWalker::DiffusionWalker(Config *config, DiffusionWalker **otherWalkers_, int nOtherWalkers_) :
     Walker(config),
@@ -8,16 +11,25 @@ DiffusionWalker::DiffusionWalker(Config *config, DiffusionWalker **otherWalkers_
     nWalkersMax(nOtherWalkers_),
     diffConstant(config->diffusionConstant()),
     tau(config->tau()),
-    idum(config->idum())
+    m_aliveNew(false),
+    m_aliveOld(false)
 {
 }
 
 void DiffusionWalker::advance(double trialEnergy) {
-    m_changeInWalkersAlive = 0;
+    Walker::advance();
     m_changeInEnergySamples = 0;
     m_energy = 0;
     for(int i = 0; i < nParticles; i++) {
-        wave->gradient(rOld, i, quantumForceOld);
+        // TODO Remove the forced init
+//                wave->initialize(rOld);
+//        WaveSlater* waveSlater = (WaveSlater*)wave;
+////        waveSlater->evaluate(rOld);
+//        waveSlater->slaterDown->initialize(rOld);
+//        waveSlater->slaterUp->initialize(rOld);
+//        waveSlater->jastrow->calculateDistances(rOld);
+//        wave->gradient(rOld, i, quantumForceOld);
+//        localEnergyOld = hamiltonian->energy(wave, rOld);
 
         // Propose move (with quantum force)
         for(int k = 0; k < nDimensions; k++) {
@@ -49,40 +61,41 @@ void DiffusionWalker::advance(double trialEnergy) {
             if(weight > ran2(idum)) {
                 wave->acceptMove(i);
                 rOld[i] = rNew[i];
+                quantumForceOld = quantumForceNew;
             } else {
                 wave->rejectMove();
                 rNew[i] = rOld[i];
             }
         } else {
             wave->rejectMove();
+            rNew[i] = rOld[i];
         }
-
+//        wave->initialize(rNew);
         // Compute branching factor PB
         localEnergyNew = hamiltonian->energy(wave, rNew);
+//        std::cout << "Energies: " << rNew[0][0] << "," << rNew[0][1] <<" " << rNew[1][0] << "," << rNew[1][1] << ": " << localEnergyNew << " " << localEnergyOld << std::endl;
         double branchingFactor = exp(- tau * (0.5 * (localEnergyOld + localEnergyNew) - trialEnergy));
         // Make int(PB + u) copies
 //                std::cout << "PB: " << branchingFactor << " " << trialEnergy << " " << localEnergyOld << " " << localEnergyNew << std::endl;
         int reproductions = (int) (branchingFactor + ran2(idum));
 //                std::cout << reproductions << std::endl;
+        // Accumulate the energy and any observables weighted by PB
+        m_energy += localEnergyNew * branchingFactor;
+        m_changeInEnergySamples++;
         if(reproductions == 0) {
-//                    std::cout << "Killing walker" << std::endl;
-            m_changeInWalkersAlive--;
+//            std::cout << "Killing walker" << std::endl;
             m_aliveNew = false;
         } else {
-            // Accumulate the energy and any observables weighted by PB
-            m_energy += localEnergyNew * branchingFactor;
-            m_changeInEnergySamples++;
             if(reproductions > 1) {
                 for(int repro = 0; repro < reproductions; repro++) {
-//                            std::cout << "Good choice!" << std::endl;
+//                    std::cout << "Reproduction" << std::endl;
                     bool foundDeadWalker = false;
                     for(int walkerIndex = 0; walkerIndex < nWalkersMax; walkerIndex++) {
                         DiffusionWalker *otherWalker = otherWalkers[walkerIndex];
                         // find a dead walker to ressurect
                         if(!otherWalker->aliveNew() && !foundDeadWalker) {
-                            m_changeInWalkersAlive ++;
                             otherWalker->setAliveNew(true);
-                            otherWalker->copyFromOther(this);
+                            otherWalker->copyOtherWalker(this);
                             foundDeadWalker = true;
                             break;
                         }

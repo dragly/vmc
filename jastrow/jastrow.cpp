@@ -42,10 +42,11 @@ void Jastrow::initialize(vec2 positions[]) {
 /*!
   */
 void Jastrow::calculateDistances(vec2 r[]) {
+    vec2 diff;
     for(int i = 0; i < nParticles; i++) {
         rNew[i] = r[i];
         for(int j = i + 1; j < nParticles; j++) {
-            vec2 diff = r[i] - r[j];
+            diff = (r[i] - r[j]);
             distancesNew.at(i,j) = sqrt(dot(diff,diff));
             jastrowArgumentsNew.at(i,j) = argument(i,j,distancesNew);
         }
@@ -54,7 +55,7 @@ void Jastrow::calculateDistances(vec2 r[]) {
     jastrowArgumentsNew = symmatu(jastrowArgumentsNew); // reflect the upper triangle to the lower
 }
 
-void Jastrow::acceptEvaluation(int movedParticle)
+void Jastrow::acceptMove(int movedParticle)
 {
     (void)movedParticle;
     for(int i = 0; i < nParticles; i++) {
@@ -64,7 +65,7 @@ void Jastrow::acceptEvaluation(int movedParticle)
     jastrowArgumentsOld = jastrowArgumentsNew;
 }
 
-void Jastrow::refuseEvaluation()
+void Jastrow::rejectMove()
 {
     for(int i = 0; i < nParticles; i++) {
         rNew[i] = rOld[i];
@@ -175,7 +176,6 @@ double Jastrow::ratio(vec2 &r, int movedParticle)
         }
     }
 //    jastrowArgumentsNew = jastrowArgumentsOld;
-//    calculateDistances(rNew);
 //    for(int i = 0; i < nParticles; i++) {
 //        for(int j = i + 1; j < nParticles; j++) {
 //            argumentChange += jastrowArgumentsOld.at(i,j) - jastrowArgumentsNew.at(i,j);

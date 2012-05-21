@@ -9,7 +9,7 @@ MonteCarlo::MonteCarlo(Config *config) :
     nDimensions(config->nDimensions()),
     m_energy(0),
     m_energySquared(0),
-    idum(config->idum()),
+    idumMC(config->idum()),
     terminalizationSum(0),
     terminalizationNum(0),
     terminalized(false),
@@ -51,10 +51,9 @@ void MonteCarlo::checkTerminalization(double localEnergy) {
     if(!(cycle % 1000)) {
         double terminalizationAverage = terminalizationSum / terminalizationNum;
         diffAverage = fabs(terminalizationAverage - prevTerminalizationAverage);
-        if(diffAverage < 2 && terminalizationTrials > 100) {
+        if(diffAverage < 2 && terminalizationTrials > 50) {
             terminalized = true;
             cycle = 0;
-            std::cout << "Terminalization trials " << terminalizationTrials << std::endl;
         }
         prevTerminalizationAverage = terminalizationAverage;
         terminalizationSum = 0;

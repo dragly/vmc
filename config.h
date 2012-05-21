@@ -126,8 +126,8 @@ private:
     double m_omega;
     bool m_interactionEnabled;
     long m_idum;
-    double m_tau;
     double m_diffusionConstant;
+    double m_tau;
 };
 
 #endif // CONFIG_H

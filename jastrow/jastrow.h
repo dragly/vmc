@@ -17,11 +17,11 @@ public:
     void setParameters(double *parameters);
     void calculateDistances(vec2 r[]);
     void initialize(vec2 positions[]);
-    void acceptEvaluation(int movedParticle);
+    void acceptMove(int movedParticle);
     double argument(int i, int j, mat &distances);
 
     void gradient(vec2 r[], int movedParticle, vec &rGradient);
-    void refuseEvaluation();
+    void rejectMove();
     ~Jastrow();
     double laplacePartial(vec2 r[], int movedParticle);
 private:

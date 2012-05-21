@@ -116,16 +116,16 @@ void WaveSlater::initialize(vec2 positions[]) {
 // TODO update matrices with new values for moved particle
 void WaveSlater::acceptMove(int movedParticle) {
     WaveFunction::acceptMove(movedParticle);
-    slaterUp->acceptEvaluation(movedParticle);
-    slaterDown->acceptEvaluation(movedParticle);
-    jastrow->acceptEvaluation(movedParticle);
+    slaterUp->acceptMove(movedParticle);
+    slaterDown->acceptMove(movedParticle);
+    jastrow->acceptMove(movedParticle);
 }
 
 void WaveSlater::rejectMove() {
     WaveFunction::rejectMove();
-    slaterUp->refuseEvaluation();
-    slaterDown->refuseEvaluation();
-    jastrow->refuseEvaluation();
+    slaterUp->rejectMove();
+    slaterDown->rejectMove();
+    jastrow->rejectMove();
 }
 
 /*!
@@ -185,6 +185,13 @@ void WaveSlater::gradient(vec2 r[], int movedParticle, vec &rGradient) {
  */
 WaveFunction* WaveSlater::clone() {
     WaveSlater *myCopy = new WaveSlater(config);
-//    myCopy->initialize(rNew);
+    myCopy->setUseAnalyticalGradient(this->useAnalyticalGradient);
+    myCopy->setUseAnalyticalLaplace(this->useAnalyticalLaplace);
+    myCopy->interactionEnabled = this->interactionEnabled;
+    myCopy->setParameters(parameters);
+    myCopy->previousEvaluation = this->previousEvaluation;
+    myCopy->currentEvaluation = this->currentEvaluation;
+    myCopy->nParticles = this->nParticles;
+    myCopy->nDimensions = this->nDimensions;
     return myCopy;
 }

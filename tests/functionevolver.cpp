@@ -12,7 +12,7 @@ FunctionEvolver::FunctionEvolver(int nGenes, int nIndividuals, int nPopulations)
     x = linspace<vec>(-1, 1, 100);
     result = zeros<vec>(x.n_elem);
     for(uint j = 0; j < x.n_elem; j++) {
-        result[j] = exp(- 2 * x[j] * x[j]) * exp(- 3 * x[j] * x[j]) * 3 * exp(- 4 * x[j] * x[j]);
+        result[j] = exp(- 2 * x[j] * x[j]) * 3 * exp(- 4 * x[j] * x[j]) * 3 * exp(- 4 * x[j] * x[j]);
     }
     fitnessResult = zeros<vec>(x.n_elem);
 }
@@ -29,7 +29,7 @@ void FunctionEvolver::calculate(vec &coefficients) {
     }
 }
 
-double FunctionEvolver::fitness(vec &coefficients)
+double FunctionEvolver::fitness(vec &coefficients, int population, int individual)
 {
     calculate(coefficients);
     double diffSum = 0;

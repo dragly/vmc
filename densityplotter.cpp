@@ -23,14 +23,13 @@
 using namespace std;
 
 DensityPlotter::DensityPlotter(Config *config_) :
-    config(config_)
+    config(config_),
+    idum(config->idum())
 {
     if(config->nDimensions() != 2) {
         cerr << "Density plots only implemented for two dimensions!" << endl;
         exit(928);
     }
-    // every node has its own seed for the random numbers
-    idum = -1;
     // allocate matrices which contain the position of the particles
     r_old = new vec2[config->nParticles()];
     r_new = new vec2[config->nParticles()];
@@ -103,8 +102,8 @@ void DensityPlotter::makePlot()
             for (int cycle = 1; cycle <= m_nCycles; cycle++){
                 // new positions for all particles
                 for (int i = 1; i < config->nParticles(); i++) {
-                    r_new[i][0] = aMin + (aMax - aMin) * ran2(&idum);
-                    r_new[i][1] = bMin + (bMax - bMin) * ran2(&idum);
+                    r_new[i][0] = aMin + (aMax - aMin) * ran2(idum);
+                    r_new[i][1] = bMin + (bMax - bMin) * ran2(idum);
                 }  //  end of loop over particles
                 // compute probability
                 prob += m_wave->evaluate(r_new) * m_wave->evaluate(r_new) * (r_new[0][0] * r_new[0][0]  + r_new[0][1] * r_new[0][1]);

@@ -31,11 +31,11 @@ public:
     void gradient(vec2 r[], int movedParticle, vec &rGradient);
     void rejectMove();
     WaveFunction *clone();
+    Slater *slaterUp;
+    Slater *slaterDown;
+    Jastrow *jastrow;
     ~WaveSlater();
 private:
-    Slater *slaterDown;
-    Slater *slaterUp;
-    Jastrow *jastrow;
 
     Orbital **orbitals;
     bool interactionEnabled;

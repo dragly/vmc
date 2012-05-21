@@ -12,12 +12,14 @@ Evolver::Evolver()
 
 Evolver::Evolver(int nGenes, int nIndividuals, int nPopulations)
 {
-    constructor(nIndividuals, nGenes, nPopulations);
+    constructor(nGenes, nIndividuals, nPopulations);
 }
 
 void Evolver::constructor(int nGenes, int nIndividuals, int nPopulations) {
-    idum = -1;
-    currentCycle = 0;
+    idum = new long;
+    *idum = -1*time(NULL);
+    cycle = 0;
+    rescaleCycles = 50;
     this->nIndividuals = nIndividuals;
     this->nGenes = nGenes;
     this->nPopulations = nPopulations;
@@ -42,6 +44,8 @@ void Evolver::constructor(int nGenes, int nIndividuals, int nPopulations) {
     allBestValue = INFINITY;
     cyclesSinceLastImprovement = 0;
     cyclesSinceLastRescale = 0;
+    veryFirst = true;
+    cycle = 0;
 
     std::cout << "Done constructing" << std::endl;
 }
@@ -57,7 +61,10 @@ void Evolver::updateBest()
     for(int i = 0; i < nPopulations; i++) {
         for(int j = 0; j < nIndividuals; j++) {
             vec &genes = populations[i][j];
-            double value = fitness(genes);
+            double value = fitness(genes, i, j);
+            if(isnan(fabs(value))) {
+                value = INFINITY;
+            }
             values[i][j] = value;
             if(value < allBestValue) {
                 allBestValue = value;
@@ -72,14 +79,16 @@ void Evolver::updateBest()
 
 void Evolver::rescale()
 {
-    double expScale = lowScaleLimit + (highScaleLimit - lowScaleLimit) * ran2(&idum);
+    double expScale = lowScaleLimit + (highScaleLimit - lowScaleLimit) * ran2(idum);
     scale = pow(10,expScale);
 }
 
 void Evolver::evolve(int nCycles, int populationMatchingPeriod)
 {
-    updateBest();
-    for(int cycle = 0; cycle < nCycles; cycle++) {
+    if(cycle == 0) {
+        updateBest();
+    }
+    for(int localCycle = 0; localCycle < nCycles; localCycle++) {
         cyclesSinceLastImprovement++;
         cyclesSinceLastRescale++;
         // Mating of the first two quarters of individuals and add to the third quarter
@@ -92,7 +101,7 @@ void Evolver::evolve(int nCycles, int populationMatchingPeriod)
                 for(int k = 0; k < nGenes; k++) {
                     // a random selection of half of the genes comes from one parent
                     int parentIndex;
-                    if(ran2(&idum) > 0.5) {
+                    if(ran2(idum) > 0.5) {
                         parentIndex = parent1Index;
                     } else {
                         parentIndex = parent2Index;
@@ -108,9 +117,9 @@ void Evolver::evolve(int nCycles, int populationMatchingPeriod)
                 uint individualIndex = bestIndices[i][nIndividuals / 2 + j];
                 vec &genes = populations[i][individualIndex]; // note the use of reference!
                 for(int k = 0; k < nGenes / 4; k++) {
-                    int randomGene = ran2(&idum) * nGenes;
-    //                double gauss = simpleGaussRandom(&idum);
-                    double gauss = ran2(&idum);
+                    int randomGene = ran2(idum) * nGenes;
+    //                double gauss = simpleGaussRandom(idum);
+                    double gauss = ran2(idum);
                     genes[randomGene] += gauss * scale;
                 }
             }
@@ -127,8 +136,8 @@ void Evolver::evolve(int nCycles, int populationMatchingPeriod)
         // Merge populations every populationMatching step. Adds the best from one population to the other population.
         if(!(cycle % populationMatchingPeriod)) {
             for(int i = 0; i < nPopulations / 2; i++) {
-                int population1Index = (int)(ran2(&idum) * (nPopulations/2));
-                int population2Index = (int)((nPopulations/2) + ran2(&idum) * (nPopulations/2));
+                int population1Index = (int)(ran2(idum) * (nPopulations/2));
+                int population2Index = (int)((nPopulations/2) + ran2(idum) * (nPopulations/2));
                 if(population1Index != population2Index) {
                     for(int j = 0; j < nIndividuals / 2; j++) {
                         uint bestIndex1 = bestIndices[population1Index][j];
@@ -145,23 +154,23 @@ void Evolver::evolve(int nCycles, int populationMatchingPeriod)
         // Testing
         updateBest();
 
-        if(cyclesSinceLastImprovement > 50) {
+        if(cyclesSinceLastImprovement > rescaleCycles) {
             rescale();
-            cyclesSinceLastImprovement = 20;
+            cyclesSinceLastImprovement = rescaleCycles * 4. / 10.;
             cyclesSinceLastRescale = 0;
-        } else if(cyclesSinceLastImprovement > 45) {
+        } else if(cyclesSinceLastImprovement > rescaleCycles * 9. / 10.) {
             scale = lastWorkingScale;
-        } else if(cyclesSinceLastImprovement > 25) {
+        } else if(cyclesSinceLastImprovement > rescaleCycles / 2.) {
             scale *= 1.2;
         }
-        if(cyclesSinceLastRescale > 100) {
+        if(cyclesSinceLastRescale > rescaleCycles * 2) {
             lastWorkingScale = scale;
             rescale();
         }
 
 
-        std::cout << "All best value " << currentCycle << " " << allBestValue << " " << scale << std::endl;
-        currentCycle++;
+        std::cout << "All best value @ cycle " << cycle << ": " << allBestValue << " with scale " << scale << std::endl;
+        cycle++;
     }
 //    std::cout << "All best genes " << populations[allBestPopulationIndex][allBestIndex] << std::endl;
     std::cout << "All best value " << allBestValue << std::endl;
