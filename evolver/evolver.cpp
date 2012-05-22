@@ -20,8 +20,8 @@ void Evolver::setPopulationData(int nGenes, int nIndividuals, int nPopulations) 
     *idum = -1*time(NULL);
     cycle = 0;
     rescaleCycles = 50;
-    this->nIndividuals = nIndividuals;
     this->nGenes = nGenes;
+    this->nIndividuals = nIndividuals;
     this->nPopulations = nPopulations;
 
     lowScaleLimit = 1e-2;

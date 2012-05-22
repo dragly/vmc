@@ -871,10 +871,10 @@ void VmcTests::geneticMinimizerTest() {
         config->setMonteCarlo(new StandardMonteCarlo(config));
 //        config->setMonteCarlo(new MonteCarloMetropolisHastings(config));
         GeneticMinimizer *evolver = new GeneticMinimizer(config);
-        evolver->setNCycles(100);
+        evolver->setNCycles(1000);
         evolver->setNSamples(100, 20000);
         evolver->setPopulationData(2, 16, 2);
-        evolver->setRescaleLimits(log(0.1), log(2));
+        evolver->setRescaleLimits(0.1, 2);
         evolver->setRescaleCycles(2);
 //        evolver->setGeneLimits(0.3, 1.2);
         evolver->runMinimizer();

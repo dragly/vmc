@@ -39,19 +39,18 @@ private:
 
     double nSamples;
 
-    vec* energies;
-
     int nSamplesStart;
     int nSamplesEnd;
+    int nCycles;
+    vec* energies;
+
     int nParticles;
     int nDimensions;
     double stepLength;
-    int nCycles;
     // Monte Carlo stuff
     MonteCarlo *monteCarlo;
     WaveFunction *wave;
     Hamiltonian *hamiltonian;
-    EvolutionaryWalker *walker;
 };
 
 #endif // GENETICMINIMIZER_H

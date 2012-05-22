@@ -87,9 +87,9 @@ elif autoMode == "run":
 		subprocess.call(runCommand, shell=True)
 	    else:
 		print bcolors.OKGREEN + "Launching job for config " + configName + " on " + servers[i] + bcolors.ENDC
-		subprocess.Popen("ssh " + servers[i] +  " 'cd "+ currentDirectory + " && " + runCommand + " &> output-" + configName + " && echo " + servers[i] + " done'", shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+		subprocess.Popen("ssh " + servers[i] +  " 'cd "+ currentDirectory + " && " + runCommand + " &> output-" + configName + " && echo " + servers[i] + " done with " + configName + "'", shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
 		i += 1
-            print "You may watch the output from the servers in the output-* files."
+            print "You may watch the output from this job in the output-" + configName + " file."
 elif autoMode == "plot":
     minimizerList = ""
     densityList = ""

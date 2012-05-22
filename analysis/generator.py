@@ -20,13 +20,12 @@ config = ConfigParser.ConfigParser()
 config.readfp(open(runFolder + "/" + configName + "/" + configFileName))
 mode = config.get("General", "mode")
 if mode == "minimizer" or mode == "density":
-    runCommand = runCommandMPI   
-nCycles = config.getint("MinimizerStandard", "nCycles")
+    runCommand = runCommandMPI
 
 if not os.path.exists(myDir):
     os.makedirs(myDir)
     
-print "Run started by " + os.uname()[1] + " at " + str(time.time()) + " with " + str(nCycles) + " cycles\n"
+print "Run started by " + os.uname()[1] + " at " + str(time.time())
 
 subprocess.call("./buildandrun.sh " + myDir + " " + runCommand + " " + configFileName + " " + prevrunConfigFileName, shell=True)
 

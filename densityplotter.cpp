@@ -95,6 +95,7 @@ void DensityPlotter::makePlot()
     // loop over positions
     for(int aStep = 0; aStep < myStepConfig.nSteps; aStep++) {
         for(int bStep = 0; bStep < bSteps; bStep++) {
+            std::cout << "Calculating for a=" << aStep << " b=" << bStep << std::endl;
             r_new[0][0] = aMin + aStep * da + myStepConfig.firstStep * da;
             r_new[0][1] = bMin + bStep * db;
             double prob = 0;
@@ -133,9 +134,9 @@ void DensityPlotter::makePlot()
                 params0File << aMin + aStep * da << " ";
                 params1File << bMin + bStep * db << " ";
             }
-            plotFile << " ";
-            params0File << " ";
-            params1File << " ";
+            plotFile << "\n";
+            params0File << "\n";
+            params1File << "\n";
         }
         plotFile.close();
         params0File.close();

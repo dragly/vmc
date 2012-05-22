@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-servers = "kondensator spole laser motstand signalgenerator geigerteller multimeter likning kretskort hartreefock gran finite"
+servers = "kondensator spole laser motstand signalgenerator geigerteller multimeter likning kretskort hartreefock"
 runFolder = "runs"
 configFileName = "config.ini"
 prevrunConfigFileName = "config.ini.prevrun"

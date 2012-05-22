@@ -6,6 +6,8 @@
 GeneticMinimizer::GeneticMinimizer(Config *config) :
     Minimizer(config),
     nSamples(100),
+    nSamplesStart(100),
+    nSamplesEnd(100),
     nCycles(100),
     nParticles(config->nParticles()),
     nDimensions(config->nDimensions()),
@@ -18,16 +20,17 @@ GeneticMinimizer::GeneticMinimizer(Config *config) :
 
 void GeneticMinimizer::loadConfiguration(INIParser *settings)
 {
+    nGenes = settings->GetInteger("GeneticMinimizer","nGenes", 2);
     nIndividuals = settings->GetInteger("GeneticMinimizer","nIndividuals", 16);
     nPopulations = settings->GetInteger("GeneticMinimizer","nPopulations", 2);
-    nGenes = settings->GetInteger("GeneticMinimizer","nGenes", 2);
-    nCycles = settings->GetInteger("GeneticMinimizer","nCycles", 1000);
+    nCycles = settings->GetInteger("GeneticMinimizer","nCycles", 20000);
     nSamplesStart = settings->GetInteger("GeneticMinimizer","nSamplesStart", 100);
     nSamplesEnd = settings->GetInteger("GeneticMinimizer","nSamplesEnd", 1000);
+    rescaleCycles = settings->GetInteger("GeneticMinimizer","rescaleCycles", 2);
     double lowRescaleLimit = settings->GetDouble("GeneticMinimizer","lowRescaleLimit", 0.1);
     double highRescaleLimit = settings->GetDouble("GeneticMinimizer","highRescaleLimit", 2.0);
     setRescaleLimits(lowRescaleLimit, highRescaleLimit);
-    setPopulationData(nGenes, nPopulations, nIndividuals);
+    setPopulationData(nGenes, nIndividuals, nPopulations);
 }
 
 void GeneticMinimizer::runMinimizer()
@@ -40,7 +43,7 @@ void GeneticMinimizer::runMinimizer()
     }
     for(int acycle = 0; acycle < nCycles; acycle++) {
         allBestValue = INFINITY;
-        evolve(1,5);
+        evolve(1, nCycles / 10.);
         double energySum = 0;
         int nEnergySamples = 0;
         double alphaSum = 0;
@@ -60,7 +63,7 @@ void GeneticMinimizer::runMinimizer()
         dataFile << betaSum / nEnergySamples << " ";
         dataFile << energySum / nEnergySamples << " ";
         dataFile << nEnergySamples << std::endl;
-        std::cout << cycle << ": Mean energy " <<  left << setw(10) << energySum / nEnergySamples << " using params " <<  left << setw(10) << alphaSum / nEnergySamples << " " <<  left << setw(10) << betaSum / nEnergySamples << " with best " <<  left << setw(10) << energies[allBestPopulationIndex][allBestIndex] << " using " <<  left << setw(10) << populations[allBestPopulationIndex][allBestIndex][0] << ", " << left << setw(10) <<  populations[allBestPopulationIndex][allBestIndex][1] << " @ scale " <<  left << setw(10) << scale << "," << lowScaleLimit << "," << highScaleLimit << " samples: " << nSamples << " x " << nIndividuals << " x " << nPopulations << std::endl;
+        std::cout << cycle << ": Mean energy " <<  left << setw(10) << energySum / nEnergySamples << " using params " <<  left << setw(10) << alphaSum / nEnergySamples << " " <<  left << setw(10) << betaSum / nEnergySamples << " with best " <<  left << setw(10) << energies[allBestPopulationIndex][allBestIndex] << " using " <<  left << setw(10) << populations[allBestPopulationIndex][allBestIndex][0] << ", " << left << setw(10) <<  populations[allBestPopulationIndex][allBestIndex][1] << " @ scale " <<  left << setw(10) << scale << " samples: " << nSamples << " x " << nIndividuals << " x " << nPopulations << std::endl;
     }
     dataFile.close();
 
