@@ -35,7 +35,7 @@ void Walker::initialize(vec2 *positions)
         rOld[i] = positions[i];
     }
     wave->initialize(positions);
-    wave->gradient(positions, 0, quantumForceNew);
+    wave->gradient(positions, quantumForceNew);
     quantumForceOld = quantumForceNew;
     localEnergyOld = hamiltonian->energy(wave, rNew);
     localEnergyNew = localEnergyOld;

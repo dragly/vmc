@@ -33,7 +33,7 @@ protected:
     int m_nParticles;
     int m_nDimensions;
     // monte carlo settings
-    int m_nCycles;
+    int m_nSamples;
     // energies to store in block files
     double *m_allEnergies;
 private:

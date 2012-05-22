@@ -149,41 +149,41 @@ INIParser::~INIParser()
 
 void INIParser::Close()
 {
-    int emptylines = 0;
+//    int emptylines = 0;
     fstream inifile;
 
     inifile.open(this->filename.c_str(), ios::out);
     if(inifile.is_open())
     {
         this->InitGood = false; // file is closed, so false
-        vector< vector <string> >::iterator section_it;
-        vector<string>::iterator sectionnames_it;
-        vector<string>::iterator line_it;
+//        vector< vector <string> >::iterator section_it;
+//        vector<string>::iterator sectionnames_it;
+//        vector<string>::iterator line_it;
 
-        for(section_it = this->buffer.begin(), sectionnames_it = this->sectionnames.begin(); section_it != this->buffer.end(); ++section_it, ++sectionnames_it)
-        {
-            if(sectionnames_it != this->sectionnames.end())
-            {
-                if(!this->withoutSections) // only write the section if the section name isn't empty and if the mode "without Section" isn't true
-                    inifile << '[' << *sectionnames_it << ']' << endl;
-            }
+//        for(section_it = this->buffer.begin(), sectionnames_it = this->sectionnames.begin(); section_it != this->buffer.end(); ++section_it, ++sectionnames_it)
+//        {
+//            if(sectionnames_it != this->sectionnames.end())
+//            {
+//                if(!this->withoutSections) // only write the section if the section name isn't empty and if the mode "without Section" isn't true
+//                    inifile << '[' << *sectionnames_it << ']' << endl;
+//            }
 
-            // get all lines of the section
-            for(line_it = section_it->begin(); line_it != section_it->end(); ++line_it)
-            {
-                // don't add a new line if the section and entry is the last one
-                if((this->buffer.end()-section_it) == 2 && (section_it->end() - line_it) == 2) // = last entry of the last section
-                {
-                    if(line_it->compare(INI_LINE_DONTSAVE)) // only write the line if it isn't marked as removed
-                        inifile << *line_it;
-                }
-                else
-                {
-                    if(line_it->compare(INI_LINE_DONTSAVE)) // only write the line if it isn't marked as removed
-                        inifile << *line_it << endl;
-                }
-            }
-        }
+//            // get all lines of the section
+//            for(line_it = section_it->begin(); line_it != section_it->end(); ++line_it)
+//            {
+//                // don't add a new line if the section and entry is the last one
+//                if((this->buffer.end()-section_it) == 2 && (section_it->end() - line_it) == 2) // = last entry of the last section
+//                {
+//                    if(line_it->compare(INI_LINE_DONTSAVE)) // only write the line if it isn't marked as removed
+//                        inifile << *line_it;
+//                }
+//                else
+//                {
+//                    if(line_it->compare(INI_LINE_DONTSAVE)) // only write the line if it isn't marked as removed
+//                        inifile << *line_it << endl;
+//                }
+//            }
+//        }
         inifile.close();
         this->Closed = true;
     }

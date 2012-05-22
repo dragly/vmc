@@ -1,9 +1,9 @@
 #include "diffusionmontecarlo.h"
-#include "montecarlostandard.h"
+#include "standardmontecarlo.h"
 #include "../wavefunction/wavefunction.h"
 #include "../wavefunction/waveslater.h"
 #include "../random.h"
-#include "montecarlometropolishastings.h"
+#include "metropolishastingsmontecarlo.h"
 
 DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config) :
     MonteCarlo(config),
@@ -55,7 +55,7 @@ void DiffusionMonteCarlo::sample(int nCycles)
     // Initialize ensemble of walkers from VMC best guess
     MonteCarloMetropolisHastings *initialMonteCarlo = new MonteCarloMetropolisHastings(config);
     initialMonteCarlo->setRecordMoves(true, nWalkersAlive * nParticles);
-    initialMonteCarlo->setTerminalizationEnabled(true);
+    initialMonteCarlo->setThermalizationEnabled(true);
     initialMonteCarlo->sample(nWalkersAlive * correlationStep);
     double trialEnergy = initialMonteCarlo->energy();
     std::cout << "Initial trial energy was " << trialEnergy << std::endl;

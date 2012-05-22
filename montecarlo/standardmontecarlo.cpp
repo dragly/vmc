@@ -1,4 +1,4 @@
-#include "montecarlostandard.h"
+#include "standardmontecarlo.h"
 #include "../matrix.h"
 #include "../random.h"
 #include "../utils.h"
@@ -7,31 +7,21 @@
 #include <iostream>
 #include <iomanip>
 
-MonteCarloStandard::MonteCarloStandard(Config *config) :
+StandardMonteCarlo::StandardMonteCarlo(Config *config) :
     MonteCarlo(config),
     rank(config->rank()),
-    stepLength(config->stepLength()),
     firstSample(true)
 {
-    // allocate matrices which contain the position of the particles
-    rOld = new vec2[ nParticles];
-    rNew = new vec2[ nParticles];
-    for (int i = 0; i < nParticles; i++) {
-        for (int j=0; j < nDimensions; j++) {
-            rOld[i][j] = rNew[i][j] = stepLength*(ran2(idumMC)-0.5);
-        }
-    }
+
     m_allEnergies = new double[1]; // dummy array that can be deleted when sampling with energy storage
     m_moves = new vec2*[1];
     m_moves[0] = new vec2[nParticles];
 }
 
-MonteCarloStandard::~MonteCarloStandard()
+StandardMonteCarlo::~StandardMonteCarlo()
 {
-    delete [] rOld;
-    delete [] rNew;
 }
-void MonteCarloStandard::sample(int nCycles)
+void StandardMonteCarlo::sample(int nCycles)
 {
     m_energy = 0;
     m_energySquared = 0;
@@ -50,15 +40,15 @@ void MonteCarloStandard::sample(int nCycles)
     m_energy = m_energySquared = 0; localEnergy=0;
 
     //  initial trial position
-    if(firstSample) {
-        for (int i = 0; i < nParticles; i++) {
-            for (int j=0; j < nDimensions; j++) {
-                rOld[i][j] = stepLength*(ran2(idumMC)-0.5);
-            }
-            rNew[i] = rOld[i];
-        }
-//        firstSample = false;
-    }
+//    if(firstSample) {
+//        for (int i = 0; i < nParticles; i++) {
+//            for (int j=0; j < nDimensions; j++) {
+//                rOld[i][j] = stepLength*(ran2(idumMC)-0.5);
+//            }
+//            rNew[i] = rOld[i];
+//        }
+////        firstSample = false;
+//    }
     wave->initialize(rOld);
     // TODO Optimize step length by Newton's method
     // loop over monte carlo cycles

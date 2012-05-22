@@ -81,7 +81,7 @@ double Jastrow::argument(int i, int j, mat &distances) {
 /*!
   Note: Partial because it does not include the square gradient term. (8.46 in Leirvåg's thesis) This must be included manually.
   */
-double Jastrow::laplacePartial(vec2 r[], int movedParticlea) {
+double Jastrow::laplacePartial() {
     // Optimized by removing square gradient term. Reduced inclusive cost by 80 % !
     double laplaceSum = 0;
     for(int movedParticle = 0; movedParticle < nParticles; movedParticle++) {
@@ -107,13 +107,8 @@ double Jastrow::laplacePartial(vec2 r[], int movedParticlea) {
  * \param rGradient
  * Note: Call ratio() or calculateDistances() before calling this function to update the distance matrix.
  */
-void Jastrow::gradient(vec2 r[], int movedParticlea, vec &rGradient)
+void Jastrow::gradient(vec2 r[], vec &rGradient)
 {
-//    for(int i = 0; i < nParticles; i++) {
-//        if(r[i][0] != rNew[i][0] || r[i][1] != rNew[i][1]) {
-//            std::cout << "Inequality" << i << "\n" << r[i] << std::endl << rNew[i] << std::endl << rOld[i] << std::endl;
-//        }
-//    }
     rGradient.zeros();
     for(int movedParticle = 0; movedParticle < nParticles; movedParticle++) {
         int p = movedParticle;

@@ -1,4 +1,4 @@
-#include "minimizerstandard.h"
+#include "standardminimizer.h"
 
 #include <cmath>
 #include <iostream>
@@ -18,7 +18,7 @@
 #include "../inih/ini.h"
 
 #include "../wavefunction/wavesimple.h"
-#include "../montecarlo/montecarlostandard.h"
+#include "../montecarlo/standardmontecarlo.h"
 #include "../matrix.h"
 #include "../hamiltonian/hamiltoniansimple.h"
 #include "../hamiltonian/hamiltonianideal.h"
@@ -27,7 +27,7 @@
 
 using namespace std;
 
-MinimizerStandard::MinimizerStandard(Config *config) :
+StandardMinimizer::StandardMinimizer(Config *config) :
     Minimizer(config)
 {
     m_wave = config->wave();
@@ -35,12 +35,12 @@ MinimizerStandard::MinimizerStandard(Config *config) :
     m_monteCarlo = config->monteCarlo();
 }
 
-void MinimizerStandard::loadConfiguration(INIParser *settings)
+void StandardMinimizer::loadConfiguration(INIParser *settings)
 {
     m_settings = settings;
     charge = atof(settings->Get("MinimizerStandard","charge", "1.0").c_str());
     stepLength = atof(settings->Get("MinimizerStandard","stepLength", "1.0").c_str());
-    m_nCycles = atoi(settings->Get("MinimizerStandard","nCycles", "1000").c_str());
+    m_nSamples = atoi(settings->Get("MinimizerStandard","nCycles", "1000").c_str());
     nVariations = settings->GetInteger("MinimizerStandard","nVariations", 11);    //  default number of variations
     alphaStart = settings->GetDouble("MinimizerStandard","alphaStart", 0);    //  default number of variations
     alphaEnd= settings->GetDouble("MinimizerStandard","alphaEnd", 1);    //  default number of variations
@@ -48,7 +48,7 @@ void MinimizerStandard::loadConfiguration(INIParser *settings)
     betaEnd = settings->GetDouble("MinimizerStandard","betaEnd", 1);    //  default number of variations
 }
 
-void MinimizerStandard::runMinimizer()
+void StandardMinimizer::runMinimizer()
 {
     int total_number_cycles;
     mat cumulativeEnergy, cumulativeEnergySquared;
@@ -68,7 +68,7 @@ void MinimizerStandard::runMinimizer()
 
     // broadcast the total number of  variations
     MPI_Bcast (&nVariations, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast (&m_nCycles, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast (&m_nSamples, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     //  initialize the arrays  by zeroing them
     totalCumulativeEnergy = zeros<mat>(nVariations,nVariations);
@@ -79,7 +79,7 @@ void MinimizerStandard::runMinimizer()
     parameter0Map = zeros<mat>(nVariations, nVariations);
     parameter1Map = zeros<mat>(nVariations, nVariations);
 
-    total_number_cycles = m_nCycles*config->nProcesses();
+    total_number_cycles = m_nSamples*config->nProcesses();
 
     // array to store all energies for last variation of alpha
 
@@ -95,9 +95,9 @@ void MinimizerStandard::runMinimizer()
         parameters[1] = betaStart;
         for (int j=0; j < nVariations; j++){
             std::cout << "Testing parameters " << parameters[0] << " " << parameters[1] << std::endl;
-            std::cout << "with " << m_nCycles << " cycles" << std::endl;
+            std::cout << "with " << m_nSamples << " cycles" << std::endl;
             m_wave->setParameters(parameters);
-            m_monteCarlo->sample(m_nCycles);
+            m_monteCarlo->sample(m_nSamples);
             // update the energy average and its squared
             cumulativeEnergy(i,j) = m_monteCarlo->energy();
             cumulativeEnergySquared(i,j) = m_monteCarlo->energySquared();

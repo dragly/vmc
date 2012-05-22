@@ -1,5 +1,5 @@
 #include "evolutionarymontecarlo.h"
-#include "../montecarlo/montecarlometropolishastings.h"
+#include "../montecarlo/metropolishastingsmontecarlo.h"
 #include "../config.h"
 #include "../random.h"
 
@@ -98,7 +98,7 @@ void EvolutionaryMonteCarlo::sample(int nCycles)
     // Initialize ensemble of walkers from VMC best guess
     MonteCarloMetropolisHastings *initialMonteCarlo = new MonteCarloMetropolisHastings(config);
     initialMonteCarlo->setRecordMoves(true, nPopulations * nIndividuals * nParticles * nWalkers);
-    initialMonteCarlo->setTerminalizationEnabled(true);
+    initialMonteCarlo->setThermalizationEnabled(true);
     initialMonteCarlo->sample(nWalkers * nIndividuals * nPopulations * correlationStep);
     trialEnergy = initialMonteCarlo->energy();
     std::cout << "Initial trial energy was " << trialEnergy << std::endl;

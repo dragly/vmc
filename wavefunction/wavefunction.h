@@ -15,12 +15,10 @@ class WaveFunction
 public:
     WaveFunction(Config *config);
     virtual double evaluate(vec2 r[]) = 0;
-    virtual void gradient(vec2 r[], int movedParticle, vec &rGradient) {
-        (void)movedParticle;
+    virtual void gradient(vec2 r[], vec &rGradient) {
         gradientNumerical(r, rGradient);
     }
-    virtual double laplace(vec2 r[], int movedParticle) {
-        (void)movedParticle;
+    virtual double laplace(vec2 r[]) {
         return laplaceNumerical(r);
     }
     virtual WaveFunction* clone() = 0;

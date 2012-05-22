@@ -46,7 +46,6 @@ HEADERS += \
     matrix.h \
     wavefunction/wavefunction.h \
     montecarlo/montecarlo.h \
-    montecarlo/montecarlostandard.h \
     random.h \
     wavefunction/wavesimple.h \
     utils.h \
@@ -58,12 +57,9 @@ HEADERS += \
     blocker.h \
     densityplotter.h \
     config.h \
-    montecarlo/montecarlometropolishastings.h\
     slater/slater.h \
-    minimizer/minimizerevolutionary.h \
     hermite.h \
     orbital/orbital.h \
-    minimizer/minimizerstandard.h \
     minimizer/minimizer.h \
     wavefunction/waveslater.h \
     jastrow/jastrow.h \
@@ -73,13 +69,16 @@ HEADERS += \
     montecarlo/evolutionarymontecarlo.h \
     walker/walker.h \
     walker/evolutionarywalker.h \
-    walker/diffusionwalker.h
+    walker/diffusionwalker.h \
+    minimizer/geneticminimizer.h \
+    minimizer/standardminimizer.h \
+    montecarlo/standardmontecarlo.h \
+    montecarlo/metropolishastingsmontecarlo.h
 
 SOURCES += main.cpp \
     matrix.cpp \
     wavefunction/wavefunction.cpp \
     montecarlo/montecarlo.cpp \
-    montecarlo/montecarlostandard.cpp \
     random.cpp \
     wavefunction/wavesimple.cpp \
     mainapplication.cpp \
@@ -90,13 +89,10 @@ SOURCES += main.cpp \
     blocker.cpp \
     densityplotter.cpp \
     config.cpp \
-    montecarlo/montecarlometropolishastings.cpp\
     slater/slater.cpp \
-    minimizer/minimizerevolutionary.cpp \
     hermite.cpp \
     orbital/orbital.cpp \
     minimizer/minimizer.cpp \
-    minimizer/minimizerstandard.cpp \
     wavefunction/waveslater.cpp \
     jastrow/jastrow.cpp \
     inih/ini.cpp \
@@ -105,4 +101,8 @@ SOURCES += main.cpp \
     montecarlo/evolutionarymontecarlo.cpp \
     walker/walker.cpp \
     walker/evolutionarywalker.cpp \
-    walker/diffusionwalker.cpp
+    walker/diffusionwalker.cpp \
+    minimizer/standardminimizer.cpp \
+    montecarlo/metropolishastingsmontecarlo.cpp \
+    montecarlo/standardmontecarlo.cpp \
+    minimizer/geneticminimizer.cpp

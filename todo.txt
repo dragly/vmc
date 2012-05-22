@@ -18,3 +18,7 @@ Use this walker instead of MonteCarloStandard
 Give an walker to each individual
 Let each individual reuse its walker's positions
 Let the other coefficients/genes determine the new walker's initial positions?
+
+
+Could be done, but not to do:
+- Update only parts of gradient affected by moved particle

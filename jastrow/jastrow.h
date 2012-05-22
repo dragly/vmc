@@ -20,10 +20,10 @@ public:
     void acceptMove(int movedParticle);
     double argument(int i, int j, mat &distances);
 
-    void gradient(vec2 r[], int movedParticle, vec &rGradient);
+    void gradient(vec2 r[], vec &rGradient);
     void rejectMove();
     ~Jastrow();
-    double laplacePartial(vec2 r[], int movedParticle);
+    double laplacePartial();
 private:
     int nParticles;
     int nDimensions;

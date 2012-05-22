@@ -21,13 +21,15 @@
 #include "mainapplication.h"
 
 #include "wavefunction/wavesimple.h"
-#include "montecarlo/montecarlostandard.h"
+#include "montecarlo/standardmontecarlo.h"
 #include "matrix.h"
-#include "minimizer/minimizerstandard.h"
+#include "minimizer/standardminimizer.h"
 #include "minimizer/minimizer.h"
 #include "blocker.h"
 #include "densityplotter.h"
 #include "config.h"
+#include "montecarlo/diffusionmontecarlo.h"
+#include "minimizer/geneticminimizer.h"
 using namespace  std;
 
 MainApplication::MainApplication(int* argc, char*** argv) :
@@ -62,6 +64,8 @@ void MainApplication::loadConfiguration()
                 m_mode = DensityMode;
             } else if(modeString == "blocking") {
                 m_mode = BlockingMode;
+            } else if(modeString == "genetic") {
+                m_mode = GeneticMode;
             } else {
                 cerr << __PRETTY_FUNCTION__ << ": Unknown mode '" << modeString << "'" << endl;
                 exit(460);
@@ -80,46 +84,36 @@ void MainApplication::runConfiguration()
 {
     loadConfiguration();
     if(m_mode == MinimizerMode) {
-        runMinimizer();
+        Minimizer *minimizer = new StandardMinimizer(m_config);
+        minimizer->loadConfiguration(m_settings);
+        minimizer->runMinimizer();
+        delete minimizer;
     } else if(m_mode== DensityMode) {
-        runDensity();
+        DensityPlotter *densityPlotter = new DensityPlotter(m_config);
+        densityPlotter->loadConfiguration(m_settings);
+        densityPlotter->makePlot();
+        delete densityPlotter;
     } else if(m_mode == BlockingMode) {
-        runBlocking();
+        Blocker* blocker = new Blocker();
+        blocker->loadConfiguration(m_settings);
+        blocker->runBlocking();
+        delete blocker;
     } else if(m_mode == DiffusionMode) {
-        runDiffusion();
+        DiffusionMonteCarlo *diffusionMonteCarlo = new DiffusionMonteCarlo(m_config);
+        diffusionMonteCarlo->loadConfiguration(m_settings);
+        diffusionMonteCarlo->sample(40000);
+        double energy = diffusionMonteCarlo->energy();
+        std::cout << "Diffusion monte carlo returned energy of " << energy << std::endl;
+        delete diffusionMonteCarlo;
+    } else if(m_mode == GeneticMode) {
+        GeneticMinimizer *geneticMinimizer = new GeneticMinimizer(m_config);
+        geneticMinimizer->loadConfiguration(m_settings);
+        geneticMinimizer->runMinimizer();
+        delete geneticMinimizer;
     } else {
         cerr << __PRETTY_FUNCTION__ << ": Unknown mode" << endl;
         exit(459);
     }
-}
-
-void MainApplication::runMinimizer()
-{
-    Minimizer *minimizer = new MinimizerStandard(m_config);
-    minimizer->loadConfiguration(m_settings);
-    minimizer->runMinimizer();
-}
-
-void MainApplication::runDiffusion()
-{
-    // DiffusionMonteCarlo *diffMC = new DiffusionMonteCarlo();
-    // ...
-}
-
-void MainApplication::runBlocking()
-{
-//    if(m_rank == 0) {
-    Blocker* blocker = new Blocker();
-    blocker->loadConfiguration(m_settings);
-    blocker->runBlocking();
-//    }
-}
-
-void MainApplication::runDensity()
-{
-    DensityPlotter *densityPlotter = new DensityPlotter(m_config);
-    densityPlotter->loadConfiguration(m_settings);
-    densityPlotter->makePlot();
 }
 
 void MainApplication::finalize() {

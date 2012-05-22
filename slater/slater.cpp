@@ -159,7 +159,7 @@ void Slater::rejectMove() {
     currentRatio = previousRatio;
 }
 
-void Slater::gradient(vec2 r[], int movedParticlea, vec &rGradient) {
+void Slater::gradient(vec2 r[], vec &rGradient) {
     rGradient.zeros();
     for(int a = 0; a < nParticles; a++) {
         // TODO we are now recalculating the gradient for all particles, this could be avoided
@@ -178,7 +178,7 @@ void Slater::gradient(vec2 r[], int movedParticlea, vec &rGradient) {
     }
 }
 
-double Slater::laplace(vec2 r[], int movedParticlea)
+double Slater::laplace(vec2 r[])
 {
     // TODO we are now recalculating the laplace for all particles, this could be avoided
     double laplaceResult = 0;

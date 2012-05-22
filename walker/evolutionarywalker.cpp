@@ -25,7 +25,7 @@ void EvolutionaryWalker::advance() {
         // Apply fixed node approximation (keep sign or reject move)
         if(ratio > 0) {
             // Compute weight function
-            wave->gradient(rNew, i, quantumForceNew);
+            wave->gradient(rNew, quantumForceNew);
             double argSum = 0;
             for(int j = 0; j < nParticles; j++) {
                 for(int k = 0; k < nDimensions; k++) {

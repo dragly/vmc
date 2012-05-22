@@ -16,7 +16,7 @@
 #include "wavefunction/wavefunction.h"
 #include "inih/ini.h"
 #include "config.h"
-#include "montecarlo/montecarlostandard.h"
+#include "montecarlo/standardmontecarlo.h"
 #include "matrix.h"
 #include "random.h"
 
@@ -106,7 +106,7 @@ void DensityPlotter::makePlot()
                     r_new[i][1] = bMin + (bMax - bMin) * ran2(idum);
                 }  //  end of loop over particles
                 // compute probability
-                prob += m_wave->evaluate(r_new) * m_wave->evaluate(r_new) * (r_new[0][0] * r_new[0][0]  + r_new[0][1] * r_new[0][1]);
+                prob += m_wave->evaluate(r_new) * m_wave->evaluate(r_new)/* * (r_new[0][0] * r_new[0][0]  + r_new[0][1] * r_new[0][1])*/;
             }   // end of loop over MC trials
             myProbability[aStep][bStep] = prob / m_nCycles;
         }
@@ -125,17 +125,17 @@ void DensityPlotter::makePlot()
 
     if(config->rank() == 0) {
         plotFile.open("density.dat");
-        params0File.open("params0.dat");
-        params1File.open("params1.dat");
+        params0File.open("density-grid-x.dat");
+        params1File.open("density-grid-y.dat");
         for(int aStep = 0; aStep < aSteps; aStep++) {
             for(int bStep = 0; bStep < bSteps; bStep++) {
-                plotFile << probability[aStep][bStep] << "\t";
-                params0File << aMin + aStep * da << "\t";
-                params1File << bMin + bStep * db << "\t";
+                plotFile << probability[aStep][bStep] << " ";
+                params0File << aMin + aStep * da << " ";
+                params1File << bMin + bStep * db << " ";
             }
-            plotFile << "\n";
-            params0File << "\n";
-            params1File << "\n";
+            plotFile << " ";
+            params0File << " ";
+            params1File << " ";
         }
         plotFile.close();
         params0File.close();

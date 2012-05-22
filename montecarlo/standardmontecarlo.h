@@ -8,19 +8,16 @@ using namespace arma;
 #include "../wavefunction/wavefunction.h"
 #include "../config.h"
 
-class MonteCarloStandard : public MonteCarlo
+class StandardMonteCarlo : public MonteCarlo
 {
 public:
-    MonteCarloStandard(Config* config);
+    StandardMonteCarlo(Config* config);
 
     void sample(int nCycles);
 
-    ~MonteCarloStandard();
+    ~StandardMonteCarlo();
 private:
     int rank;
-    double stepLength;
-    vec2 *rOld;
-    vec2 *rNew;
     bool firstSample;
 };
 

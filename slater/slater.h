@@ -24,8 +24,8 @@ public:
     double ratio(vec2 &particlePosition, int movedParticle);
     void acceptMove(int movedParticle);
     void initialize(vec2 positions[]);
-    double laplace(vec2 r[], int movedParticlea);
-    void gradient(vec2 r[], int movedParticle, vec &rGradient);
+    double laplace(vec2 r[]);
+    void gradient(vec2 r[], vec &rGradient);
     bool hasParticle(int particleNumber) const;
     void rejectMove();
     void updateMatrix(vec2 &particlePosition, int movedParticle);

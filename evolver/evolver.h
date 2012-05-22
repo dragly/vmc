@@ -11,13 +11,15 @@ public:
     Evolver();
     Evolver(int nGenes, int nIndividuals, int nPopulations);
 
-    void constructor(int nGenes, int nIndividuals, int nPopulations);
+    void setPopulationData(int nGenes, int nIndividuals, int nPopulations);
 
     void evolve(int nSteps, int populationMatchingPeriod);
 
     void setRescaleLimits(double low, double high) {
         lowScaleLimit = low;
         highScaleLimit = high;
+        initialLowScaleLimit = low;
+        initialHighScaleLimit = high;
         rescale();
     }
 
@@ -51,6 +53,9 @@ protected:
     double scale;
     double lowScaleLimit;
     double highScaleLimit;
+
+    double initialLowScaleLimit;
+    double initialHighScaleLimit;
     // at what precision should we start calling for rescales?
     double rescalePrecisionLimit;
 

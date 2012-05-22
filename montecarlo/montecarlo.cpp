@@ -1,7 +1,8 @@
 #include "montecarlo.h"
 
-#include "montecarlostandard.h"
-#include "montecarlometropolishastings.h"
+#include "standardmontecarlo.h"
+#include "metropolishastingsmontecarlo.h"
+#include "../random.h"
 
 MonteCarlo::MonteCarlo(Config *config) :
     config(config),
@@ -18,18 +19,33 @@ MonteCarlo::MonteCarlo(Config *config) :
     wave(config->wave()),
     hamiltonian(config->hamiltonian()),
     recordMoves(false),
-    nMoves(1)
+    nMoves(1),
+    stepLength(config->stepLength())
 {
+    // allocate matrices which contain the position of the particles
+    rOld = new vec2[nParticles];
+    rNew = new vec2[nParticles];
+    randomizePositions();
 }
 
 MonteCarlo::~MonteCarlo() {
     delete [] m_moves;
+    delete [] rOld;
+    delete [] rNew;
+}
+
+void MonteCarlo::randomizePositions() {
+    for (int i = 0; i < nParticles; i++) {
+        for (int j=0; j < nDimensions; j++) {
+            rOld[i][j] = rNew[i][j] = stepLength*(ran2(idumMC)-0.5);
+        }
+    }
 }
 
 MonteCarlo* MonteCarlo::fromName(string monteCarloClass, Config *config)
 {
     if(monteCarloClass == "MonteCarloStandard") {
-        return new MonteCarloStandard(config);
+        return new StandardMonteCarlo(config);
     } else if(monteCarloClass == "MonteCarloMetropolisHastings") {
         return new MonteCarloMetropolisHastings(config);
     } else {

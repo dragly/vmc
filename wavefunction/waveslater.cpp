@@ -135,14 +135,14 @@ void WaveSlater::rejectMove() {
  * \param movedParticle The index of the particle which was last moved
  * \return Laplace to wave ratio \f$\frac{\del^2 \Psi}{\Psi}\f$
  */
-double WaveSlater::laplace(vec2 r[], int movedParticle) {
+double WaveSlater::laplace(vec2 r[]) {
     if(!useAnalyticalLaplace) {
         return laplaceNumerical(r);
     }
     double laplaceSum = 0;
-    laplaceSum += slaterUp->laplace(r, movedParticle);
+    laplaceSum += slaterUp->laplace(r);
 //    std::cout << "up " << slaterUp->laplace(r, movedParticle) << std::endl;
-    laplaceSum += slaterDown->laplace(r, movedParticle);
+    laplaceSum += slaterDown->laplace(r);
     if(interactionEnabled) {
 //    std::cout << "down " << slaterDown->laplace(r, movedParticle) << std::endl;
 //        jastrow->calculateDistances(r);
@@ -150,29 +150,29 @@ double WaveSlater::laplace(vec2 r[], int movedParticle) {
         vec slaterUpGradient = zeros<vec>(nParticles * nDimensions);
         vec slaterDownGradient = zeros<vec>(nParticles * nDimensions);
         vec jastrowGradient = zeros<vec>(nParticles * nDimensions);
-        slaterUp->gradient(r, movedParticle, slaterUpGradient);
-        slaterDown->gradient(r, movedParticle, slaterDownGradient);
-        jastrow->gradient(r, movedParticle, jastrowGradient);
+        slaterUp->gradient(r, slaterUpGradient);
+        slaterDown->gradient(r, slaterDownGradient);
+        jastrow->gradient(r, jastrowGradient);
 
         laplaceSum += dot(jastrowGradient, jastrowGradient);
-        laplaceSum += jastrow->laplacePartial(r, movedParticle);
+        laplaceSum += jastrow->laplacePartial();
 
         laplaceSum += 2 * dot(slaterUpGradient + slaterDownGradient, jastrowGradient);
     }
     return laplaceSum;
 }
 
-void WaveSlater::gradient(vec2 r[], int movedParticle, vec &rGradient) {
+void WaveSlater::gradient(vec2 r[], vec &rGradient) {
     if(!useAnalyticalGradient) {
         return gradientNumerical(r, rGradient);
     }
     vec slaterUpGradient = zeros<vec>(nParticles * nDimensions);
     vec slaterDownGradient = zeros<vec>(nParticles * nDimensions);
     vec jastrowGradient = zeros<vec>(nParticles * nDimensions);
-    slaterUp->gradient(r, movedParticle, slaterUpGradient);
-    slaterDown->gradient(r, movedParticle, slaterDownGradient);
+    slaterUp->gradient(r, slaterUpGradient);
+    slaterDown->gradient(r, slaterDownGradient);
     if(interactionEnabled) {
-        jastrow->gradient(r, movedParticle, jastrowGradient);
+        jastrow->gradient(r, jastrowGradient);
     }
     rGradient = slaterUpGradient + slaterDownGradient + jastrowGradient;
 //    gradientNumerical(r, movedParticle, rGradient);

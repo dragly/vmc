@@ -1,4 +1,4 @@
-#include "montecarlometropolishastings.h"
+#include "metropolishastingsmontecarlo.h"
 #include <math.h>
 #include "../matrix.h"
 #include "../random.h"
@@ -8,14 +8,9 @@
 MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(Config *config) :
     MonteCarlo(config),
     rank(config->rank()),
-    stepLength(config->stepLength()),
     hamiltonian(config->hamiltonian()),
     firstSample(true)
 {
-    // allocate matrices which contain the position of the particles
-    rOld = new vec2[ nParticles];
-    rNew = new vec2[ nParticles];
-
     quantumForceNew = zeros<vec>(nParticles * nDimensions);
     quantumForceOld = zeros<vec>(nParticles * nDimensions);
 }
@@ -40,15 +35,15 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
         nthMove = nCycles * nParticles / (nMoves);
     }
     //  initial trial position, note calling with alpha
-    for (int i = 0; i < nParticles; i++) {
-        for (int j=0; j < nDimensions; j++) {
-            rOld[i][j] = stepLength*(ran2(idumMC)-0.5);
-        }
-        rNew[i] = rOld[i];
-    }
+//    for (int i = 0; i < nParticles; i++) {
+//        for (int j=0; j < nDimensions; j++) {
+//            rOld[i][j] = stepLength*(ran2(idumMC)-0.5);
+//        }
+//        rNew[i] = rOld[i];
+//    }
     wave->initialize(rOld);
     //    wave->gradient(rOld, 0, waveGradientOld); // TODO add particle number
-    wave->gradient(rOld, 0, quantumForceOld); // TODO add particle number
+    wave->gradient(rOld, quantumForceOld); // TODO add particle number
     quantumForceOld *= 2;
     int acceptances = 0;
     int rejections = 0;
@@ -57,7 +52,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
     for (int cycle = 0; cycle <= nCycles; cycle++){
         // new trial position
         for (int i = 0; i < nParticles; i++) {
-            wave->gradient(rOld, 0, quantumForceOld); // TODO add particle number
+            wave->gradient(rOld, quantumForceOld); // TODO add particle number
             quantumForceOld *= 2;
             for (int k=0; k < nDimensions; k++) {
                 int qfIndex = i * nDimensions + k;
@@ -65,7 +60,7 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
             }
 
             // The Metropolis test is performed by moving one particle at the time
-            wave->gradient(rNew, 0, quantumForceNew); // TODO add particle number
+            wave->gradient(rNew, quantumForceNew); // TODO add particle number
             quantumForceNew *= 2;
             double argSum = 0;
             for(int j = 0; j < nParticles; j++) {

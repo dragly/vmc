@@ -1,5 +1,5 @@
-#ifndef MINIMIZEREVOLUTIONARY_H
-#define MINIMIZEREVOLUTIONARY_H
+#ifndef GENETICMINIMIZER_H
+#define GENETICMINIMIZER_H
 
 #include <vector>
 #include <armadillo>
@@ -16,30 +16,26 @@ class EvolutionaryWalker;
     general as possible with regards to the problem and could hopefully
     be used for a completely different problem.
 */
-class MinimizerEvolutionary : public Minimizer, public Evolver
+class GeneticMinimizer : public Minimizer, public Evolver
 {
 public:
-    MinimizerEvolutionary(Config *config);
+    GeneticMinimizer(Config *config);
 
     void runMinimizer();
     void loadConfiguration(INIParser * settings);
-
-    void startEvolution();
 
     void setNSamples(int nStart, int nEnd) {
         nSamples = nStart;
         nSamplesStart = nStart;
         nSamplesEnd = nEnd;
     }
+    void setNCycles(int nCycles) {
+        this->nCycles = nCycles;
+    }
 
 private:
     double fitness(vec &coefficients, int population, int individual);
 
-    // Monte Carlo stuff
-    WaveFunction *wave;
-    MonteCarlo *monteCarlo;
-    EvolutionaryWalker *walker;
-    Hamiltonian *hamiltonian;
 
     double nSamples;
 
@@ -51,6 +47,11 @@ private:
     int nDimensions;
     double stepLength;
     int nCycles;
+    // Monte Carlo stuff
+    MonteCarlo *monteCarlo;
+    WaveFunction *wave;
+    Hamiltonian *hamiltonian;
+    EvolutionaryWalker *walker;
 };
 
-#endif // MINIMIZEREVOLUTIONARY_H
+#endif // GENETICMINIMIZER_H

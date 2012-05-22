@@ -32,7 +32,7 @@ double WaveIdeal::evaluate(vec2 r[])
     return wf;
 }
 
-double WaveIdeal::laplace(vec2 r[], int movedParticle)
+double WaveIdeal::laplace(vec2 r[])
 {
     double alpha = parameters[0];
     double beta = parameters[1];

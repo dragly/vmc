@@ -7,15 +7,15 @@ using namespace arma;
 
 Evolver::Evolver()
 {
-    constructor(32,32,10);
+    setPopulationData(32,32,10);
 }
 
 Evolver::Evolver(int nGenes, int nIndividuals, int nPopulations)
 {
-    constructor(nGenes, nIndividuals, nPopulations);
+    setPopulationData(nGenes, nIndividuals, nPopulations);
 }
 
-void Evolver::constructor(int nGenes, int nIndividuals, int nPopulations) {
+void Evolver::setPopulationData(int nGenes, int nIndividuals, int nPopulations) {
     idum = new long;
     *idum = -1*time(NULL);
     cycle = 0;
@@ -46,14 +46,13 @@ void Evolver::constructor(int nGenes, int nIndividuals, int nPopulations) {
     cyclesSinceLastRescale = 0;
     veryFirst = true;
     cycle = 0;
-
-    std::cout << "Done constructing" << std::endl;
 }
 
 Evolver::~Evolver()
 {
     delete [] populations;
     delete [] values;
+    delete [] bestIndices;
 }
 
 void Evolver::updateBest()
@@ -62,6 +61,7 @@ void Evolver::updateBest()
         for(int j = 0; j < nIndividuals; j++) {
             vec &genes = populations[i][j];
             double value = fitness(genes, i, j);
+//            std::cout << "Value: " << value << std::endl;
             if(isnan(fabs(value))) {
                 value = INFINITY;
             }
@@ -75,25 +75,32 @@ void Evolver::updateBest()
         }
         bestIndices[i] = sort_index(values[i]);
     }
+    if(allBestIndex == -1 || allBestPopulationIndex == -1) {
+        std::cerr << "No fitness function returned anything better than nan or inf. Evolver cannot continue." << std::endl;
+        exit(961);
+    }
 }
 
 void Evolver::rescale()
 {
-    double expScale = lowScaleLimit + (highScaleLimit - lowScaleLimit) * ran2(idum);
+    double lowLimit = log(lowScaleLimit);
+    double highLimit = log(highScaleLimit);
+    double expScale = lowLimit + (highLimit - lowLimit) * ran2(idum);
     scale = pow(10,expScale);
 }
 
-void Evolver::evolve(int nCycles, int populationMatchingPeriod)
+void Evolver::evolve(int nSteps, int populationMatchingPeriod)
 {
     if(cycle == 0) {
         updateBest();
+//        std::cout << "Done first update" << std::endl;
     }
-    for(int localCycle = 0; localCycle < nCycles; localCycle++) {
+    for(int localCycle = 0; localCycle < nSteps; localCycle++) {
         cyclesSinceLastImprovement++;
         cyclesSinceLastRescale++;
         // Mating of the first two quarters of individuals and add to the third quarter
         for(int i = 0; i < nPopulations; i++) {
-            for(int j = 0; j < nIndividuals / 2; j += 2) {
+            for(int j = 0; j < nIndividuals / 2.; j += 2) {
                 uint parent1Index = bestIndices[i][j];
                 uint parent2Index = bestIndices[i][j + 1];
                 uint childIndex = bestIndices[i][j / 2 + nIndividuals / 2];
@@ -113,8 +120,8 @@ void Evolver::evolve(int nCycles, int populationMatchingPeriod)
 
         // Mutate one gene in the second half of individuals
         for(int i = 0; i < nPopulations; i++) {
-            for(int j = 0; j < nIndividuals / 2; j++) {
-                uint individualIndex = bestIndices[i][nIndividuals / 2 + j];
+            for(int j = nIndividuals * 2. / 4.; j < nIndividuals; j++) {
+                uint individualIndex = bestIndices[i][j];
                 vec &genes = populations[i][individualIndex]; // note the use of reference!
                 for(int k = 0; k < nGenes; k++) {
                     int randomGene = ran2(idum) * nGenes;
@@ -127,8 +134,8 @@ void Evolver::evolve(int nCycles, int populationMatchingPeriod)
 
         // Introduction of completely new individuals, generated from the best but with random additions
         for(int i = 0; i < nPopulations; i++) {
-            for(int j = 0; j < nIndividuals / 4; j++) {
-                uint individualIndex = bestIndices[i][3 * nIndividuals / 4 + j];
+            for(int j = 7. * nIndividuals / 8.; j < nIndividuals; j++) {
+                uint individualIndex = bestIndices[i][j];
                 for(int k = 0; k < nGenes; k++) {
                     double gauss = 2 * ran2(idum) - 1;
                     populations[i][individualIndex][k] = allBestGenes[k] + gauss * scale;

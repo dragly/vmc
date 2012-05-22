@@ -1,5 +1,5 @@
-#ifndef MINIMIZERSTANDARD_H
-#define MINIMIZERSTANDARD_H
+#ifndef STANDARDMINIMIZER_H
+#define STANDARDMINIMIZER_H
 
 #include <iostream>
 #include <fstream>
@@ -15,10 +15,10 @@ class MonteCarlo;
 
 using namespace std;
 
-class MinimizerStandard : public Minimizer
+class StandardMinimizer : public Minimizer
 {
 public:
-    MinimizerStandard(Config *config);
+    StandardMinimizer(Config *config);
     void runMinimizer();
     void loadConfiguration(INIParser *settings);
 private:
@@ -41,4 +41,4 @@ private:
 
 };
 
-#endif // MINIMIZERSTANDARD_H
+#endif // STANDARDMINIMIZER_H

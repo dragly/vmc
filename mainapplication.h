@@ -16,16 +16,13 @@ public:
         BlockingMode,
         DensityMode,
         MinimizerMode,
+        GeneticMode,
         DiffusionMode
     };
 
     void loadConfiguration();
     void runConfiguration();
 
-    void runMinimizer();
-    void runDiffusion();
-    void runBlocking();
-    void runDensity();
     void finalize();
 private:
     INIParser *m_settings;

@@ -3,9 +3,9 @@
 #include "../matrix.h"
 #include "../config.h"
 #include "../hamiltonian/hamiltonianideal.h"
-#include "../montecarlo/montecarlostandard.h"
-#include "../montecarlo/montecarlometropolishastings.h"
-#include "../minimizer/minimizerevolutionary.h"
+#include "../montecarlo/standardmontecarlo.h"
+#include "../montecarlo/metropolishastingsmontecarlo.h"
+#include "../minimizer/geneticminimizer.h"
 #include "../hermite.h"
 #include "../orbital/orbital.h"
 #include "../slater/slater.h"
@@ -15,8 +15,6 @@
 #include "../montecarlo/diffusionmontecarlo.h"
 #include "../montecarlo/evolutionarymontecarlo.h"
 #include "functionevolver.h"
-
-#include "minimizerevolutionarytest.h"
 
 #include <QtCore/QString>
 #include <QtTest/QtTest>
@@ -63,16 +61,16 @@ public:
     void fullSlaterSixInteractionTest();
     void fullIdealHastingsTest();
     void fullIdealHastingsSlaterTest();
+    void evolverTest();
 
     // unfinished tests
-    void evolverTest();
     void diffusionMonteCarloTest();
     void evolutionaryMonteCarloTest();
 private slots:
     // quick tests
     // slow tests
     // unfinished tests
-    void minimizerEvolutionaryTest();
+    void geneticMinimizerTest();
 
 private:
     Config *oldConfig;
@@ -120,7 +118,7 @@ void VmcTests::cleanupTestCase()
 void VmcTests::waveSimpleLaplaceTest()
 {
     waveSimple->setUseAnalyticalLaplace(true);
-    double analyticalLaplace = waveSimple->laplace(r_old, 0);
+    double analyticalLaplace = waveSimple->laplace(r_old);
     waveSimple->setUseAnalyticalLaplace(false);
     double numericalLaplace = waveSimple->laplaceNumerical(r_old);
     QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 0.001);
@@ -129,7 +127,7 @@ void VmcTests::waveSimpleLaplaceTest()
 void VmcTests::waveIdealLaplaceTest()
 {
     waveIdeal->setUseAnalyticalLaplace(true);
-    double analyticalLaplace = waveIdeal->laplace(r_old, 0);
+    double analyticalLaplace = waveIdeal->laplace(r_old);
     waveIdeal->setUseAnalyticalLaplace(false);
     double numericalLaplace = waveIdeal->laplaceNumerical(r_old);
     QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 0.001);
@@ -148,7 +146,7 @@ void VmcTests::waveSimpleGradientTest()
     parameters[0] = 2;
     parameters[1] = 1;
     waveSimpleNew->setParameters(parameters);
-    waveSimpleNew->gradient(rPositions, 0, rGradient);
+    waveSimpleNew->gradient(rPositions, rGradient);
     QVERIFY(fabs(rGradient[0] - 0.735) < 0.001);
     QVERIFY(fabs(rGradient[1] - 0.000) < 0.0000001);
     cout << "Particles..." << endl;
@@ -169,12 +167,12 @@ void VmcTests::fullIdealTest()
     parameters[0] = 1;
     parameters[1] = 0.4;
     waveIdeal1->setParameters(parameters);
-    MonteCarloStandard *monteCarlo = new MonteCarloStandard(config1);
+    StandardMonteCarlo *monteCarlo = new StandardMonteCarlo(config1);
     double energy;
     //  Do the mc sampling
     monteCarlo->sample(nCycles);
     energy = monteCarlo->energy();
-    std::cout << "Full ideal energy was " << energy << std::endl;
+//    std::cout << "Full ideal energy was " << energy << std::endl;
     QVERIFY(fabs(energy - 3.00034530284643397025) < 1e-2);
 }
 
@@ -321,7 +319,7 @@ void VmcTests::fullIdealHastingsTest()
     //  Do the mc sampling
     monteCarlo->sample(nCycles);
     energy = monteCarlo->energy();
-    std::cout << "Full ideal Hastings energy was " << energy << std::endl;
+//    std::cout << "Full ideal Hastings energy was " << energy << std::endl;
     QVERIFY(fabs(energy - 3.000) < 1e-2);
 }
 
@@ -529,7 +527,7 @@ void VmcTests::waveSlaterGradientTest()
             waveSlater1->initialize(r);
             vec analyticalGradient = zeros<vec>(nParticles * nDimensions);
             vec numericalGradient = zeros<vec>(nParticles * nDimensions);
-            waveSlater1->gradient(r, 1, analyticalGradient);
+            waveSlater1->gradient(r, analyticalGradient);
             waveSlater1->gradientNumerical(r, numericalGradient);
             for(int i = 0; i < nDimensions * nParticles; i++) {
 //                std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
@@ -579,7 +577,7 @@ void VmcTests::waveSlaterLaplaceTest()
             }
             waveSlater1->setParameters(parameters);
             waveSlater1->initialize(r);
-            double analyticalLaplace = waveSlater1->laplace(r, 0);
+            double analyticalLaplace = waveSlater1->laplace(r);
             double numericalLaplace = waveSlater1->laplaceNumerical(r);
 //            std::cout << analyticalLaplace << " " << numericalLaplace << std::endl;
 //            std::cout << "Diff: " << fabs(analyticalLaplace - numericalLaplace) << std::endl;
@@ -657,7 +655,7 @@ void VmcTests::waveSlaterSixParticleTest()
     parameters[0] = 1.0;
     parameters[1] = 0.4;
     waveSlater1->setParameters(parameters);
-    cout << "Value for slaterSixParticleTest: " << waveSlater1->evaluate(rpos) << endl;
+//    cout << "Value for slaterSixParticleTest: " << waveSlater1->evaluate(rpos) << endl;
 }
 
 void VmcTests::orbitalGradientTest()
@@ -786,11 +784,11 @@ void VmcTests::fullSlaterSixNoInteractionTest()
     waveSlater1->setParameters(parameters);
     int nCycles = 50000;
     //    waveSlater1->setUseAnalyticalLaplace(false);
-    MonteCarloStandard *monteCarlo1 = new MonteCarloStandard(config1);
+    StandardMonteCarlo *monteCarlo1 = new StandardMonteCarlo(config1);
     //  Do the mc sampling
     monteCarlo1->sample(nCycles);
     double energy = monteCarlo1->energy();
-    cout << "Six non-interacting energy was " << fabs(energy) << endl;
+//    cout << "Six non-interacting energy was " << fabs(energy) << endl;
     QVERIFY(fabs(energy - 10) < 1e-2);
 }
 
@@ -819,10 +817,10 @@ void VmcTests::fullSlaterSixInteractionTest()
         parameters[1] = 0.565;
         waveSlater2->setParameters(parameters);
         config1->setWave(waveSlater2);
-        MonteCarloStandard *monteCarlo2 = new MonteCarloStandard(config1);
+        StandardMonteCarlo *monteCarlo2 = new StandardMonteCarlo(config1);
         monteCarlo2->sample(nCycles);
         double energy = monteCarlo2->energy();
-        cout << "Six interacting energy was " << fabs(energy) << endl;
+//        cout << "Six interacting energy was " << fabs(energy) << endl;
         QVERIFY(fabs(energy - 20.190) < 1e-1);
     }
 //    std::cout << "Benchmark used to be 51.328 seconds @ hyperon" << std::endl;
@@ -834,13 +832,10 @@ void VmcTests::evolverTest()
 {
     QBENCHMARK {
         FunctionEvolver *evolver = new FunctionEvolver(16, 32, 4);
-        evolver->setRescaleLimits(-1, 1);
-        evolver->evolve(1000,250);
+        evolver->setRescaleLimits(-10, 10);
+        evolver->evolve(2000,250);
 //        std::cout << evolver->fitnessResult << std::endl;
         evolver->calculate(evolver->allBestGenes);
-
-//        std::cout << "All best genes\n" << evolver->allBestGenes << std::endl;
-//        std::cout << "All best fitness\n" << evolver->fitnessResult << std::endl;
 
         ofstream data;
         data.open("fitness.dat");
@@ -849,17 +844,21 @@ void VmcTests::evolverTest()
         }
         data.close();
 
+        for(uint i = 0; i < evolver->x.n_elem; i++) {
+            QVERIFY(evolver->result[i] - evolver->fitnessResult[i] < 1e-1);
+        }
+
         delete evolver;
     }
 }
 
-void VmcTests::minimizerEvolutionaryTest() {
+void VmcTests::geneticMinimizerTest() {
     QBENCHMARK {
         Config *config = new Config(0, 1);
-        config->setNParticles(12);
+        config->setNParticles(2);
         config->setNDimensions(2);
         config->setOmega(1);
-        config->setStepLength(2.0);
+        config->setStepLength(2);
         WaveFunction *wave = new WaveSlater(config);
         double parameters[2];
         parameters[0] = 999;
@@ -869,11 +868,12 @@ void VmcTests::minimizerEvolutionaryTest() {
         wave->setUseAnalyticalLaplace(true);
         config->setWave(wave);
         config->setHamiltonian(new HamiltonianIdeal(config));
-        config->setMonteCarlo(new MonteCarloStandard(config));
+        config->setMonteCarlo(new StandardMonteCarlo(config));
 //        config->setMonteCarlo(new MonteCarloMetropolisHastings(config));
-        MinimizerEvolutionary *evolver = new MinimizerEvolutionary(config);
-        evolver->setNSamples(100, 1000000);
-        evolver->constructor(2, 16, 2);
+        GeneticMinimizer *evolver = new GeneticMinimizer(config);
+        evolver->setNCycles(100);
+        evolver->setNSamples(100, 20000);
+        evolver->setPopulationData(2, 16, 2);
         evolver->setRescaleLimits(log(0.1), log(2));
         evolver->setRescaleCycles(2);
 //        evolver->setGeneLimits(0.3, 1.2);

@@ -22,7 +22,7 @@ double HamiltonianSimple::energy(WaveFunction *wave, vec2 r[])
     // compute the kinetic energy
     // TODO: Create a derivative-finder function that uses interpolation to approximate the derivative
     // TODO: Add the number of the particle that has been moved
-    eKinetic = -0.5*wave->laplace(r, 0);
+    eKinetic = -0.5*wave->laplace(r);
     //    e_kinetic = 0.5*e_kinetic/h2;
     // compute the potential energy
     ePotential = 0;

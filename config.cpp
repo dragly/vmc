@@ -8,7 +8,7 @@
 #include "inih/ini.h"
 #include "wavefunction/waveslater.h"
 #include "hamiltonian/hamiltonianideal.h"
-#include "montecarlo/montecarlostandard.h"
+#include "montecarlo/standardmontecarlo.h"
 
 using namespace std;
 

@@ -24,7 +24,7 @@ public:
     double energySquared() {
         return m_energySquared;
     }
-    void setTerminalizationEnabled(bool arg) {
+    void setThermalizationEnabled(bool arg) {
         terminalized = !arg;
         terminalizationTrials = 0;
     }
@@ -36,6 +36,7 @@ public:
     void checkTerminalization(double localEnergy);
     void setRecordMoves(bool arg, int nMoves);
     void recordMove(int i, int nthMove);
+    void randomizePositions();
 protected:
     Config *config;
     int nParticles;
@@ -65,6 +66,9 @@ protected:
     int cycle;
 
     bool storeEnergies;
+    vec2 *rOld;
+    vec2 *rNew;
+    double stepLength;
 };
 
 #endif // MONTECARLO_H

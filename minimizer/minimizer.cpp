@@ -35,6 +35,6 @@ void Minimizer::writeBlockData() {
     // Open file for writing:
     blockofile.open(ost.str().c_str(), ios::out | ios::binary);
     blockofile.write((char*)(m_allEnergies+1),
-                     m_nCycles*sizeof(double));
+                     m_nSamples*sizeof(double));
     blockofile.close();
 }

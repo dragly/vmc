@@ -27,8 +27,8 @@ public:
     void acceptMove(int movedParticle);
     double ratio(vec2 &particlePosition, int movedParticle);
     void initialize(vec2 positions[]);
-    double laplace(vec2 r[], int movedParticle);
-    void gradient(vec2 r[], int movedParticle, vec &rGradient);
+    double laplace(vec2 r[]);
+    void gradient(vec2 r[], vec &rGradient);
     void rejectMove();
     WaveFunction *clone();
     Slater *slaterUp;

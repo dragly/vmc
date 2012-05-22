@@ -10,6 +10,15 @@ Orbital::Orbital(double nx, double ny, Config *config) :
 {
 }
 
+void Orbital::setParameters(double *parameters)
+{
+    alpha = parameters[0];
+    beta = parameters[1];
+    alphaOmega = omega * alpha;
+    sqrtAlphaOmega = sqrt(alphaOmega);
+    alphaOmegaalphaOmega = alphaOmega * alphaOmega;
+}
+
 /*!
   Evaluates the orbital at the given position.
 
@@ -22,15 +31,6 @@ double Orbital::evaluate(const vec2 &r) const
     double Hx = Hermite::evaluate(m_nx, sqrtAlphaOmega*r[0]);
     double Hy = Hermite::evaluate(m_ny, sqrtAlphaOmega*r[1]);
     return Hx*Hy* exp(-alpha*omega*(r[0]*r[0] + r[1]*r[1])/2);
-}
-
-void Orbital::setParameters(double *parameters)
-{
-    alpha = parameters[0];
-    beta = parameters[1];
-    alphaOmega = omega * alpha;
-    sqrtAlphaOmega = sqrt(alphaOmega);
-    alphaOmegaalphaOmega = alphaOmega * alphaOmega;
 }
 
 void Orbital::gradient(const vec2 &r, vec2 &rGradient) const {

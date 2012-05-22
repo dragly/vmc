@@ -16,9 +16,6 @@ public:
     ~MonteCarloMetropolisHastings();
 private:
     int rank;
-    double stepLength;
-    vec2 *rOld;
-    vec2 *rNew;
 //    vec waveGradientOld;
 //    vec waveGradientNew;
     vec quantumForceNew;

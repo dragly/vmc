@@ -13,7 +13,7 @@ class WaveSimple : public WaveFunction
 public:
     WaveSimple(Config *config);
     double evaluate(vec2 r[]);
-    double laplace(vec2 r[], int movedParticle);
+    double laplace(vec2 r[]);
     WaveFunction* clone() {
         std::cerr << "Clone not implemented for WaveSimple" << std::endl;
         exit(978);
