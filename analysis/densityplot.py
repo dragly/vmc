@@ -29,11 +29,13 @@ for datapath in argv:
     fig.scene.background = (1.0, 1.0, 1.0)
     fig.scene.foreground = (0.0, 0.0, 0.0)
 
-    surface = surf(param0, param1, data, warp_scale='auto')
+    from numpy.linalg.linalg import norm
+    normalizedData = data / norm(data)
+    surface = surf(param0, param1, normalizedData, warp_scale='auto')
     surface.actor.property.edge_visibility = True
     surface.actor.property.lighting = True
 
-    myaxes = axes(xlabel='x', ylabel='y', zlabel='E')
+    myaxes = axes(xlabel='x', ylabel='y', zlabel='P(x,y)')
     myaxes.title_text_property.italic = False
     myaxes.title_text_property.bold = False
     myaxes.title_text_property.font_family = 'times'

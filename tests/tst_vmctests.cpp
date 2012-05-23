@@ -61,16 +61,16 @@ public:
     void fullSlaterSixInteractionTest();
     void fullIdealHastingsTest();
     void fullIdealHastingsSlaterTest();
-    void evolverTest();
 
     // unfinished tests
-    void diffusionMonteCarloTest();
     void evolutionaryMonteCarloTest();
+    void geneticMinimizerTest();
+    void evolverTest();
 private slots:
     // quick tests
     // slow tests
     // unfinished tests
-    void geneticMinimizerTest();
+    void diffusionMonteCarloTest();
 
 private:
     Config *oldConfig;
@@ -172,7 +172,7 @@ void VmcTests::fullIdealTest()
     //  Do the mc sampling
     monteCarlo->sample(nCycles);
     energy = monteCarlo->energy();
-//    std::cout << "Full ideal energy was " << energy << std::endl;
+    //    std::cout << "Full ideal energy was " << energy << std::endl;
     QVERIFY(fabs(energy - 3.00034530284643397025) < 1e-2);
 }
 
@@ -203,24 +203,24 @@ void VmcTests::slaterInverse() {
         Slater* slater2 = new Slater(config1, orbitals, true);
         slater1->initialize(r);
         slater2->initialize(r);
-//        std::cout << "Init:" << std::endl;
-//        std::cout << slater1->matrix() << std::endl;
-//        std::cout << slater2->matrix() << std::endl;
+        //        std::cout << "Init:" << std::endl;
+        //        std::cout << slater1->matrix() << std::endl;
+        //        std::cout << slater2->matrix() << std::endl;
         for(int cycle = 0; cycle < 20; cycle++) {
             for(int movedParticle = 0; movedParticle < config1->nParticles(); movedParticle++) {
                 for(int j = 0; j < config1->nDimensions(); j++) {
                     r[movedParticle].at(j) = ran2(&idum);
                 }
-//                std::cout << "movedParticle:" << movedParticle << std::endl;
+                //                std::cout << "movedParticle:" << movedParticle << std::endl;
                 slater1->ratio(r[movedParticle] , movedParticle);
                 slater1->calculateInverse(movedParticle);
                 mat analyticalInverse = slater1->inverse();
                 slater2->initialize(r);
                 mat numericalInverse = slater2->inverse();
-//                std::cout << "Matrix: " << std::endl;
-//                std::cout << slater1->matrix() << std::endl << slater2->matrix() << std::endl;
-//                std::cout << "Inverse:" << std::endl;
-//                std::cout << analyticalInverse << std::endl << numericalInverse << std::endl;
+                //                std::cout << "Matrix: " << std::endl;
+                //                std::cout << slater1->matrix() << std::endl << slater2->matrix() << std::endl;
+                //                std::cout << "Inverse:" << std::endl;
+                //                std::cout << analyticalInverse << std::endl << numericalInverse << std::endl;
                 for(int i = 0; i < 2; i++) {
                     for(int j = 0; j < 2; j++) {
                         QCOMPARE(analyticalInverse.at(i,j), numericalInverse.at(i,j));
@@ -319,7 +319,7 @@ void VmcTests::fullIdealHastingsTest()
     //  Do the mc sampling
     monteCarlo->sample(nCycles);
     energy = monteCarlo->energy();
-//    std::cout << "Full ideal Hastings energy was " << energy << std::endl;
+    //    std::cout << "Full ideal Hastings energy was " << energy << std::endl;
     QVERIFY(fabs(energy - 3.000) < 1e-2);
 }
 
@@ -517,8 +517,8 @@ void VmcTests::waveSlaterGradientTest()
         for(int i = 0; i < nParticles; i++) {
             r[i][0] = 4 * ran2(&idum) - 2;
             r[i][1] = 4 * ran2(&idum) - 2;
-//            r[i][0] = 0.34 + i * 0.2;
-//            r[i][1] = 0.12 + i * 0.42;
+            //            r[i][0] = 0.34 + i * 0.2;
+            //            r[i][1] = 0.12 + i * 0.42;
         }
         for(int p = 1; p < 11; p++) {
             parameters[0] = ran2(&idum);
@@ -530,8 +530,8 @@ void VmcTests::waveSlaterGradientTest()
             waveSlater1->gradient(r, analyticalGradient);
             waveSlater1->gradientNumerical(r, numericalGradient);
             for(int i = 0; i < nDimensions * nParticles; i++) {
-//                std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
-//                std::cout << "Diff: " << fabs(analyticalGradient[i] - numericalGradient[i]) << std::endl;
+                //                std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
+                //                std::cout << "Diff: " << fabs(analyticalGradient[i] - numericalGradient[i]) << std::endl;
                 QVERIFY(fabs(analyticalGradient[i] - numericalGradient[i]) < 1e-2);
             }
         }
@@ -560,10 +560,10 @@ void VmcTests::waveSlaterLaplaceTest()
     for(int w = 1; w < 11; w++) {
         config1->setOmega(w * 0.1);
         if(w > 5) {
-//            std::cout << "Interaction enabled" << std::endl;
+            //            std::cout << "Interaction enabled" << std::endl;
             config1->setInteractionEnabled(true);
         } else {
-//            std::cout << "Interaction disabled" << std::endl;
+            //            std::cout << "Interaction disabled" << std::endl;
             config1->setInteractionEnabled(false);
         }
         WaveSlater *waveSlater1 = new WaveSlater(config1);
@@ -579,8 +579,8 @@ void VmcTests::waveSlaterLaplaceTest()
             waveSlater1->initialize(r);
             double analyticalLaplace = waveSlater1->laplace(r);
             double numericalLaplace = waveSlater1->laplaceNumerical(r);
-//            std::cout << analyticalLaplace << " " << numericalLaplace << std::endl;
-//            std::cout << "Diff: " << fabs(analyticalLaplace - numericalLaplace) << std::endl;
+            //            std::cout << analyticalLaplace << " " << numericalLaplace << std::endl;
+            //            std::cout << "Diff: " << fabs(analyticalLaplace - numericalLaplace) << std::endl;
             QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 1e-5);
         }
     }
@@ -655,7 +655,7 @@ void VmcTests::waveSlaterSixParticleTest()
     parameters[0] = 1.0;
     parameters[1] = 0.4;
     waveSlater1->setParameters(parameters);
-//    cout << "Value for slaterSixParticleTest: " << waveSlater1->evaluate(rpos) << endl;
+    //    cout << "Value for slaterSixParticleTest: " << waveSlater1->evaluate(rpos) << endl;
 }
 
 void VmcTests::orbitalGradientTest()
@@ -697,7 +697,7 @@ void VmcTests::orbitalGradientTest()
                         double wfminus = orbital->evaluate(rMinus);
                         double wfplus  = orbital->evaluate(rPlus);
                         simpleGradient[j] = (wfplus - wfminus)/(2*hstep);
-//                        std::cout << analyticalGradient[j] << " " << simpleGradient[j] << std::endl;
+                        //                        std::cout << analyticalGradient[j] << " " << simpleGradient[j] << std::endl;
                         QVERIFY(fabs(analyticalGradient[j] - simpleGradient[j]) < 1e-4);
                     }
                 }
@@ -788,7 +788,7 @@ void VmcTests::fullSlaterSixNoInteractionTest()
     //  Do the mc sampling
     monteCarlo1->sample(nCycles);
     double energy = monteCarlo1->energy();
-//    cout << "Six non-interacting energy was " << fabs(energy) << endl;
+    //    cout << "Six non-interacting energy was " << fabs(energy) << endl;
     QVERIFY(fabs(energy - 10) < 1e-2);
 }
 
@@ -808,7 +808,7 @@ void VmcTests::fullSlaterSixInteractionTest()
         config1->setHamiltonian(hamiltonian);
         config1->setInteractionEnabled(true);
         int nCycles = 50000;
-//        int nCycles = 500; // using few cycles for profiling
+        //        int nCycles = 500; // using few cycles for profiling
         WaveSlater *waveSlater2 = new WaveSlater(config1);
         waveSlater2->setUseAnalyticalGradient(true);
         waveSlater2->setUseAnalyticalLaplace(true);
@@ -820,36 +820,45 @@ void VmcTests::fullSlaterSixInteractionTest()
         StandardMonteCarlo *monteCarlo2 = new StandardMonteCarlo(config1);
         monteCarlo2->sample(nCycles);
         double energy = monteCarlo2->energy();
-//        cout << "Six interacting energy was " << fabs(energy) << endl;
+        //        cout << "Six interacting energy was " << fabs(energy) << endl;
         QVERIFY(fabs(energy - 20.190) < 1e-1);
     }
-//    std::cout << "Benchmark used to be 51.328 seconds @ hyperon" << std::endl;
-//    std::cout << "Benchmark used to be 6.835 seconds @ home after first optimizations" << std::endl;
-//    std::cout << "Benchmark used to be 4.045 seconds @ home after profiling optimizations" << std::endl;
+    //    std::cout << "Benchmark used to be 51.328 seconds @ hyperon" << std::endl;
+    //    std::cout << "Benchmark used to be 6.835 seconds @ home after first optimizations" << std::endl;
+    //    std::cout << "Benchmark used to be 4.045 seconds @ home after profiling optimizations" << std::endl;
 }
 
 void VmcTests::evolverTest()
 {
-    QBENCHMARK {
-        FunctionEvolver *evolver = new FunctionEvolver(16, 32, 4);
-        evolver->setRescaleLimits(-10, 10);
-        evolver->evolve(2000,250);
-//        std::cout << evolver->fitnessResult << std::endl;
+    //    QBENCHMARK {
+    double sum = 0;
+    double sumsq = 0;
+    for(int test = 0; test < 100; test++) {
+        std::cout << test << std::endl;
+        FunctionEvolver *evolver = new FunctionEvolver(16, 16, 2);
+        evolver->setRescaleLimits(1e-10, 1e10);
+        evolver->evolve(500,250);
+        //        std::cout << evolver->fitnessResult << std::endl;
         evolver->calculate(evolver->allBestGenes);
 
-        ofstream data;
-        data.open("fitness.dat");
-        for(uint i = 0; i < evolver->x.n_elem; i++) {
-            data << evolver->x[i] << "\t" << evolver->result[i] << "\t" << evolver->fitnessResult[i] << std::endl;
-        }
-        data.close();
+        //        ofstream data;
+        //        data.open("fitness.dat");
+        //        for(uint i = 0; i < evolver->x.n_elem; i++) {
+        //            data << evolver->x[i] << " " << evolver->result[i] << " " << evolver->fitnessResult[i] << std::endl;
+        //        }
+        //        data.close();
 
         for(uint i = 0; i < evolver->x.n_elem; i++) {
-            QVERIFY(evolver->result[i] - evolver->fitnessResult[i] < 1e-1);
+            //            QVERIFY(fabs(evolver->result[i] - evolver->fitnessResult[i]) < 1e-1);
+            double val = fabs(evolver->result[i] - evolver->fitnessResult[i]);
+            sum += val;
+            sumsq += val*val;
         }
 
         delete evolver;
     }
+    std::cout << "Sum: " << sum << " variance: " << (sum/1000. * sum/1000.) - sumsq/1000 << std::endl;
+    //    }
 }
 
 void VmcTests::geneticMinimizerTest() {
@@ -869,14 +878,14 @@ void VmcTests::geneticMinimizerTest() {
         config->setWave(wave);
         config->setHamiltonian(new HamiltonianIdeal(config));
         config->setMonteCarlo(new StandardMonteCarlo(config));
-//        config->setMonteCarlo(new MonteCarloMetropolisHastings(config));
+        //        config->setMonteCarlo(new MonteCarloMetropolisHastings(config));
         GeneticMinimizer *evolver = new GeneticMinimizer(config);
         evolver->setNCycles(1000);
         evolver->setNSamples(100, 20000);
         evolver->setPopulationData(2, 16, 2);
         evolver->setRescaleLimits(0.1, 2);
         evolver->setRescaleCycles(2);
-//        evolver->setGeneLimits(0.3, 1.2);
+        //        evolver->setGeneLimits(0.3, 1.2);
         evolver->runMinimizer();
 
         delete evolver;
@@ -894,10 +903,10 @@ void VmcTests::diffusionMonteCarloTest() {
     double parameters[2];
     parameters[0] = 0.987;
     parameters[1] = 0.4;
-//        parameters[0] = 0.928;
-//        parameters[1] = 0.55;
-//    parameters[0] = 0.92;
-//    parameters[1] = 0.565;
+    //        parameters[0] = 0.928;
+    //        parameters[1] = 0.55;
+    //    parameters[0] = 0.92;
+    //    parameters[1] = 0.565;
 
     WaveSlater *waveSlater = new WaveSlater(config);
     config->setWave(waveSlater);
@@ -924,8 +933,8 @@ void VmcTests::evolutionaryMonteCarloTest() {
     double parameters[2];
     parameters[0] = 0.987;
     parameters[1] = 0.398;
-//    parameters[0] = 0.928;
-//    parameters[1] = 0.55;
+    //    parameters[0] = 0.928;
+    //    parameters[1] = 0.55;
 
     WaveSlater *waveSlater = new WaveSlater(config);
     config->setWave(waveSlater);

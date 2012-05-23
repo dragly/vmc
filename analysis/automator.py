@@ -93,6 +93,7 @@ elif autoMode == "run":
 elif autoMode == "plot":
     minimizerList = ""
     densityList = ""
+    geneticList = ""
     for afile in files:
 	configName = afile
 	myDir = runFolder + "/" + configName + "/"
@@ -104,9 +105,12 @@ elif autoMode == "plot":
 	    minimizerList += myDir + " "
 	elif mode == "density":
 	    densityList += myDir + " "
+        elif mode == "genetic":
+            geneticList += myDir + " "
 	else:
 	    print "Unknown mode"
 	    
     subprocess.call("python minimizerplot.py " + minimizerList, shell=True)
     subprocess.call("python densityplot.py " + densityList, shell=True)
+    subprocess.call("python geneticplot.py " + geneticList, shell=True)
 print "Automator finished."
