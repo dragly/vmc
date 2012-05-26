@@ -902,7 +902,7 @@ void VmcTests::diffusionMonteCarloTest() {
     config->setNDimensions(2);
     config->setInteractionEnabled(true);
     config->setDiffusionConstant(0.5);
-    config->setTau(0.001);
+    config->setTau(0.00001);
     config->setStepLength(0.001);
     config->setOmega(1.0);
 
