@@ -13,10 +13,13 @@ public:
     ~MonteCarlo();
 
     virtual void sample(int nCycles) = 0;
-    virtual void loadConfiguration(INIParser *settings) {
-        (void)settings;
-    }
+    virtual void loadConfiguration(INIParser *settings);
+
     static MonteCarlo *fromName(string monteCarloClass, Config *config);
+
+    double *allEnergies() {
+        return m_allEnergies;
+    }
 
     double energy() {
         return m_energy;
@@ -31,6 +34,10 @@ public:
 
     vec2 **moves() {
         return m_moves;
+    }
+
+    void setStoreEnergies(bool arg) {
+        storeEnergies = arg;
     }
 
     void checkTerminalization(double localEnergy);
@@ -65,10 +72,11 @@ protected:
 
     int cycle;
 
-    bool storeEnergies;
     vec2 *rOld;
     vec2 *rNew;
     double stepLength;
+    bool storeEnergies;
+    double spawnRadius;
 };
 
 #endif // MONTECARLO_H

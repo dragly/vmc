@@ -17,7 +17,8 @@ public:
         DensityMode,
         MinimizerMode,
         GeneticMode,
-        DiffusionMode
+        DiffusionMode,
+        OneRunMode
     };
 
     void loadConfiguration();

@@ -7,15 +7,15 @@ using namespace arma;
 #include "../hamiltonian/hamiltonian.h"
 #include "../wavefunction/wavefunction.h"
 
-class MonteCarloMetropolisHastings : public MonteCarlo
+class MetropolisHastingsMonteCarlo : public MonteCarlo
 {
 public:
-    MonteCarloMetropolisHastings(Config *config);
+    MetropolisHastingsMonteCarlo(Config *config);
     void sample(int nCycles);
 
-    ~MonteCarloMetropolisHastings();
+    ~MetropolisHastingsMonteCarlo();
 private:
-    int rank;
+    int myRank;
 //    vec waveGradientOld;
 //    vec waveGradientNew;
     vec quantumForceNew;
@@ -25,6 +25,7 @@ private:
     vec2 positionDiff ;
     Hamiltonian* hamiltonian;
     bool firstSample;
+    double diffConstant;
 };
 
 #endif // MONTECARLOMETROPOLISHASTINGS_H

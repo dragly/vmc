@@ -22,19 +22,7 @@ using namespace std;
 
 Minimizer::Minimizer(Config *config) :
     config(config),
-    m_rank(config->rank()),
+    m_rank(config->myRank()),
     m_nProcesses(config->nProcesses())
 {
-}
-
-void Minimizer::writeBlockData() {
-    ofstream blockofile;
-    // Setting output file name for this rank:
-    ostringstream ost;
-    ost << "blocks_rank" << m_rank << ".dat";
-    // Open file for writing:
-    blockofile.open(ost.str().c_str(), ios::out | ios::binary);
-    blockofile.write((char*)(m_allEnergies+1),
-                     m_nSamples*sizeof(double));
-    blockofile.close();
 }

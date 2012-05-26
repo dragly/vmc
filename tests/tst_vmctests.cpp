@@ -57,10 +57,10 @@ public:
     void waveSlaterGradientTest();
     // slow tests
     void fullIdealTest();
-    void fullSlaterSixNoInteractionTest();
-    void fullSlaterSixInteractionTest();
     void fullIdealHastingsTest();
     void fullIdealHastingsSlaterTest();
+    void fullSlaterSixInteractionTest();
+    void fullSlaterSixNoInteractionTest();
 
     // unfinished tests
     void evolutionaryMonteCarloTest();
@@ -314,12 +314,13 @@ void VmcTests::fullIdealHastingsTest()
     parameters[0] = 1;
     parameters[1] = 0.4;
     waveIdeal1->setParameters(parameters);
-    MonteCarloMetropolisHastings *monteCarlo = new MonteCarloMetropolisHastings(config1);
+    MetropolisHastingsMonteCarlo *monteCarlo = new MetropolisHastingsMonteCarlo(config1);
+    monteCarlo->setThermalizationEnabled(false);
     double energy;
     //  Do the mc sampling
     monteCarlo->sample(nCycles);
     energy = monteCarlo->energy();
-    //    std::cout << "Full ideal Hastings energy was " << energy << std::endl;
+        std::cout << "Full ideal Hastings energy was " << energy << std::endl;
     QVERIFY(fabs(energy - 3.000) < 1e-2);
 }
 
@@ -422,7 +423,7 @@ void VmcTests::fullIdealHastingsSlaterTest()
     waveSlater1->setParameters(parameters);
     int nCycles = 100000;
     //    waveSlater1->setUseAnalyticalLaplace(false);
-    MonteCarloMetropolisHastings *monteCarlo = new MonteCarloMetropolisHastings(config1);
+    MetropolisHastingsMonteCarlo *monteCarlo = new MetropolisHastingsMonteCarlo(config1);
     //    double *allEnergies = new double[nCycles+1];
     double energy;
     //  Do the mc sampling
@@ -772,6 +773,7 @@ void VmcTests::fullSlaterSixNoInteractionTest()
     config1->setNDimensions(2);
     config1->setNParticles(6);
     config1->setInteractionEnabled(false);
+    config1->setStepLength(0.01);
     HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
     config1->setHamiltonian(hamiltonian);
     WaveSlater *waveSlater1 = new WaveSlater(config1);
@@ -784,11 +786,11 @@ void VmcTests::fullSlaterSixNoInteractionTest()
     waveSlater1->setParameters(parameters);
     int nCycles = 50000;
     //    waveSlater1->setUseAnalyticalLaplace(false);
-    StandardMonteCarlo *monteCarlo1 = new StandardMonteCarlo(config1);
+    MetropolisHastingsMonteCarlo *monteCarlo1 = new MetropolisHastingsMonteCarlo(config1);
     //  Do the mc sampling
     monteCarlo1->sample(nCycles);
     double energy = monteCarlo1->energy();
-    //    cout << "Six non-interacting energy was " << fabs(energy) << endl;
+    cout << "Six non-interacting energy was " << fabs(energy) << endl;
     QVERIFY(fabs(energy - 10) < 1e-2);
 }
 
@@ -802,25 +804,27 @@ void VmcTests::fullSlaterSixInteractionTest()
 {
     QBENCHMARK {
         Config *config1 = new Config(0,1);
-        config1->setNDimensions(2);
         config1->setNParticles(6);
+        config1->setNDimensions(2);
+        config1->setStepLength(1.0);
         HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
         config1->setHamiltonian(hamiltonian);
         config1->setInteractionEnabled(true);
-        int nCycles = 50000;
+        int nCycles = 100000;
         //        int nCycles = 500; // using few cycles for profiling
         WaveSlater *waveSlater2 = new WaveSlater(config1);
         waveSlater2->setUseAnalyticalGradient(true);
         waveSlater2->setUseAnalyticalLaplace(true);
         double parameters[2];
-        parameters[0] = 0.92;
-        parameters[1] = 0.565;
+        parameters[0] = 0.9303;
+        parameters[1] = 0.5493;
         waveSlater2->setParameters(parameters);
         config1->setWave(waveSlater2);
-        StandardMonteCarlo *monteCarlo2 = new StandardMonteCarlo(config1);
+        MetropolisHastingsMonteCarlo *monteCarlo2 = new MetropolisHastingsMonteCarlo(config1);
+        monteCarlo2->setThermalizationEnabled(true);
         monteCarlo2->sample(nCycles);
         double energy = monteCarlo2->energy();
-        //        cout << "Six interacting energy was " << fabs(energy) << endl;
+        cout << "Six interacting energy was " << fabs(energy) << endl;
         QVERIFY(fabs(energy - 20.190) < 1e-1);
     }
     //    std::cout << "Benchmark used to be 51.328 seconds @ hyperon" << std::endl;
@@ -894,17 +898,19 @@ void VmcTests::geneticMinimizerTest() {
 
 void VmcTests::diffusionMonteCarloTest() {
     Config *config = new Config(0, 1);
-    config->setNParticles(2);
+    config->setNParticles(6);
     config->setNDimensions(2);
     config->setInteractionEnabled(true);
     config->setDiffusionConstant(0.5);
-    config->setTau(0.01);
+    config->setTau(0.001);
+    config->setStepLength(0.001);
+    config->setOmega(1.0);
 
     double parameters[2];
-    parameters[0] = 0.987;
-    parameters[1] = 0.4;
-    //        parameters[0] = 0.928;
-    //        parameters[1] = 0.55;
+//        parameters[0] = 0.987;
+//        parameters[1] = 0.4;
+    parameters[0] = 0.9303;
+    parameters[1] = 0.5493;
     //    parameters[0] = 0.92;
     //    parameters[1] = 0.565;
 

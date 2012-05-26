@@ -14,8 +14,8 @@ using namespace std;
 class Config
 {
 public:
-    Config(int rank, int nProcesses);
-    int rank() {
+    Config(int myRank, int nProcesses);
+    int myRank() {
         return m_rank;
     }
     int nProcesses() const  {

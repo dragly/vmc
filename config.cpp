@@ -12,8 +12,8 @@
 
 using namespace std;
 
-Config::Config(int rank, int nProcesses) :
-    m_rank(rank),
+Config::Config(int myRank, int nProcesses) :
+    m_rank(myRank),
     m_nProcesses(nProcesses),
     m_nParticles(2),
     m_nDimensions(2),
@@ -21,20 +21,20 @@ Config::Config(int rank, int nProcesses) :
     m_wave(0),
     m_hamiltonian(0),
     m_monteCarloClass("MonteCarloStandard"),
-    m_omega(1),
+    m_omega(1.0),
     m_interactionEnabled(true),
-    m_idum(-rank*time(NULL)),
+    m_idum(-myRank*time(NULL)),
     m_diffusionConstant(0.5),
     m_tau(0.01)
 {
 }
 
 void Config::loadConfiguration(INIParser* settings) {
-    m_nParticles = settings->GetInteger("General", "nParticles", m_nParticles);
-    m_nDimensions = settings->GetInteger("General", "nDimensions", m_nDimensions);
+    m_nParticles = settings->GetDouble("General", "nParticles", m_nParticles);
+    m_nDimensions = settings->GetDouble("General", "nDimensions", m_nDimensions);
     m_interactionEnabled = settings->GetBoolean("General", "interactionEnabled", m_interactionEnabled);
-    m_stepLength = atof(settings->Get("General", "stepLength", "1.0").c_str());
-    m_omega = atof(settings->Get("General", "omega", "1.0").c_str());
+    m_stepLength = settings->GetDouble("General", "stepLength", m_stepLength);
+    m_omega = settings->GetDouble("General", "omega", m_omega);
 
     // Wave properties
     string waveClass = settings->Get("Wave","class", "WaveSimple");
@@ -66,4 +66,5 @@ void Config::loadConfiguration(INIParser* settings) {
         cerr << "Unknown Monte Carlo class '" << m_monteCarloClass << "'" << endl;
         exit(97);
     }
+    m_monteCarlo->loadConfiguration(settings);
 }

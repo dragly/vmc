@@ -17,63 +17,74 @@ using namespace std;
 
 #include "blocker.h"
 #include "inih/ini.h"
+#include "config.h"
 
 // TODO make sure that the Blocker class actually does what it is supposed to
 
-Blocker::Blocker()
+Blocker::Blocker(Config* config_) :
+    nProcesses(config_->nProcesses()),
+    nBlockSamples(41),
+    minBlockSize(1),
+    maxBlockSize(10000),
+    config(config_)
 {
 }
 
 void Blocker::loadConfiguration(INIParser *settings)
 {
-    m_settings = settings;
-    m_nProcesses = atoi(settings->Get("Blocker","nProcesses", "1").c_str());
+    nBlockSamples = settings->GetDouble("Blocking", "nBlockSamples", nBlockSamples);
+    minBlockSize = settings->GetDouble("Blocking", "minBlockSize", minBlockSize);
+    maxBlockSize = settings->GetDouble("Blocking", "maxBlockSize", maxBlockSize);
+    scratchDir = settings->GetString("Blocking", "scratchDir", "/scratch/blocking");
 }
 
 void Blocker::runBlocking() {
     // load block data
     struct stat result;
     int nLocal = 0;
-    int nBlockData = 0;
-    if(stat("blocks_rank0.dat", &result) == 0) {
-        nLocal = result.st_size / sizeof(double);
-        cout << nLocal << endl;
-        nBlockData = nLocal * m_nProcesses;
+    int nSamples = 0;
+
+    ostringstream blockfile;
+    ostringstream path;
+    path << scratchDir << "/" << config->nParticles() << "p-omega" << config->omega();
+    blockfile << path.str() << "/blocks_rank0.dat";
+    if(stat(blockfile.str().c_str(), &result) == 0) {
+
     } else {
         cerr << "Trouble loading blocks_rank0.dat" << endl;
         exit(99);
     }
 
-    double *mcResults = new double[nBlockData];
-    for(int i = 0; i < m_nProcesses; i++) {
+    nLocal = result.st_size / sizeof(double);
+    nSamples = nLocal * nProcesses;
+
+    double *monteCarloResults = new double[nSamples];
+    for(int i = 0; i < nProcesses; i++) {
         ostringstream ost;
-        ost << "blocks_rank" << i << ".dat";
+        ost << path.str() << "/blocks_rank" << i << ".dat";
         ifstream infile;
-        infile.open(ost.str().c_str(), ios::in | ios::binary);
-        infile.read((char*)&(mcResults[i*nLocal]), result.st_size);
-        infile.close();
+        if(stat(ost.str().c_str(), &result) == 0) {
+            infile.open(ost.str().c_str(), ios::in | ios::binary);
+            infile.read((char*)&(monteCarloResults[i*nLocal]), result.st_size);
+            infile.close();
+            } else {
+            std::cerr << "Could not find file " << ost.str() << std::endl;
+            exit(953);
+        }
     }
-    int nBlockSamples = 41;
-    int minBlockSize = nBlockData / 50;
-    int maxBlockSize = nBlockData / 10;
     int blockStepSize = (maxBlockSize - minBlockSize) / (nBlockSamples - 1);
     int blockSize = -1;
-    double meanSigma[2];
+    double results[2];
+    ofstream outfile;
+    outfile.open("blockingdata.dat");
     for(int i = 0; i < nBlockSamples; i++) {
         blockSize = minBlockSize + i * blockStepSize;
-        blocking(mcResults, nBlockData, blockSize, meanSigma);
-        double mean = meanSigma[0];
-        double sigma = meanSigma[1];
-        printf("BlockSize: %d    Mean: %.6f     Sigma: %.6f\n", blockSize, mean, sqrt(sigma/((nBlockData/blockSize)-1)));
+        blocking(monteCarloResults, nSamples, blockSize, results);
+        double mean = results[0];
+        double standardError = results[1];
+        outfile << blockSize << " " << mean << " " << standardError << std::endl;
     }
-}
-
-double Blocker::mean(double* values, double nValues) {
-    double myMean = 0;
-    for(int i = 0; i < nValues; i++) {
-        myMean += values[i];
-    }
-    return myMean / nValues;
+    outfile.close();
 }
 
 void Blocker::blocking(double *values, int nValues, int blockSize, double *result) {
@@ -82,13 +93,13 @@ void Blocker::blocking(double *values, int nValues, int blockSize, double *resul
     double totalBlockSumSquared = 0;
     for(int i = 0; i < nBlocks; i++) {
         double blockSum = 0;
-        for(int j = 0; j < nValues; j++) {
+        for(int j = 0; j < blockSize; j++) {
             double val = values[i * blockSize + j];
             blockSum += val;
         }
-        totalBlockSum += (blockSum / nValues);
-        totalBlockSumSquared += (blockSum / nValues) * (blockSum / nValues);
+        totalBlockSum += (blockSum / blockSize);
+        totalBlockSumSquared += (blockSum / blockSize) * (blockSum / blockSize);
     }
     result[0] = totalBlockSum / nBlocks;
-    result[1] = (totalBlockSumSquared / nBlocks - result[0] * result[0]);
+    result[1] = sqrt(totalBlockSumSquared / nBlocks - result[0] * result[0]) / sqrt(nBlocks - 1);
 }

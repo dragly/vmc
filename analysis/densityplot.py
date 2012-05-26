@@ -8,6 +8,7 @@ from numpy import *
 from matplotlib import rc
 from sys import argv
 import ConfigParser
+options.offscreen = True
 first = True
 
 for datapath in argv:
@@ -15,15 +16,20 @@ for datapath in argv:
 	first = False
 	continue
 
-    config = ConfigParser.ConfigParser()
-    configFileName = datapath + "/config.ini"
-    config.read(configFileName)
-    nParticles = config.get("General", "nParticles")
+    try:
+        config = ConfigParser.ConfigParser()
+        configFileName = datapath + "/config.ini"
+        config.read(configFileName)
+        nParticles = config.get("General", "nParticles")
 
-    param0 = loadtxt(datapath + "/density-grid-x.dat")
-    param1 = loadtxt(datapath + "/density-grid-y.dat")
-    data = loadtxt(datapath + "/density.dat")
-
+        param0 = loadtxt(datapath + "/density-grid-x.dat")
+        param1 = loadtxt(datapath + "/density-grid-y.dat")
+        data = loadtxt(datapath + "/density.dat")
+    except IOError as e:
+        print "Could not find data files for " + myDir + ". Skipping..."
+        continue
+    print "Plotting " + datapath
+    
     fig = figure(size=(1280,960))
 
     fig.scene.background = (1.0, 1.0, 1.0)

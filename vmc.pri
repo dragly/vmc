@@ -73,7 +73,8 @@ HEADERS += \
     minimizer/geneticminimizer.h \
     minimizer/standardminimizer.h \
     montecarlo/standardmontecarlo.h \
-    montecarlo/metropolishastingsmontecarlo.h
+    montecarlo/metropolishastingsmontecarlo.h \
+    onerun/onerun.h
 
 SOURCES += main.cpp \
     matrix.cpp \
@@ -105,4 +106,5 @@ SOURCES += main.cpp \
     minimizer/standardminimizer.cpp \
     montecarlo/metropolishastingsmontecarlo.cpp \
     montecarlo/standardmontecarlo.cpp \
-    minimizer/geneticminimizer.cpp
+    minimizer/geneticminimizer.cpp \
+    onerun/onerun.cpp

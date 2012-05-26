@@ -3,6 +3,7 @@
 #include "standardmontecarlo.h"
 #include "metropolishastingsmontecarlo.h"
 #include "../random.h"
+#include "../inih/ini.h"
 
 MonteCarlo::MonteCarlo(Config *config) :
     config(config),
@@ -20,7 +21,9 @@ MonteCarlo::MonteCarlo(Config *config) :
     hamiltonian(config->hamiltonian()),
     recordMoves(false),
     nMoves(1),
-    stepLength(config->stepLength())
+    stepLength(config->stepLength()),
+    storeEnergies(false),
+    spawnRadius(2)
 {
     // allocate matrices which contain the position of the particles
     rOld = new vec2[nParticles];
@@ -34,10 +37,15 @@ MonteCarlo::~MonteCarlo() {
     delete [] rNew;
 }
 
+void MonteCarlo::loadConfiguration(INIParser *settings)
+{
+    spawnRadius = settings->GetDouble("MonteCarlo", "spawnRadius", spawnRadius);
+}
+
 void MonteCarlo::randomizePositions() {
     for (int i = 0; i < nParticles; i++) {
         for (int j=0; j < nDimensions; j++) {
-            rOld[i][j] = rNew[i][j] = stepLength*(ran2(idumMC)-0.5);
+            rOld[i][j] = rNew[i][j] = spawnRadius * simpleGaussRandom(idumMC);
         }
     }
 }
@@ -47,7 +55,7 @@ MonteCarlo* MonteCarlo::fromName(string monteCarloClass, Config *config)
     if(monteCarloClass == "MonteCarloStandard") {
         return new StandardMonteCarlo(config);
     } else if(monteCarloClass == "MonteCarloMetropolisHastings") {
-        return new MonteCarloMetropolisHastings(config);
+        return new MetropolisHastingsMonteCarlo(config);
     } else {
         return 0;
     }
@@ -67,7 +75,7 @@ void MonteCarlo::checkTerminalization(double localEnergy) {
     if(!(cycle % 1000)) {
         double terminalizationAverage = terminalizationSum / terminalizationNum;
         diffAverage = fabs(terminalizationAverage - prevTerminalizationAverage);
-        if(diffAverage < 2 && terminalizationTrials > 50) {
+        if(diffAverage < 2 && terminalizationTrials > 25) {
             terminalized = true;
             cycle = 0;
         }

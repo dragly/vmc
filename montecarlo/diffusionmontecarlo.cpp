@@ -45,20 +45,21 @@ DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config) :
     //            aliveNew[i] = false;
     //        }
     //    }
-    std::cout << "Done constructing DMC class" << std::endl;
 }
 
 // Note: Implementation from http://www.ornl.gov/~pk7/thesis/pkthnode21.html
 
 void DiffusionMonteCarlo::sample(int nCycles)
 {
+    std::cout << "Running VMC to initialize DMC" << std::endl;
     // Initialize ensemble of walkers from VMC best guess
-    MonteCarloMetropolisHastings *initialMonteCarlo = new MonteCarloMetropolisHastings(config);
+    MetropolisHastingsMonteCarlo *initialMonteCarlo = new MetropolisHastingsMonteCarlo(config);
     initialMonteCarlo->setRecordMoves(true, nWalkersAlive * nParticles);
     initialMonteCarlo->setThermalizationEnabled(true);
+//    initialMonteCarlo->setThermalizationEnabled(false); // TODO set true
     initialMonteCarlo->sample(nWalkersAlive * correlationStep);
     double trialEnergy = initialMonteCarlo->energy();
-    std::cout << "Initial trial energy was " << trialEnergy << std::endl;
+    std::cout << "Done initializing. Initial trial energy was " << trialEnergy << std::endl;
 
     ofstream scatterfile;
     scatterfile.open("positions-init.dat");
@@ -73,6 +74,7 @@ void DiffusionMonteCarlo::sample(int nCycles)
     }
     scatterfile.close();
 
+    std::cout << "Done writing data to file." << std::endl;
     int blockLength = 100;
     double energySum = 0;
     int nEnergySamples = 0;

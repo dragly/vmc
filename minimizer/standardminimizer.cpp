@@ -28,20 +28,19 @@
 using namespace std;
 
 StandardMinimizer::StandardMinimizer(Config *config) :
-    Minimizer(config)
+    Minimizer(config),
+    m_wave(config->wave()),
+    m_monteCarlo(config->monteCarlo()),
+    m_hamiltonian(config->hamiltonian())
 {
-    m_wave = config->wave();
-    m_hamiltonian = config->hamiltonian();
-    m_monteCarlo = config->monteCarlo();
+
 }
 
 void StandardMinimizer::loadConfiguration(INIParser *settings)
 {
     m_settings = settings;
-    charge = atof(settings->Get("MinimizerStandard","charge", "1.0").c_str());
-    stepLength = atof(settings->Get("MinimizerStandard","stepLength", "1.0").c_str());
-    m_nSamples = atoi(settings->Get("MinimizerStandard","nCycles", "1000").c_str());
-    nVariations = settings->GetInteger("MinimizerStandard","nVariations", 11);    //  default number of variations
+    m_nSamples = settings->GetDouble("MinimizerStandard","nCycles", 1000);
+    nVariations = settings->GetDouble("MinimizerStandard","nVariations", 11);    //  default number of variations
     alphaStart = settings->GetDouble("MinimizerStandard","alphaStart", 0);    //  default number of variations
     alphaEnd= settings->GetDouble("MinimizerStandard","alphaEnd", 1);    //  default number of variations
     betaStart = settings->GetDouble("MinimizerStandard","betaStart", 0);    //  default number of variations
@@ -155,15 +154,15 @@ void StandardMinimizer::runMinimizer()
             for(int j=0; j < nVariations; j++){
                 double energy = totalCumulativeEnergy(i,j) ;
                 double variance = totalCumulativeEnergySquared(i,j) - energy*energy;
-                double error = sqrt(variance/(total_number_cycles-1));
+                double error = sqrt(variance / (total_number_cycles-1));
                 energyFile << setiosflags(ios::showpoint | ios::uppercase);
-                energyFile << setw(15) << setprecision(8) << energy;
-                parameters0File << setw(15) << setprecision(8) << parameter0Map(i,j);
-                parameters1File << setw(15) << setprecision(8) << parameter1Map(i,j);
+                energyFile << setw(15) << setprecision(20) << energy;
+                parameters0File << setw(15) << setprecision(20) << parameter0Map(i,j);
+                parameters1File << setw(15) << setprecision(20) << parameter1Map(i,j);
                 varianceFile << setiosflags(ios::showpoint | ios::uppercase);
-                varianceFile << setw(15) << setprecision(8) << variance;
+                varianceFile << setw(15) << setprecision(20) << variance;
                 errorFile << setiosflags(ios::showpoint | ios::uppercase);
-                errorFile << setw(15) << setprecision(8) << error;
+                errorFile << setw(15) << setprecision(20) << error;
             }
             energyFile << std::endl;
             varianceFile << std::endl;
@@ -173,7 +172,4 @@ void StandardMinimizer::runMinimizer()
         }
         energyFile.close();  // close output file
     }
-    // TODO Fix blocking!
-    writeBlockData();
-//    delete [] m_allEnergies;l
 }

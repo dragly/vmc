@@ -13,11 +13,11 @@ class StandardMonteCarlo : public MonteCarlo
 public:
     StandardMonteCarlo(Config* config);
 
-    void sample(int nCycles);
+    void sample(int nSamples);
 
     ~StandardMonteCarlo();
 private:
-    int rank;
+    int myRank;
     bool firstSample;
 };
 

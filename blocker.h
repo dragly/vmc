@@ -2,18 +2,24 @@
 #define BLOCKER_H
 
 class INIParser;
+class Config;
+
+#include <string>
 
 class Blocker
 {
 public:
-    Blocker();
+    Blocker(Config *config);
     void runBlocking();
-    double mean(double *values, double nValues);
     void blocking(double *values, int nValues, int blockSize, double *result);
     void loadConfiguration(INIParser *settings);
 private:
-    int m_nProcesses;
-    INIParser *m_settings;
+    int nProcesses;
+    int nBlockSamples;
+    int minBlockSize;
+    int maxBlockSize;
+    std::string scratchDir;
+    Config *config;
 };
 
 #endif // BLOCKER_H

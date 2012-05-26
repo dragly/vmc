@@ -30,6 +30,7 @@
 #include "config.h"
 #include "montecarlo/diffusionmontecarlo.h"
 #include "minimizer/geneticminimizer.h"
+#include "onerun/onerun.h"
 using namespace  std;
 
 MainApplication::MainApplication(int* argc, char*** argv) :
@@ -47,7 +48,7 @@ void MainApplication::loadConfiguration()
     // Make sure the config is loaded by one processor at the time
     for(int i = 0; i < m_nProcesses; i++) {
         if(i == m_rank) {
-            std::cout << "Loading ini reader for rank " << m_rank << std::endl;
+            std::cout << "Loading ini reader for myRank " << m_rank << std::endl;
             m_settings = new INIParser("config.ini");
 
             if(!m_settings->Good()) {
@@ -66,6 +67,8 @@ void MainApplication::loadConfiguration()
                 m_mode = BlockingMode;
             } else if(modeString == "genetic") {
                 m_mode = GeneticMode;
+            } else if(modeString == "onerun") {
+                m_mode = OneRunMode;
             } else {
                 cerr << __PRETTY_FUNCTION__ << ": Unknown mode '" << modeString << "'" << endl;
                 exit(460);
@@ -94,7 +97,7 @@ void MainApplication::runConfiguration()
         densityPlotter->makePlot();
         delete densityPlotter;
     } else if(m_mode == BlockingMode) {
-        Blocker* blocker = new Blocker();
+        Blocker* blocker = new Blocker(m_config);
         blocker->loadConfiguration(m_settings);
         blocker->runBlocking();
         delete blocker;
@@ -110,6 +113,11 @@ void MainApplication::runConfiguration()
         geneticMinimizer->loadConfiguration(m_settings);
         geneticMinimizer->runMinimizer();
         delete geneticMinimizer;
+    } else if(m_mode == OneRunMode) {
+        OneRun *oneRun = new OneRun(m_config);
+        oneRun->loadConfiguration(m_settings);
+        oneRun->run();
+        delete oneRun;
     } else {
         cerr << __PRETTY_FUNCTION__ << ": Unknown mode" << endl;
         exit(459);

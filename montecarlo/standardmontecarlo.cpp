@@ -9,10 +9,9 @@
 
 StandardMonteCarlo::StandardMonteCarlo(Config *config) :
     MonteCarlo(config),
-    rank(config->rank()),
+    myRank(config->myRank()),
     firstSample(true)
 {
-
     m_allEnergies = new double[1]; // dummy array that can be deleted when sampling with energy storage
     m_moves = new vec2*[1];
     m_moves[0] = new vec2[nParticles];
@@ -21,7 +20,7 @@ StandardMonteCarlo::StandardMonteCarlo(Config *config) :
 StandardMonteCarlo::~StandardMonteCarlo()
 {
 }
-void StandardMonteCarlo::sample(int nCycles)
+void StandardMonteCarlo::sample(int nSamples)
 {
     m_energy = 0;
     m_energySquared = 0;
@@ -30,11 +29,12 @@ void StandardMonteCarlo::sample(int nCycles)
     prevTerminalizationAverage = 99999999;
     double localEnergy = 0;
     if(storeEnergies) {
-        m_allEnergies = new double[nCycles];
+        // TODO delete m_allEnergies first
+        m_allEnergies = new double[nSamples];
     }
     int nthMove = 0;
     if(recordMoves) {
-        nthMove = nCycles * nParticles / (nMoves);
+        nthMove = nSamples * nParticles / (nMoves);
     }
     // initialisations of variational parameters and energies
     m_energy = m_energySquared = 0; localEnergy=0;
@@ -53,7 +53,7 @@ void StandardMonteCarlo::sample(int nCycles)
     // TODO Optimize step length by Newton's method
     // loop over monte carlo cycles
     int move = 0;
-    for (cycle = 0; cycle < nCycles; cycle++){
+    for (cycle = 0; cycle < nSamples; cycle++){
         // new position
         for (int i = 0; i < nParticles; i++) {
             for (int j=0; j < nDimensions; j++) {
@@ -106,8 +106,8 @@ void StandardMonteCarlo::sample(int nCycles)
 
         }   // end of loop over MC trials
     }  //  end of loop over particles
-    m_energy /= (nCycles * nParticles);
-    m_energySquared /= (nCycles * nParticles);
+    m_energy /= (nSamples * nParticles);
+    m_energySquared /= (nSamples * nParticles);
     //    std::cout << "Done sampling. Had " << terminalizationTrials << " terminalization trials with the last diff at " << diffAverage << std::endl;
 }
 

@@ -20,13 +20,13 @@ GeneticMinimizer::GeneticMinimizer(Config *config) :
 
 void GeneticMinimizer::loadConfiguration(INIParser *settings)
 {
-    nGenes = settings->GetInteger("GeneticMinimizer","nGenes", 2);
-    nIndividuals = settings->GetInteger("GeneticMinimizer","nIndividuals", 16);
-    nPopulations = settings->GetInteger("GeneticMinimizer","nPopulations", 2);
-    nCycles = settings->GetInteger("GeneticMinimizer","nCycles", 20000);
-    nSamplesStart = settings->GetInteger("GeneticMinimizer","nSamplesStart", 100);
-    nSamplesEnd = settings->GetInteger("GeneticMinimizer","nSamplesEnd", 1000);
-    rescaleCycles = settings->GetInteger("GeneticMinimizer","rescaleCycles", 2);
+    nGenes = settings->GetDouble("GeneticMinimizer","nGenes", 2);
+    nIndividuals = settings->GetDouble("GeneticMinimizer","nIndividuals", 16);
+    nPopulations = settings->GetDouble("GeneticMinimizer","nPopulations", 2);
+    nCycles = settings->GetDouble("GeneticMinimizer","nCycles", 20000);
+    nSamplesStart = settings->GetDouble("GeneticMinimizer","nSamplesStart", 100);
+    nSamplesEnd = settings->GetDouble("GeneticMinimizer","nSamplesEnd", 1000);
+    rescaleCycles = settings->GetDouble("GeneticMinimizer","rescaleCycles", 2);
     double lowRescaleLimit = settings->GetDouble("GeneticMinimizer","lowRescaleLimit", 0.1);
     double highRescaleLimit = settings->GetDouble("GeneticMinimizer","highRescaleLimit", 2.0);
     setRescaleLimits(lowRescaleLimit, highRescaleLimit);

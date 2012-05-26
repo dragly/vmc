@@ -96,7 +96,7 @@ double EvolutionaryMonteCarlo::fitness(vec &genes, int population, int individua
 void EvolutionaryMonteCarlo::sample(int nCycles)
 {
     // Initialize ensemble of walkers from VMC best guess
-    MonteCarloMetropolisHastings *initialMonteCarlo = new MonteCarloMetropolisHastings(config);
+    MetropolisHastingsMonteCarlo *initialMonteCarlo = new MetropolisHastingsMonteCarlo(config);
     initialMonteCarlo->setRecordMoves(true, nPopulations * nIndividuals * nParticles * nWalkers);
     initialMonteCarlo->setThermalizationEnabled(true);
     initialMonteCarlo->sample(nWalkers * nIndividuals * nPopulations * correlationStep);

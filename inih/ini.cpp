@@ -226,7 +226,7 @@ int INIParser::GetInteger(const char section[], const char key[], int defaultVal
         lsection++;
     }
 
-    if(!lsection_found && !this->withoutSections) return 0;
+    if(!lsection_found && !this->withoutSections) return defaultValue;
 
     buffer_end = this->buffer[lsection].end();
     for(buffer_it = this->buffer[lsection].begin(); buffer_it < buffer_end; ++buffer_it)
@@ -272,7 +272,7 @@ double INIParser::GetDouble(const char section[], const char key[], double defau
         lsection++;
     }
 
-    if(!lsection_found && !this->withoutSections) return 0;
+    if(!lsection_found && !this->withoutSections) return defaultValue;
 
     buffer_end = this->buffer[lsection].end();
     for(buffer_it = this->buffer[lsection].begin(); buffer_it < buffer_end; ++buffer_it)
@@ -319,7 +319,7 @@ long INIParser::GetLong(const char section[], const char key[], long defaultValu
         lsection++;
     }
 
-    if(!lsection_found && !this->withoutSections) return 0;
+    if(!lsection_found && !this->withoutSections) return defaultValue;
 
     buffer_end = this->buffer[lsection].end();
     for(buffer_it = this->buffer[lsection].begin(); buffer_it < buffer_end; ++buffer_it)
@@ -366,7 +366,7 @@ bool INIParser::GetBoolean(const char section[], const char key[], bool defaultV
         lsection++;
     }
 
-    if(!lsection_found && !this->withoutSections) return 0;
+    if(!lsection_found && !this->withoutSections) return defaultValue;
 
     buffer_end = this->buffer[lsection].end();
     for(buffer_it = this->buffer[lsection].begin(); buffer_it < buffer_end; ++buffer_it)
@@ -422,7 +422,7 @@ string INIParser::GetString(const char section[], const char key[], string defau
         lsection++;
     }
 
-    if(!lsection_found && !this->withoutSections) return "";
+    if(!lsection_found && !this->withoutSections) return defaultValue;
 
     buffer_end=this->buffer[lsection].end();
     for(buffer_it = this->buffer[lsection].begin(); buffer_it < buffer_end; ++buffer_it)

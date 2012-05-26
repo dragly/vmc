@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 import subprocess
 import dircache
@@ -33,24 +32,61 @@ if autoMode == "kill":
 	print "Calling: ssh " + server +  " 'killall vmc'"
 	subprocess.call("ssh " + server +  " 'killall vmc'", shell=True)
 elif autoMode == "status":
+    for afile in files:
+        configName = afile
+        
+        myDir = runFolder + "/" + configName + "/"
+        try:
+            config = ConfigParser.ConfigParser()
+            configFileName = myDir + "config.ini"
+            config.read(configFileName)
+        except IOError as e:
+            print bcolors.FAIL + "Could not find configfile for " + myDir + ". Skipping..."
+            continue
+        mode = config.get("General", "mode")
+        fileop = open(configFileName)
+        configData = fileop.read()
+        
+        prevConfigFile = myDir + prevrunConfigFileName
+        prevConfigData = ""
+        if os.path.exists(prevConfigFile):
+            prevConfigFileOp = open(prevConfigFile)
+            prevConfigData = prevConfigFileOp.read()
+            
+        if prevConfigData == configData:
+            #print bcolors.WARNING + "Config is the same. No need to run again." + bcolors.ENDC
+            aasfasf = 0
+        elif os.path.exists(myDir + lockFileName):
+            print "Found job in " + afile
+            lockFileOp = open(myDir + lockFileName)
+            lockHost = lockFileOp.read()
+            lockFileOp.close()
+            print bcolors.WARNING + "Run is locked by process on host " + lockHost + bcolors.ENDC
+        else:
+            print "Found job in " + afile
+            print bcolors.OKGREEN + "Updated config file. It needs a rerun." + bcolors.ENDC
+            
     for server in servers:
-	print server + ":"
-	nProcs = subprocess.check_output("ssh " + server +  " 'ps aux | grep generator.py | wc -l'", shell=True)
-	if(int(nProcs) > 2):
-	    print bcolors.OKGREEN + "Running " + nProcs.replace("\n","") + bcolors.ENDC
-	users = subprocess.check_output("ssh " + server +  " 'users'", shell=True)
-	if users != "":
-	    print bcolors.WARNING + users.replace("\n","") + bcolors.ENDC
+        print server + ":"
+        nProcs = subprocess.check_output("ssh " + server +  " 'ps aux | grep generator.py | wc -l'", shell=True)
+        if(int(nProcs) > 2):
+            print bcolors.OKGREEN + "Running " + nProcs.replace("\n","") + bcolors.ENDC
+        users = subprocess.check_output("ssh " + server +  " 'users'", shell=True)
+        if users != "":
+            print bcolors.WARNING + users.replace("\n","") + bcolors.ENDC
 elif autoMode == "run":
     for afile in files:
 	print "Found job in " + afile
 	configName = afile
 	
 	myDir = runFolder + "/" + configName + "/"
-	
-	config = ConfigParser.ConfigParser()
-	configFileName = myDir + "config.ini"
-	config.read(configFileName)
+	try:
+            config = ConfigParser.ConfigParser()
+            configFileName = myDir + "config.ini"
+            config.read(configFileName)
+        except IOError as e:
+            print bcolors.FAIL + "Could not find configfile for " + myDir + ". Skipping..."
+            continue
 	mode = config.get("General", "mode")
 	fileop = open(configFileName)
 	configData = fileop.read()
@@ -72,16 +108,16 @@ elif autoMode == "run":
 	    runCommand = "python generator.py " + configName
 	    serverOccupied = True
 	    while(serverOccupied):
+                if i >= len(servers):
+                    print "All servers occupied. Exiting!"
+                    exit(0)
+                    break;
 		nProcs = subprocess.check_output("ssh " + servers[i] +  " 'ps aux | grep generator.py | wc -l'", shell=True)
 		if(int(nProcs) < 3):
 		    serverOccupied = False
 		else:
 		    print bcolors.WARNING + "Server " + servers[i] + " already in use. Choosing next." + bcolors.ENDC
 		    i += 1
-		    if i >= len(servers):
-			print "All servers occupied. Exiting!"
-			exit(0)
-			break;
 	    if runLocal:
 		print "Running " + configName + " locally"
 		subprocess.call(runCommand, shell=True)
@@ -94,6 +130,7 @@ elif autoMode == "plot":
     minimizerList = ""
     densityList = ""
     geneticList = ""
+    onerunList = ""
     for afile in files:
 	configName = afile
 	myDir = runFolder + "/" + configName + "/"
@@ -107,10 +144,13 @@ elif autoMode == "plot":
 	    densityList += myDir + " "
         elif mode == "genetic":
             geneticList += myDir + " "
+        elif mode == "onerun":
+            onerunList += myDir + " "
 	else:
 	    print "Unknown mode"
 	    
     subprocess.call("python minimizerplot.py " + minimizerList, shell=True)
     subprocess.call("python densityplot.py " + densityList, shell=True)
     subprocess.call("python geneticplot.py " + geneticList, shell=True)
+    subprocess.call("python blockingplot.py " + onerunList, shell=True)
 print "Automator finished."

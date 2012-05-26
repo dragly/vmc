@@ -40,7 +40,7 @@ public:
         m_charge = arg;
     }
 
-    void divideSteps(int rank, int nProcesses, int totalSteps, StepConfig *stepConfig);
+    void divideSteps(int myRank, int nProcesses, int totalSteps, StepConfig *stepConfig);
 private:
     Config *config;
     WaveFunction *m_wave;

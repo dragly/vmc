@@ -5,28 +5,29 @@
 #include "../utils.h"
 #include "../config.h"
 
-MonteCarloMetropolisHastings::MonteCarloMetropolisHastings(Config *config) :
+MetropolisHastingsMonteCarlo::MetropolisHastingsMonteCarlo(Config *config) :
     MonteCarlo(config),
-    rank(config->rank()),
+    myRank(config->myRank()),
     hamiltonian(config->hamiltonian()),
-    firstSample(true)
+    firstSample(true),
+    diffConstant(config->diffusionConstant())
 {
     quantumForceNew = zeros<vec>(nParticles * nDimensions);
     quantumForceOld = zeros<vec>(nParticles * nDimensions);
 }
 
-MonteCarloMetropolisHastings::~MonteCarloMetropolisHastings()
+MetropolisHastingsMonteCarlo::~MetropolisHastingsMonteCarlo()
 {
 }
 
-void MonteCarloMetropolisHastings::sample(int nCycles)
+void MetropolisHastingsMonteCarlo::sample(int nCycles)
 {
+    std::cout << "Step length " << stepLength << std::endl;
     m_energy = 0;
     m_energySquared = 0;
     terminalizationSum = 0;
     terminalizationNum = 1;
     double localEnergy = 0;
-    double diffConstant = 0.5;
     int nthMove = 0;
     if(storeEnergies) {
         m_allEnergies = new double[nCycles];
@@ -47,7 +48,6 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
     quantumForceOld *= 2;
     int acceptances = 0;
     int rejections = 0;
-    stepLength = 0.01;
     // loop over monte carlo cycles
     for (int cycle = 0; cycle <= nCycles; cycle++){
         // new trial position
@@ -63,30 +63,29 @@ void MonteCarloMetropolisHastings::sample(int nCycles)
             wave->gradient(rNew, quantumForceNew); // TODO add particle number
             quantumForceNew *= 2;
             double argSum = 0;
-            for(int j = 0; j < nParticles; j++) {
-                for(int k = 0; k < nDimensions; k++) {
-                    int qfIndex = j * nDimensions + k;
-                    double quantumForceSum = quantumForceOld[qfIndex] + quantumForceNew[qfIndex];
-                    double qfPositionDiff = 0.5 * diffConstant * stepLength * (quantumForceOld[qfIndex] - quantumForceNew[qfIndex]) - (rNew[j][k] - rOld[j][k]);
-                    argSum += 0.5 * quantumForceSum * qfPositionDiff;
-                }
+            for(int k = 0; k < nDimensions; k++) {
+                int qfIndex = i * nDimensions + k;
+                double quantumForceSum = quantumForceOld[qfIndex] + quantumForceNew[qfIndex];
+                double qfPositionDiff = 0.5 * diffConstant * stepLength * (quantumForceOld[qfIndex] - quantumForceNew[qfIndex]) - (rNew[i][k] - rOld[i][k]);
+                argSum += 0.5 * quantumForceSum * qfPositionDiff;
             }
             double greensRatio = exp(argSum);
 
             double ratio = wave->ratio(rNew[i], i);
             double weight = ratio*ratio * greensRatio;
-            if(ran2(idumMC) <= weight) {
+//            std::cout << ratio << std::endl;
+            if(ran2(idumMC) < weight) {
                 rOld[i] = rNew[i];
                 wave->acceptMove(i);
                 if(terminalized) {
-                acceptances++;
+                    acceptances++;
                 }
                 //                std::cout << "Accepted" << std::endl;
             } else {
                 rNew[i] = rOld[i]; // Move the particle back
                 wave->rejectMove();
                 if(terminalized) {
-                rejections++;
+                    rejections++;
                 }
             }
             localEnergy = hamiltonian->energy(wave, rOld);

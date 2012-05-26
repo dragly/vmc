@@ -23,7 +23,6 @@ public:
     virtual void loadConfiguration(INIParser *settings) {
         (void)settings;
     }
-    void writeBlockData();
     void blocking(double *values, int nValues, int blockSize, double *result);
     double mean(double *values, double nValues);
 protected:

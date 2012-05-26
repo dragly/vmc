@@ -19,7 +19,7 @@ lockFile.close()
 config = ConfigParser.ConfigParser()
 config.readfp(open(runFolder + "/" + configName + "/" + configFileName))
 mode = config.get("General", "mode")
-if mode == "minimizer" or mode == "density":
+if mode == "minimizer" or mode == "density" or mode == "onerun":
     runCommand = runCommandMPI
 
 if not os.path.exists(myDir):
