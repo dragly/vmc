@@ -19,11 +19,22 @@ Slater::Slater(Config *config, Orbital* orbitals[], bool spinUp_) :
     currentMatrix = zeros<mat>(nParticles / 2, nParticles / 2);
     previousInverse = zeros<mat>(nParticles / 2, nParticles / 2);
     currentInverse = zeros<mat>(nParticles / 2, nParticles / 2);
+    rOld = new vec2[nParticles/2];
+    rNew = new vec2[nParticles/2];
+    for(int i = 0; i < nParticles / 2; i++) {
+        rOld[i] = zeros<vec>(2);
+        rOld[i] = zeros<vec>(2);
+    }
     if(spinUp) {
         particleIndexOffset = 0;
     } else {
         particleIndexOffset = nParticles / 2;
     }
+}
+
+Slater::~Slater() {
+    delete [] rOld;
+    delete [] rNew;
 }
 
 void Slater::initialize(vec2 positions[])
@@ -34,10 +45,11 @@ void Slater::initialize(vec2 positions[])
 }
 
 /*!
-  Note: The first half of the particles have spin up, while the others have spin down.
+  * \note The first half of the particles have spin up, while the others have spin down.
   */
 void Slater::constructMatrix(vec2 r[]) {
     for(int i = 0; i < nParticles / 2; i++) {
+        rOld[i] = r[i];
         for(int j = 0; j < nParticles / 2; j++) {
             int index = -1;
             if(spinUp) {
@@ -60,8 +72,7 @@ double Slater::determinant(vec2 r[]) {
 }
 
 /*!
-
-  Note: You need to run ratio() before calling this function.
+  * \warning You need to run ratio() before calling this function.
   */
 void Slater::calculateInverse(int movedParticle)
 {
@@ -120,7 +131,7 @@ void Slater::updateMatrix(vec2 &particlePosition, int movedParticle) {
 }
 
 /*!
-  Note: The first half of the particles have spin up, while the others have spin down.
+  * \note The first half of the particles have spin up, while the others have spin down.
   */
 double Slater::ratio(vec2 &particlePosition, int movedParticle)
 {
@@ -138,6 +149,7 @@ double Slater::ratio(vec2 &particlePosition, int movedParticle)
         currentRatio = 1;
         return 1;
     }
+    rNew[movedParticle] = particlePosition;
 }
 
 bool Slater::hasParticle(int particleNumber) const {
@@ -150,6 +162,10 @@ void Slater::acceptMove(int movedParticle)
     previousRatio = currentRatio;
     calculateInverse(movedParticle);
     previousInverse = currentInverse;
+    if(hasParticle(movedParticle)) {
+        int localParticle = movedParticle - particleIndexOffset;
+        rOld[localParticle] = rNew[localParticle];
+    }
 }
 
 void Slater::rejectMove() {
@@ -157,6 +173,9 @@ void Slater::rejectMove() {
     // TODO might not need to copy back the inverse
     currentInverse = previousInverse;
     currentRatio = previousRatio;
+    for(int i = 0; i < nParticles / 2; i++) {
+        rNew[i] = rOld[i];
+    }
 }
 
 void Slater::gradient(vec2 r[], vec &rGradient) {
@@ -206,5 +225,16 @@ mat Slater::matrix() {
     return currentMatrix;
 }
 
-Slater::~Slater() {
+/*!
+  * \note Based on code by Sigve Bøe Skattum https://github.com/sigvebs/VMC2
+  */
+double Slater::variationalGradient() {
+    double gradient = 0;
+    for (int i = 0; i < nParticles / 2; i++) {
+        for (int j = 0; j < nParticles / 2; j++) {
+            gradient += currentInverse(i, j) * orbitals[j]->variationalDerivative(rOld[j]);
+        }
+    }
+
+    return gradient;
 }

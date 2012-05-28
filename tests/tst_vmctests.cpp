@@ -64,14 +64,14 @@ public:
     void fullSlaterSixNoInteractionTest();
 
     // unfinished tests
-    void evolutionaryMonteCarloTest();
     void evolverTest();
     void diffusionMonteCarloTest();
+    void geneticMinimizerTest();
 private slots:
     // quick tests
     // slow tests
     // unfinished tests
-    void geneticMinimizerTest();
+    void evolutionaryMonteCarloTest();
 
 private:
     Config *oldConfig;
@@ -275,9 +275,6 @@ void VmcTests::jastrowRatioTest() {
     Config *config1 = new Config(1,1);
     config1->setNDimensions(2);
     config1->setNParticles(4);
-    double parameters[2];
-    parameters[0] = 1;
-    parameters[1] = 1;
 
     vec2 rOld[4];
     vec2 rNew[4];
@@ -886,7 +883,7 @@ void VmcTests::geneticMinimizerTest() {
         //        config->setMonteCarlo(new MonteCarloMetropolisHastings(config));
         GeneticMinimizer *evolver = new GeneticMinimizer(config);
         evolver->setNCycles(1000);
-        evolver->setNSamples(100, 20000);
+        evolver->setNSamples(1000, 20000);
         evolver->setPopulationData(2, 16, 2);
         evolver->setRescaleLimits(0.1, 2);
         evolver->setRescaleCycles(2);
@@ -957,7 +954,7 @@ void VmcTests::evolutionaryMonteCarloTest() {
     int nIndividuals = 16;
     int nPopulations = 1;
     EvolutionaryMonteCarlo *evolutionary = new EvolutionaryMonteCarlo(config, nGenes, nIndividuals, nPopulations);
-    evolutionary->setRescaleLimits(-2, 0);
+    evolutionary->setRescaleLimits(-2, 10);
     evolutionary->setRescaleCycles(5);
     evolutionary->sample(100000);
     double energy = evolutionary->energy();

@@ -79,7 +79,7 @@ double Jastrow::argument(int i, int j, mat &distances) {
 }
 
 /*!
-  Note: Partial because it does not include the square gradient term. (8.46 in Leirvåg's thesis) This must be included manually.
+  * \warning Named "partial" because it does not include the square gradient term. (8.46 in Leirvåg's thesis) This must be included manually.
   */
 double Jastrow::laplacePartial() {
     // Optimized by removing square gradient term. Reduced inclusive cost by 80 % !
@@ -105,7 +105,7 @@ double Jastrow::laplacePartial() {
  * \param r
  * \param movedParticlea
  * \param rGradient
- * Note: Call ratio() or calculateDistances() before calling this function to update the distance matrix.
+ * \note Call ratio() or calculateDistances() before calling this function to update the distance matrix.
  */
 void Jastrow::gradient(vec2 r[], vec &rGradient)
 {
@@ -142,7 +142,7 @@ double Jastrow::evaluate(vec2 r[]) {
 }
 
 /*!
-  Note: The distance and Jastrow argument matrices only have values in their upper right triangle.
+  * \note The distance and Jastrow argument matrices only have values in their upper right triangle.
   */
 double Jastrow::ratio(vec2 &r, int movedParticle)
 {
@@ -186,4 +186,26 @@ double Jastrow::ratio(vec2 &r, int movedParticle)
 void Jastrow::setParameters(double *parameters)
 {
     beta = parameters[1];
+}
+
+/*!
+  * \note Based on code by Sigve Bøe Skattum https://github.com/sigvebs/VMC2
+  */
+double Jastrow::variationalGradient() {
+    double rSquared = 0;
+    double rNorm = 0;
+    double value = 1;
+
+    for (int i = 0; i < nParticles; i++) {
+        for (int j = i + 1; j < nParticles; j++) {
+            rSquared = 0;
+            for (int k = 0; k < nDimensions; k++) {
+                rSquared += (distancesNew(i, k) - distancesNew(j, k)) * (distancesNew(i, k) - distancesNew(j, k));
+            }
+            rNorm = sqrt(rSquared);
+            value += a(i, j) * rSquared / ((1 + beta * rNorm)*(1 + beta * rNorm));
+        }
+    }
+
+    return -value;
 }

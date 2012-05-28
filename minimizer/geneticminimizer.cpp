@@ -16,6 +16,7 @@ GeneticMinimizer::GeneticMinimizer(Config *config) :
     wave(config->wave()),
     hamiltonian(config->hamiltonian())
 {
+    monteCarlo->setSampleVariationalGradient(true);
 }
 
 void GeneticMinimizer::loadConfiguration(INIParser *settings)
@@ -38,8 +39,10 @@ void GeneticMinimizer::runMinimizer()
     ofstream dataFile;
     dataFile.open("minimizer-evolutionary.dat");
     energies = new vec[nPopulations];
+    variationalGradients = new vec[nPopulations];
     for(int i = 0; i < nPopulations; i++) {
         energies[i] = zeros<vec>(nIndividuals);
+        variationalGradients[i] = zeros<vec>(nIndividuals);
     }
     for(int acycle = 0; acycle < nCycles; acycle++) {
         allBestValue = INFINITY;
@@ -48,6 +51,7 @@ void GeneticMinimizer::runMinimizer()
         int nEnergySamples = 0;
         double alphaSum = 0;
         double betaSum = 0;
+        double variationalGradientSum = 0;
         for(int i = 0; i < nPopulations; i++) {
             for(uint j = 0; j < bestIndices[i].size() / 2; j++) {
                 int index = bestIndices[i][j];
@@ -56,14 +60,16 @@ void GeneticMinimizer::runMinimizer()
                 energySum += energy;
                 alphaSum += fabs(populations[i][index][0]);
                 betaSum += fabs(populations[i][index][1]);
+                variationalGradientSum += variationalGradients[i][index];
             }
         }
         // TODO output variance if possible
         dataFile << alphaSum / nEnergySamples << " ";
         dataFile << betaSum / nEnergySamples << " ";
         dataFile << energySum / nEnergySamples << " ";
+        dataFile << variationalGradientSum / nEnergySamples << " ";
         dataFile << nEnergySamples << std::endl;
-        std::cout << cycle << ": Mean energy " <<  left << setw(10) << energySum / nEnergySamples << " using params " <<  left << setw(10) << alphaSum / nEnergySamples << " " <<  left << setw(10) << betaSum / nEnergySamples << " with best " <<  left << setw(10) << energies[allBestPopulationIndex][allBestIndex] << " using " <<  left << setw(10) << populations[allBestPopulationIndex][allBestIndex][0] << ", " << left << setw(10) <<  populations[allBestPopulationIndex][allBestIndex][1] << " @ scale " <<  left << setw(10) << scale << " samples: " << nSamples << " x " << nIndividuals << " x " << nPopulations << std::endl;
+        std::cout << cycle << ": Mean energy " <<  left << setw(10) << energySum / nEnergySamples << " with gradient " << left << setw(10) << variationalGradientSum / nEnergySamples << " using params " <<  left << setw(10) << alphaSum / nEnergySamples << " " <<  left << setw(10) << betaSum / nEnergySamples << " with best " <<  left << setw(10) << energies[allBestPopulationIndex][allBestIndex] << " using " <<  left << setw(10) << populations[allBestPopulationIndex][allBestIndex][0] << ", " << left << setw(10) <<  populations[allBestPopulationIndex][allBestIndex][1] << " @ scale " <<  left << setw(10) << scale << " samples: " << nSamples << " x " << nIndividuals << " x " << nPopulations << std::endl;
     }
     dataFile.close();
 
@@ -80,6 +86,8 @@ double GeneticMinimizer::fitness(vec &coefficients, int population, int individu
 
     monteCarlo->sample(nSamples);
     double energy = monteCarlo->energy();
+    vec variationalGradient = monteCarlo->variationalGradient();
+    double variationalGradientProduct = dot(variationalGradient,variationalGradient);
 
     if(population == 0 && individual == 0) {
         nSamples = nSamplesStart + (nSamplesEnd - nSamplesStart) * pow((double)cycle, 20) / pow((double)nCycles, 20);
@@ -94,6 +102,7 @@ double GeneticMinimizer::fitness(vec &coefficients, int population, int individu
         energy = INFINITY;
     }
     energies[population][individual] = energy;
+    variationalGradients[population][individual] = variationalGradientProduct;
     return energy;
 }
 

@@ -33,8 +33,8 @@ private:
     int nWalkersAlive;
     int nSamples;
     int nThermalizationCycles;
-    double timeStep;
     MonteCarlo *initialMonteCarlo;
+    double timeStep;
     double parameters[2];
     void updateWalkerParameters();
 };

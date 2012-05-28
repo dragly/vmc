@@ -29,7 +29,11 @@ public:
     bool hasParticle(int particleNumber) const;
     void rejectMove();
     void updateMatrix(vec2 &particlePosition, int movedParticle);
+    double variationalGradient();
 private:
+    vec2 *rOld;
+    vec2 *rNew;
+
     mat currentMatrix;
     mat previousMatrix;
 

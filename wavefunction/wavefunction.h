@@ -32,6 +32,8 @@ public:
     virtual void acceptMove(int movedParticle);
     virtual void rejectMove();
     virtual void initialize(vec2 r[]);
+    virtual vec variationalGradient();
+
     void setUseAnalyticalLaplace(bool val) {
         useAnalyticalLaplace = val;
     }

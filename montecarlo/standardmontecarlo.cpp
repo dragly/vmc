@@ -50,6 +50,7 @@ void StandardMonteCarlo::sample(int nSamples)
 ////        firstSample = false;
 //    }
     wave->initialize(rOld);
+    m_variationalGradient = zeros(2); // TODO make parameter-specific
     // TODO Optimize step length by Newton's method
     // loop over monte carlo cycles
     int move = 0;
@@ -82,6 +83,9 @@ void StandardMonteCarlo::sample(int nSamples)
             localEnergy = hamiltonian->energy(wave, rNew);
             // save all energies on last variate
             //        if(variate==max_variations){
+            if(sampleVariationalGradient) {
+                m_variationalGradient = m_variationalGradient + wave->variationalGradient();
+            }
             if(terminalized) {
                 if(storeEnergies) {
                     m_allEnergies[cycle] = localEnergy;
@@ -108,6 +112,7 @@ void StandardMonteCarlo::sample(int nSamples)
     }  //  end of loop over particles
     m_energy /= (nSamples * nParticles);
     m_energySquared /= (nSamples * nParticles);
+    m_variationalGradient = m_variationalGradient / (nSamples * nParticles);
     //    std::cout << "Done sampling. Had " << terminalizationTrials << " terminalization trials with the last diff at " << diffAverage << std::endl;
 }
 

@@ -195,3 +195,20 @@ WaveFunction* WaveSlater::clone() {
     myCopy->nDimensions = this->nDimensions;
     return myCopy;
 }
+
+/*!
+  * \note Based on code by Sigve Bøe Skattum https://github.com/sigvebs/VMC2
+  */
+vec WaveSlater::variationalGradient() {
+    vec varGradient = zeros(2);
+
+    // Gradient_slater;
+    varGradient(0) += slaterUp->variationalGradient();
+    varGradient(0) += slaterDown->variationalGradient();
+
+    // Gradient Jastrow.
+    if (interactionEnabled) {
+        varGradient(1) = jastrow->variationalGradient();
+    }
+    return varGradient;
+}

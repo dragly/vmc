@@ -85,8 +85,10 @@ void DiffusionMonteCarlo::sample() {
     sample(nSamples);
 }
 
-// Note: Implementation from http://www.ornl.gov/~pk7/thesis/pkthnode21.html
 
+/*!
+  * \note Implementation based on http://www.ornl.gov/~pk7/thesis/pkthnode21.html
+  */
 void DiffusionMonteCarlo::sample(int nSamplesLocal)
 {
     std::cout << "Running VMC to initialize DMC" << std::endl;

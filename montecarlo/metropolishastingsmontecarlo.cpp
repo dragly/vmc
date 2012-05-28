@@ -42,16 +42,17 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
 //        rNew[i] = rOld[i];
 //    }
     wave->initialize(rOld);
-    //    wave->gradient(rOld, 0, waveGradientOld); // TODO add particle number
-    wave->gradient(rOld, quantumForceOld); // TODO add particle number
+    //    wave->gradient(rOld, 0, waveGradientOld);
+    wave->gradient(rOld, quantumForceOld);
     quantumForceOld *= 2;
+    m_variationalGradient = zeros(2); // TODO make parameter-specific
     int acceptances = 0;
     int rejections = 0;
     // loop over monte carlo cycles
     for (int cycle = 0; cycle <= nCycles; cycle++){
         // new trial position
         for (int i = 0; i < nParticles; i++) {
-            wave->gradient(rOld, quantumForceOld); // TODO add particle number
+            wave->gradient(rOld, quantumForceOld);
             quantumForceOld *= 2;
             for (int k=0; k < nDimensions; k++) {
                 int qfIndex = i * nDimensions + k;
@@ -59,7 +60,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
             }
 
             // The Metropolis test is performed by moving one particle at the time
-            wave->gradient(rNew, quantumForceNew); // TODO add particle number
+            wave->gradient(rNew, quantumForceNew);
             quantumForceNew *= 2;
             double argSum = 0;
             for(int k = 0; k < nDimensions; k++) {
@@ -88,6 +89,9 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                 }
             }
             localEnergy = hamiltonian->energy(wave, rOld);
+            if(sampleVariationalGradient) {
+                m_variationalGradient = m_variationalGradient + wave->variationalGradient();
+            }
             if(terminalized) {
                 if(storeEnergies) {
                     m_allEnergies[cycle] = localEnergy;
@@ -113,4 +117,5 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
 //    std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
     m_energy /= (nCycles * nParticles);
     m_energySquared /= (nCycles * nParticles);
+    m_variationalGradient = m_variationalGradient / (nCycles * nParticles);
 }

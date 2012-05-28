@@ -35,6 +35,7 @@ public:
     Slater *slaterDown;
     Jastrow *jastrow;
     ~WaveSlater();
+    vec variationalGradient();
 private:
 
     Orbital **orbitals;
