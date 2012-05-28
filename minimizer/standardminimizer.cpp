@@ -155,14 +155,11 @@ void StandardMinimizer::runMinimizer()
                 double energy = totalCumulativeEnergy(i,j) ;
                 double variance = totalCumulativeEnergySquared(i,j) - energy*energy;
                 double error = sqrt(variance / (total_number_cycles-1));
-                energyFile << setiosflags(ios::showpoint | ios::uppercase);
-                energyFile << setw(15) << setprecision(20) << energy;
-                parameters0File << setw(15) << setprecision(20) << parameter0Map(i,j);
-                parameters1File << setw(15) << setprecision(20) << parameter1Map(i,j);
-                varianceFile << setiosflags(ios::showpoint | ios::uppercase);
-                varianceFile << setw(15) << setprecision(20) << variance;
-                errorFile << setiosflags(ios::showpoint | ios::uppercase);
-                errorFile << setw(15) << setprecision(20) << error;
+                energyFile << setw(15) << setprecision(20) << energy << " ";
+                parameters0File << setw(15) << setprecision(20) << parameter0Map(i,j) << " ";
+                parameters1File << setw(15) << setprecision(20) << parameter1Map(i,j) << " ";
+                varianceFile << setw(15) << setprecision(20) << variance << " ";
+                errorFile << setw(15) << setprecision(20) << error << " ";
             }
             energyFile << std::endl;
             varianceFile << std::endl;

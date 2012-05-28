@@ -37,6 +37,15 @@ public:
     // old tests
     void waveSimpleGradientTest(); // TODO - consider implementing this again
     // quick tests
+    // slow tests
+
+    // unfinished tests
+    void evolutionaryMonteCarloTest();
+    void geneticMinimizerTest();
+    void evolverTest();
+    void diffusionMonteCarloTest();
+private slots:
+    // quick tests
     void orbitalGradientTest();
     void initTestCase();
     void orbitalTest();
@@ -61,16 +70,7 @@ public:
     void fullIdealHastingsSlaterTest();
     void fullSlaterSixInteractionTest();
     void fullSlaterSixNoInteractionTest();
-
     // unfinished tests
-    void evolutionaryMonteCarloTest();
-    void geneticMinimizerTest();
-    void evolverTest();
-private slots:
-    // quick tests
-    // slow tests
-    // unfinished tests
-    void diffusionMonteCarloTest();
 
 private:
     Config *oldConfig;
@@ -806,11 +806,11 @@ void VmcTests::fullSlaterSixInteractionTest()
         Config *config1 = new Config(0,1);
         config1->setNParticles(6);
         config1->setNDimensions(2);
-        config1->setStepLength(1.0);
+        config1->setStepLength(0.001);
         HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
         config1->setHamiltonian(hamiltonian);
         config1->setInteractionEnabled(true);
-        int nCycles = 100000;
+        int nCycles = 200000;
         //        int nCycles = 500; // using few cycles for profiling
         WaveSlater *waveSlater2 = new WaveSlater(config1);
         waveSlater2->setUseAnalyticalGradient(true);

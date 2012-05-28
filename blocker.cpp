@@ -61,17 +61,21 @@ void Blocker::runBlocking() {
     double *monteCarloResults = new double[nSamples];
     for(int i = 0; i < nProcesses; i++) {
         ostringstream ost;
+        std::cout << "Opening file " << i << std::endl;
         ost << path.str() << "/blocks_rank" << i << ".dat";
         ifstream infile;
         if(stat(ost.str().c_str(), &result) == 0) {
-            infile.open(ost.str().c_str(), ios::in | ios::binary);
-            infile.read((char*)&(monteCarloResults[i*nLocal]), result.st_size);
-            infile.close();
+                infile.open(ost.str().c_str(), ios::in | ios::binary);
+                infile.read((char*)&(monteCarloResults[i*nLocal]), result.st_size);
+                infile.close();
             } else {
-            std::cerr << "Could not find file " << ost.str() << std::endl;
+                std::cerr << "Could not find file " << ost.str() << std::endl;
             exit(953);
         }
     }
+//    for(int i = 0; i < nSamples; i++) {
+//        std::cout << monteCarloResults[i] << std::endl;
+//    }
     int blockStepSize = (maxBlockSize - minBlockSize) / (nBlockSamples - 1);
     int blockSize = -1;
     double results[2];

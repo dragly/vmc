@@ -9,7 +9,8 @@ class DiffusionMonteCarlo : public MonteCarlo
 public:
     DiffusionMonteCarlo(Config *config);
 
-    void sample(int nCycles);
+    void sample(int nSamplesLocal);
+    void sample();
 //    vec2 **rOld;
 //    vec2 **rNew;
 //    WaveFunction **waves;
@@ -20,14 +21,16 @@ public:
 //    bool *aliveMid;
 //    bool *aliveNew;
 
+    int correlationStep;
     int nWalkersMax;
     int nWalkersIdeal;
-    int correlationStep;
     int nWalkersAlive;
-
-    // TODO replace these names with their proper meanings
-    double tau;
-    double eta;
+    int nSamples;
+    int nThermalizationCycles;
+    MonteCarlo *initialMonteCarlo;
+    double parameters[2];
+    void loadConfiguration(INIParser *settings);
+    void limitAliveWalkers();
 };
 
 #endif // DIFFUSIONMONTECARLO_H

@@ -25,7 +25,9 @@ if mode == "minimizer" or mode == "density" or mode == "onerun":
 if not os.path.exists(myDir):
     os.makedirs(myDir)
     
+starttime = time.time()
 print "Run started by " + os.uname()[1] + " at " + str(time.time())
+print "Run started at " + time.strftime("%Y-%m-%d %H:%M:%S")
 
 subprocess.call("./buildandrun.sh " + myDir + " " + runCommand + " " + configFileName + " " + prevrunConfigFileName, shell=True)
 
@@ -34,3 +36,7 @@ subprocess.call("./buildandrun.sh " + myDir + " " + runCommand + " " + configFil
 
 os.remove(myDir + "lock")
 print "Run done at " + time.strftime("%Y-%m-%d %H:%M:%S")
+    
+endtime = time.time()
+totaltime = endtime - starttime
+print "Run took " + str(totaltime)  + " seconds"

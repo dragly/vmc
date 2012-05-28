@@ -11,39 +11,52 @@ HamiltonianIdeal::HamiltonianIdeal(Config *config) :
 {
 }
 int ntries = 0;
-double HamiltonianIdeal::energy(WaveFunction *wave, vec2 r[])
+
+double HamiltonianIdeal::kineticEnergy(WaveFunction *wave, vec2 r[])
 {
-    double eLocal, eKinetic, ePotential,
-            rSingleParticle;
-    // compute the kinetic energy
-    // TODO: Create a derivative-finder function that uses interpolation to approximate the derivative
-    // TODO: Add the number of the particle that has been moved
-    eKinetic = -0.5*wave->laplace(r);
-//    std::cout << "eKinetic " << eKinetic << std::endl;
-    //    e_kinetic = 0.5*e_kinetic/h2;
-    // compute the potential energy
-    ePotential = 0;
+    return -0.5*wave->laplace(r);
+}
+
+double HamiltonianIdeal::potentialEnergy(WaveFunction *wave, vec2 r[])
+{
+    double ePotential = 0;
+    ePotential += externalPotentialEnergy(wave, r);
+    if(m_interactionEnabled) {
+        ePotential += interactionPotentialEnergy(wave, r);
+    }
+    return ePotential;
+}
+
+double HamiltonianIdeal::externalPotentialEnergy(WaveFunction *wave, vec2 r[])
+{
+    (void)wave;
+    double externalEnergy = 0;
+    double rSingleParticle = 0;
     // contribution from harmonic oscillator potential
     for (int i = 0; i < m_nParticles; i++) {
         rSingleParticle = 0;
         for (int j = 0; j < m_nDimensions; j++) {
             rSingleParticle += r[i][j]*r[i][j];
         }
-        ePotential += 0.5 * omega * omega * rSingleParticle;
+        externalEnergy += 0.5 * omega * omega * rSingleParticle;
     }
+    return externalEnergy;
+}
+
+double HamiltonianIdeal::interactionPotentialEnergy(WaveFunction *wave, vec2 r[])
+{
+    (void)wave;
+    double interactionEnergy = 0;
+    //     contribution from electron-electron potential
     // TODO Optimization - store an array of potential energies between particles and only update necessary parts (reduces use of sqrt)
-    if(m_interactionEnabled) {
-        //     contribution from electron-electron potential
-        for (int i = 0; i < m_nParticles-1; i++) {
-            for (int j = i+1; j < m_nParticles; j++) {
-                double r_12 = 0;
-                for (int k = 0; k < m_nDimensions; k++) {
-                    r_12 += (r[i][k]-r[j][k])*(r[i][k]-r[j][k]);
-                }
-                ePotential += 1/sqrt(r_12);
+    for (int i = 0; i < m_nParticles-1; i++) {
+        for (int j = i+1; j < m_nParticles; j++) {
+            double r_12 = 0;
+            for (int k = 0; k < m_nDimensions; k++) {
+                r_12 += (r[i][k]-r[j][k])*(r[i][k]-r[j][k]);
             }
+            interactionEnergy += 1/sqrt(r_12);
         }
     }
-    eLocal = ePotential+eKinetic;
-    return eLocal;
+    return interactionEnergy;
 }

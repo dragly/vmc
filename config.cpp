@@ -24,8 +24,7 @@ Config::Config(int myRank, int nProcesses) :
     m_omega(1.0),
     m_interactionEnabled(true),
     m_idum(-myRank*time(NULL)),
-    m_diffusionConstant(0.5),
-    m_tau(0.01)
+    m_diffusionConstant(0.5)
 {
 }
 

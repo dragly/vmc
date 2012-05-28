@@ -29,6 +29,10 @@ public:
         return m_changeInEnergySamples;
     }
 
+    void setParameters(double *parameters) {
+        wave->setParameters(parameters);
+    }
+
 protected:
     vec2 *rNew;
     vec2 *rOld;

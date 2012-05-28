@@ -69,6 +69,8 @@ void MainApplication::loadConfiguration()
                 m_mode = GeneticMode;
             } else if(modeString == "onerun") {
                 m_mode = OneRunMode;
+            } else if(modeString == "diffusion") {
+                m_mode = DiffusionMode;
             } else {
                 cerr << __PRETTY_FUNCTION__ << ": Unknown mode '" << modeString << "'" << endl;
                 exit(460);
@@ -104,7 +106,7 @@ void MainApplication::runConfiguration()
     } else if(m_mode == DiffusionMode) {
         DiffusionMonteCarlo *diffusionMonteCarlo = new DiffusionMonteCarlo(m_config);
         diffusionMonteCarlo->loadConfiguration(m_settings);
-        diffusionMonteCarlo->sample(40000);
+        diffusionMonteCarlo->sample();
         double energy = diffusionMonteCarlo->energy();
         std::cout << "Diffusion monte carlo returned energy of " << energy << std::endl;
         delete diffusionMonteCarlo;

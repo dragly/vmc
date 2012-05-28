@@ -14,6 +14,7 @@ for datapath in argv:
     if first:
 	first = False
 	continue
+    print "Plotting " + datapath
     try:
         param0 = loadtxt(datapath + "/parameters0.dat")
         param1 = loadtxt(datapath + "/parameters1.dat")
@@ -21,7 +22,6 @@ for datapath in argv:
     except IOError as e:
         print "Could not find data files for " + myDir + ". Skipping..."
         continue
-    print "Plotting " + datapath
 
     fig = figure(size=(960,960))
     fig.scene.background = (1.0, 1.0, 1.0)

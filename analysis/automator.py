@@ -123,34 +123,52 @@ elif autoMode == "run":
 		subprocess.call(runCommand, shell=True)
 	    else:
 		print bcolors.OKGREEN + "Launching job for config " + configName + " on " + servers[i] + bcolors.ENDC
-		subprocess.Popen("ssh " + servers[i] +  " 'cd "+ currentDirectory + " && " + runCommand + " &> output-" + configName + " && echo " + servers[i] + " done with " + configName + "'", shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+		subprocess.Popen("ssh " + servers[i] +  " 'cd "+ currentDirectory + " && " + runCommand + " &> output/output-" + configName + " && echo " + servers[i] + " done with " + configName + "'", shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
 		i += 1
             print "You may watch the output from this job in the output-" + configName + " file."
 elif autoMode == "plot":
+    plotAll = False
+    if len(argv) < 3 or argv[2] == "all":
+	plotAll = True
     minimizerList = ""
     densityList = ""
     geneticList = ""
     onerunList = ""
+    diffusionList = ""
     for afile in files:
 	configName = afile
 	myDir = runFolder + "/" + configName + "/"
-	config = ConfigParser.ConfigParser()
-	configFilePath = myDir + configFileName
-	config.read(configFilePath)
-	mode = config.get("General", "mode")
-	if mode == "minimizer":
-	    minimizerList += myDir + " "
-	elif mode == "density":
-	    densityList += myDir + " "
-        elif mode == "genetic":
-            geneticList += myDir + " "
-        elif mode == "onerun":
-            onerunList += myDir + " "
+	if os.path.exists(myDir + lockFileName):
+            print "Found job in " + afile
+            lockFileOp = open(myDir + lockFileName)
+            lockHost = lockFileOp.read()
+            lockFileOp.close()
+            print bcolors.WARNING + "Run is locked by process on host " + lockHost + ". Skipping locked plots." + bcolors.ENDC
 	else:
-	    print "Unknown mode"
-	    
-    subprocess.call("python minimizerplot.py " + minimizerList, shell=True)
-    subprocess.call("python densityplot.py " + densityList, shell=True)
-    subprocess.call("python geneticplot.py " + geneticList, shell=True)
-    subprocess.call("python blockingplot.py " + onerunList, shell=True)
+	    config = ConfigParser.ConfigParser()
+	    configFilePath = myDir + configFileName
+	    config.read(configFilePath)
+	    mode = config.get("General", "mode")
+	    if mode == "minimizer":
+		minimizerList += myDir + " "
+	    elif mode == "density":
+		densityList += myDir + " "
+	    elif mode == "genetic":
+		geneticList += myDir + " "
+	    elif mode == "onerun":
+		onerunList += myDir + " "
+	    elif mode == "diffusion":
+		diffusionList += myDir + " "
+	    else:
+		print "Unknown mode"
+    if plotAll or "minimizer" in argv:
+	subprocess.call("python minimizerplot.py " + minimizerList, shell=True)
+    if plotAll or "density" in argv:
+	subprocess.call("python densityplot.py " + densityList, shell=True)
+    if plotAll or "genetic" in argv:
+	subprocess.call("python geneticplot.py " + geneticList, shell=True)
+    if plotAll or "blocking" in argv:
+	subprocess.call("python blockingplot.py " + onerunList, shell=True)
+    if plotAll or "diffusion" in argv:
+	subprocess.call("python diffusionplot.py " + diffusionList, shell=True)
 print "Automator finished."

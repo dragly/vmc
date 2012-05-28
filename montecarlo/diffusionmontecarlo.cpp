@@ -4,16 +4,21 @@
 #include "../wavefunction/waveslater.h"
 #include "../random.h"
 #include "metropolishastingsmontecarlo.h"
+#include "inih/ini.h"
 
-DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config) :
-    MonteCarlo(config),
-    tau(0.01)
+DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config_) :
+    MonteCarlo(config_),
+    correlationStep(500),
+    nWalkersMax(10000),
+    nWalkersIdeal(500),
+    nWalkersAlive(nWalkersIdeal),
+    nSamples(10000),
+    nThermalizationCycles(2000),
+    initialMonteCarlo(config->monteCarlo())
 {
-    nWalkersMax = 10000;
-    nWalkersIdeal = 500;
-    nWalkersAlive = nWalkersIdeal;
-    correlationStep = 500;
-
+    parameters[0] = 0;
+    parameters[1] = 0;
+    config->wave()->setParameters(parameters);
     //    rNew = new vec2*[nWalkersMax];
     //    for(int i = 0; i < nWalkersMax; i++) {
     //        rNew[i] = new vec2[nParticles];
@@ -25,11 +30,8 @@ DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config) :
     walkers = new DiffusionWalker*[nWalkersMax];
     for(int i = 0; i < nWalkersMax; i++) {
         walkers[i] = new DiffusionWalker(config, walkers, nWalkersMax);
-        if(i < nWalkersAlive) {
-            walkers[i]->setAliveNew(true);
-            walkers[i]->setAliveOld(true);
-        }
     }
+    limitAliveWalkers();
     //    waves = new WaveFunction*[nWalkersMax];
     //    for(int i = 0; i < nWalkersMax; i++) {
     //        waves[i] = wave->clone();
@@ -47,13 +49,50 @@ DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config) :
     //    }
 }
 
+void DiffusionMonteCarlo::limitAliveWalkers()
+{
+    for(int i = 0; i < nWalkersMax; i++) {
+        if(i < nWalkersAlive) {
+            walkers[i]->setAliveNew(true);
+            walkers[i]->setAliveOld(true);
+        } else {
+            walkers[i]->setAliveNew(false);
+            walkers[i]->setAliveOld(false);
+        }
+    }
+}
+
+void DiffusionMonteCarlo::loadConfiguration(INIParser *settings) {
+    double alpha = settings->GetDouble("DiffusionMonteCarlo", "alpha", 1.0);
+    double beta = settings->GetDouble("DiffusionMonteCarlo", "beta", 1.0);
+    nWalkersMax = settings->GetDouble("DiffusionMonteCarlo", "nWalkersMax", nWalkersMax);
+    nWalkersIdeal = settings->GetDouble("DiffusionMonteCarlo", "nWalkersIdeal", nWalkersIdeal);
+    nWalkersAlive = nWalkersIdeal;
+    correlationStep = settings->GetDouble("DiffusionMonteCarlo", "correlationStep", correlationStep);
+    nSamples = settings->GetDouble("DiffusionMonteCarlo", "nSamples", nSamples);
+    double tau = settings->GetDouble("DiffusionMonteCarlo", "tau", 0.02);
+    nThermalizationCycles = settings->GetDouble("DiffusionMonteCarlo", "nThermalizationCycles", nThermalizationCycles);
+    std::cout << tau << std::endl;
+    parameters[0] = alpha;
+    parameters[1] = beta;
+    for(int i = 0; i < nWalkersMax; i++) {
+        walkers[i]->setParameters(parameters);
+        walkers[i]->setTimeStep(tau);
+        config->wave()->setParameters(parameters);
+    }
+    limitAliveWalkers();
+}
+
+void DiffusionMonteCarlo::sample() {
+    sample(nSamples);
+}
+
 // Note: Implementation from http://www.ornl.gov/~pk7/thesis/pkthnode21.html
 
-void DiffusionMonteCarlo::sample(int nCycles)
+void DiffusionMonteCarlo::sample(int nSamplesLocal)
 {
     std::cout << "Running VMC to initialize DMC" << std::endl;
     // Initialize ensemble of walkers from VMC best guess
-    MetropolisHastingsMonteCarlo *initialMonteCarlo = new MetropolisHastingsMonteCarlo(config);
     initialMonteCarlo->setRecordMoves(true, nWalkersAlive * nParticles);
     initialMonteCarlo->setThermalizationEnabled(true);
 //    initialMonteCarlo->setThermalizationEnabled(false); // TODO set true
@@ -61,26 +100,29 @@ void DiffusionMonteCarlo::sample(int nCycles)
     double trialEnergy = initialMonteCarlo->energy();
     std::cout << "Done initializing. Initial trial energy was " << trialEnergy << std::endl;
 
-    ofstream scatterfile;
-    scatterfile.open("positions-init.dat");
+    ofstream positionFile;
+    positionFile.open("dmc-positions-init.dat");
     vec2 **moves = initialMonteCarlo->moves();
     for(int j = 0; j < nWalkersAlive; j++) {
         walkers[j]->initialize(moves[j]);
         if(j < nWalkersAlive) {
             for(int i = 0; i < nParticles; i++) {
-                scatterfile << moves[j][i][0] << "\t" << moves[j][i][1] << std::endl;
+                positionFile << moves[j][i][0] << "\t" << moves[j][i][1] << std::endl;
             }
         }
     }
-    scatterfile.close();
+    positionFile.close();
+    std::cout << "Done writing positions to file." << std::endl;
 
-    std::cout << "Done writing data to file." << std::endl;
+    ofstream energyFile;
+    energyFile.open("dmc-energies.dat");
+
     int blockLength = 100;
     double energySum = 0;
     int nEnergySamples = 0;
     int blockSamples = 0;
     // For every cycle:
-    for(int cycle = 0; cycle < nCycles; cycle++) {
+    for(int cycle = 0; cycle < nSamplesLocal; cycle++) {
         // For every walker (configuration)
         nWalkersAlive = 0;
         for(int i = 0; i < nWalkersMax; i++) {
@@ -92,11 +134,13 @@ void DiffusionMonteCarlo::sample(int nCycles)
                 nWalkersAlive++;
             } // END if walker alive
         } // END for each walker
+        double meanEnergy = energySum / nEnergySamples;
+        energyFile << cycle << " " << meanEnergy << " " << nWalkersAlive << std::endl;
         //        std::cout << "Alive walkers: " << nWalkersAlive << "\xd" << std::endl;
         // Repeat configuration moves for about 100 - 1000 steps
-        if(cycle < 2000 || !(cycle % blockLength)) {
+        if(cycle < nThermalizationCycles || !(cycle % blockLength)) {
             // Update trial energy ET to bring it closer to the current ensemble
-            trialEnergy = energySum / nEnergySamples;
+            trialEnergy = meanEnergy;
             std::cout << "Trial energy is now " << trialEnergy << " with " << nWalkersAlive << " walkers at cycle " << cycle << std::endl;
             // Renormalise the number of walkers to the target number by creating or deleting walkers
             //            while(nWalkersAlive > nWalkersIdeal) {
@@ -129,15 +173,16 @@ void DiffusionMonteCarlo::sample(int nCycles)
             //            std::cout << "Walkers alive after " << aliveOld[walker] << " " << aliveNew[walker] << std::endl;
         }
     }
-    scatterfile.open("positions-end.dat");
+    energyFile.close();
+    positionFile.open("dmc-positions-end.dat");
     for(int j = 0; j < nWalkersMax; j++) {
         if(walkers[j]->aliveOld()) {
             for(int i = 0; i < nParticles; i++) {
-                scatterfile << walkers[j]->positionsNew()[i][0] << "\t" << walkers[j]->positionsNew()[i][0] << std::endl;
+                positionFile << walkers[j]->positionsNew()[i][0] << "\t" << walkers[j]->positionsNew()[i][0] << std::endl;
             }
         }
     }
-    scatterfile.close();
+    positionFile.close();
 
     m_energy = trialEnergy;
 }

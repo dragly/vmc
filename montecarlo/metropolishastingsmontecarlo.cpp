@@ -22,7 +22,6 @@ MetropolisHastingsMonteCarlo::~MetropolisHastingsMonteCarlo()
 
 void MetropolisHastingsMonteCarlo::sample(int nCycles)
 {
-    std::cout << "Step length " << stepLength << std::endl;
     m_energy = 0;
     m_energySquared = 0;
     terminalizationSum = 0;

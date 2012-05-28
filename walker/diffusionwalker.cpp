@@ -10,7 +10,7 @@ DiffusionWalker::DiffusionWalker(Config *config, DiffusionWalker **otherWalkers_
     otherWalkers(otherWalkers_),
     nWalkersMax(nOtherWalkers_),
     diffConstant(config->diffusionConstant()),
-    tau(config->tau()),
+    timeStep(0.01),
     m_aliveNew(false),
     m_aliveOld(false)
 {
@@ -27,7 +27,7 @@ void DiffusionWalker::advance(double trialEnergy) {
         for(int k = 0; k < nDimensions; k++) {
             // TODO per cartesian component tau?
             int qfIndex = i * nDimensions + k;
-            rNew[i][k] = rOld[i][k] + tau * diffConstant * quantumForceOld[qfIndex] + sqrt(2 * tau * diffConstant) * simpleGaussRandom(idum);
+            rNew[i][k] = rOld[i][k] + timeStep * diffConstant * quantumForceOld[qfIndex] + sqrt(2 * timeStep * diffConstant) * simpleGaussRandom(idum);
 //                    std::cout << "i ndim k " << i * nDimensions + k << " " << quantumForceNew->n_elem << std::endl;
 //                    std::cout << "Quantum force " << j << " " << i << " " << k << " " << quantumForceNew[j][i * nDimensions + k] << std::endl;
 //                    std::cout << "Old/New: " << rOld[j][i][k] << " " << rNew[j][i][k] << std::endl;
@@ -43,7 +43,7 @@ void DiffusionWalker::advance(double trialEnergy) {
             for(int k = 0; k < nDimensions; k++) {
                 int qfIndex = i * nDimensions + k;
                 double quantumForceSum = quantumForceOld[qfIndex] + quantumForceNew[qfIndex];
-                double qfPositionDiff = 0.5 * tau * diffConstant * (quantumForceOld[qfIndex] - quantumForceNew[qfIndex]) - (rNew[i][k] - rOld[i][k]);
+                double qfPositionDiff = 0.5 * timeStep * diffConstant * (quantumForceOld[qfIndex] - quantumForceNew[qfIndex]) - (rNew[i][k] - rOld[i][k]);
                 argSum += 0.5 * quantumForceSum * qfPositionDiff;
             }
             double greensRatio = exp(argSum);
@@ -78,7 +78,7 @@ void DiffusionWalker::advance(double trialEnergy) {
         // Compute branching factor PB
         localEnergyNew = hamiltonian->energy(wave, rNew);
         localEnergyOld = hamiltonian->energy(wave, rOld);
-        double branchingFactor = exp(- tau * diffConstant * (0.5 * (localEnergyNew + localEnergyOld) - trialEnergy));
+        double branchingFactor = exp(- timeStep * diffConstant * (0.5 * (localEnergyNew + localEnergyOld) - trialEnergy));
         // Make int(PB + u) copies
         int reproductions = int(branchingFactor + ran2(idum));
         // Accumulate the energy and any observables weighted by PB

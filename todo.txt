@@ -21,5 +21,7 @@ Let the other coefficients/genes determine the new walker's initial positions?
 
 Plot radial configuration of DMC vs best VMC
 
+Create run files for DMC
+
 Could be done, but not to do:
 - Update only parts of gradient affected by moved particle

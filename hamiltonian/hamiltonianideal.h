@@ -10,7 +10,10 @@ class HamiltonianIdeal : public Hamiltonian
 {
 public:
     HamiltonianIdeal(Config *config);
-    double energy(WaveFunction *wave, vec2 r[]);
+    double kineticEnergy(WaveFunction *wave, vec2 r[]);
+    double potentialEnergy(WaveFunction *wave, vec2 r[]);
+    double externalPotentialEnergy(WaveFunction *wave, vec2 r[]);
+    double interactionPotentialEnergy(WaveFunction *wave, vec2 r[]);
     double omega;
 };
 

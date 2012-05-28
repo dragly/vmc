@@ -108,15 +108,6 @@ WaveFunction* WaveFunction::fromName(std::string waveClass, Config* config) {
     }
 }
 
-///*!
-//  Tells the system about which particle was moved last
-//*/
-//void WaveFunction::setPreviousMovedParticle(int particleNumber)
-//{
-//    assert(particleNumber < nParticles);
-//    previousMovedParticle = particleNumber;
-//}
-
 /*!
   This function does a ratio by evaluating the system in its current
   position and dividing by the previous evaluation. This is strongly

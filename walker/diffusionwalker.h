@@ -20,6 +20,14 @@ public:
     bool aliveOld() {
         return m_aliveOld;
     }
+    void setTimeStep(double arg) {
+        timeStep = arg;
+    }
+
+    double getTimeStep() {
+        return timeStep;
+    }
+
     void progressToNextStep();
 
     void advance(double trialEnergy);
@@ -28,7 +36,7 @@ private:
     int nWalkersMax;
 
     double diffConstant;
-    double tau;
+    double timeStep;
     bool m_aliveNew;
     bool m_aliveOld;
 };

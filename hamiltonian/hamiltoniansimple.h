@@ -8,7 +8,8 @@ class HamiltonianSimple : public Hamiltonian
 {
 public:
     HamiltonianSimple(Config *config);
-    double energy(WaveFunction *wave, vec2 r[]);
+    double potentialEnergy(WaveFunction *wave, vec2 r[]);
+    double kineticEnergy(WaveFunction *wave, vec2 r[]);
     void setAnalyticalKineticEnergy(bool val);
 private:
 };
