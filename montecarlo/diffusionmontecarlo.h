@@ -11,10 +11,16 @@ public:
 
     void sample(int nSamplesLocal);
     void sample();
+    void setTimeStep(double arg) {
+        timeStep = arg;
+        updateWalkerParameters();
+    }
+    void loadConfiguration(INIParser *settings);
+
 //    vec2 **rOld;
 //    vec2 **rNew;
 //    WaveFunction **waves;
-
+private:
     DiffusionWalker **walkers;
 
 //    bool *aliveOld;
@@ -27,10 +33,10 @@ public:
     int nWalkersAlive;
     int nSamples;
     int nThermalizationCycles;
+    double timeStep;
     MonteCarlo *initialMonteCarlo;
     double parameters[2];
-    void loadConfiguration(INIParser *settings);
-    void limitAliveWalkers();
+    void updateWalkerParameters();
 };
 
 #endif // DIFFUSIONMONTECARLO_H

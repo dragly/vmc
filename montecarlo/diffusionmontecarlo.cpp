@@ -4,7 +4,7 @@
 #include "../wavefunction/waveslater.h"
 #include "../random.h"
 #include "metropolishastingsmontecarlo.h"
-#include "inih/ini.h"
+#include "../inih/ini.h"
 
 DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config_) :
     MonteCarlo(config_),
@@ -14,7 +14,8 @@ DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config_) :
     nWalkersAlive(nWalkersIdeal),
     nSamples(10000),
     nThermalizationCycles(2000),
-    initialMonteCarlo(config->monteCarlo())
+    initialMonteCarlo(config->monteCarlo()),
+    timeStep(0.0001)
 {
     parameters[0] = 0;
     parameters[1] = 0;
@@ -31,7 +32,7 @@ DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config_) :
     for(int i = 0; i < nWalkersMax; i++) {
         walkers[i] = new DiffusionWalker(config, walkers, nWalkersMax);
     }
-    limitAliveWalkers();
+    updateWalkerParameters();
     //    waves = new WaveFunction*[nWalkersMax];
     //    for(int i = 0; i < nWalkersMax; i++) {
     //        waves[i] = wave->clone();
@@ -49,7 +50,7 @@ DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config_) :
     //    }
 }
 
-void DiffusionMonteCarlo::limitAliveWalkers()
+void DiffusionMonteCarlo::updateWalkerParameters()
 {
     for(int i = 0; i < nWalkersMax; i++) {
         if(i < nWalkersAlive) {
@@ -59,7 +60,10 @@ void DiffusionMonteCarlo::limitAliveWalkers()
             walkers[i]->setAliveNew(false);
             walkers[i]->setAliveOld(false);
         }
+        walkers[i]->setParameters(parameters);
+        walkers[i]->setTimeStep(timeStep);
     }
+    config->wave()->setParameters(parameters);
 }
 
 void DiffusionMonteCarlo::loadConfiguration(INIParser *settings) {
@@ -70,17 +74,11 @@ void DiffusionMonteCarlo::loadConfiguration(INIParser *settings) {
     nWalkersAlive = nWalkersIdeal;
     correlationStep = settings->GetDouble("DiffusionMonteCarlo", "correlationStep", correlationStep);
     nSamples = settings->GetDouble("DiffusionMonteCarlo", "nSamples", nSamples);
-    double tau = settings->GetDouble("DiffusionMonteCarlo", "tau", 0.02);
+    timeStep = settings->GetDouble("DiffusionMonteCarlo", "tau", timeStep);
     nThermalizationCycles = settings->GetDouble("DiffusionMonteCarlo", "nThermalizationCycles", nThermalizationCycles);
-    std::cout << tau << std::endl;
     parameters[0] = alpha;
     parameters[1] = beta;
-    for(int i = 0; i < nWalkersMax; i++) {
-        walkers[i]->setParameters(parameters);
-        walkers[i]->setTimeStep(tau);
-        config->wave()->setParameters(parameters);
-    }
-    limitAliveWalkers();
+    updateWalkerParameters();
 }
 
 void DiffusionMonteCarlo::sample() {

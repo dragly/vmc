@@ -36,15 +36,7 @@ public:
 
     // old tests
     void waveSimpleGradientTest(); // TODO - consider implementing this again
-    // quick tests
-    // slow tests
 
-    // unfinished tests
-    void evolutionaryMonteCarloTest();
-    void geneticMinimizerTest();
-    void evolverTest();
-    void diffusionMonteCarloTest();
-private slots:
     // quick tests
     void orbitalGradientTest();
     void initTestCase();
@@ -70,7 +62,16 @@ private slots:
     void fullIdealHastingsSlaterTest();
     void fullSlaterSixInteractionTest();
     void fullSlaterSixNoInteractionTest();
+
     // unfinished tests
+    void evolutionaryMonteCarloTest();
+    void evolverTest();
+    void diffusionMonteCarloTest();
+private slots:
+    // quick tests
+    // slow tests
+    // unfinished tests
+    void geneticMinimizerTest();
 
 private:
     Config *oldConfig;
@@ -902,7 +903,6 @@ void VmcTests::diffusionMonteCarloTest() {
     config->setNDimensions(2);
     config->setInteractionEnabled(true);
     config->setDiffusionConstant(0.5);
-    config->setTau(0.00001);
     config->setStepLength(0.001);
     config->setOmega(1.0);
 
@@ -924,6 +924,7 @@ void VmcTests::diffusionMonteCarloTest() {
     config->setHamiltonian(hamiltonianIdeal);
 
     DiffusionMonteCarlo *diffusionMonteCarlo = new DiffusionMonteCarlo(config);
+    diffusionMonteCarlo->setTimeStep(0.0001);
     diffusionMonteCarlo->sample(40000);
     double energy = diffusionMonteCarlo->energy();
     std::cout << "Diffusion monte carlo returned energy of " << energy << std::endl;
