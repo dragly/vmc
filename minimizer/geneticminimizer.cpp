@@ -39,10 +39,15 @@ void GeneticMinimizer::runMinimizer()
     ofstream dataFile;
     dataFile.open("minimizer-evolutionary.dat");
     energies = new vec[nPopulations];
-    variationalGradients = new vec[nPopulations];
+    variationalGradientProducts = new vec[nPopulations];
+    variationalGradients = new vec*[nPopulations];
     for(int i = 0; i < nPopulations; i++) {
         energies[i] = zeros<vec>(nIndividuals);
-        variationalGradients[i] = zeros<vec>(nIndividuals);
+        variationalGradientProducts[i] = zeros<vec>(nIndividuals);
+        variationalGradients[i] = new vec[nIndividuals];
+        for(int j = 0; j < nIndividuals; j++) {
+            variationalGradients[i][j] = zeros<vec>(2);
+        }
     }
     for(int acycle = 0; acycle < nCycles; acycle++) {
         allBestValue = INFINITY;
@@ -60,7 +65,7 @@ void GeneticMinimizer::runMinimizer()
                 energySum += energy;
                 alphaSum += fabs(populations[i][index][0]);
                 betaSum += fabs(populations[i][index][1]);
-                variationalGradientSum += variationalGradients[i][index];
+                variationalGradientSum += variationalGradientProducts[i][index];
             }
         }
         // TODO output variance if possible
@@ -102,7 +107,8 @@ double GeneticMinimizer::fitness(vec &coefficients, int population, int individu
         energy = INFINITY;
     }
     energies[population][individual] = energy;
-    variationalGradients[population][individual] = variationalGradientProduct;
+    variationalGradientProducts[population][individual] = variationalGradientProduct;
+    variationalGradients[population][individual] = variationalGradient;
     return energy;
 }
 

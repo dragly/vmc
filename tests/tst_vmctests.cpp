@@ -66,12 +66,12 @@ public:
     // unfinished tests
     void evolverTest();
     void diffusionMonteCarloTest();
-    void geneticMinimizerTest();
+    void evolutionaryMonteCarloTest();
 private slots:
     // quick tests
     // slow tests
     // unfinished tests
-    void evolutionaryMonteCarloTest();
+    void geneticMinimizerTest();
 
 private:
     Config *oldConfig;
