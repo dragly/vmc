@@ -68,7 +68,7 @@ elif autoMode == "status":
             
     for server in servers:
         print server + ":"
-        nProcs = subprocess.check_output("ssh " + server +  " 'ps aux | grep generator.py | wc -l'", shell=True)
+        nProcs = subprocess.check_output("ssh " + server +  " 'ps aux | grep vmc | wc -l'", shell=True)
         if(int(nProcs) > 2):
             print bcolors.OKGREEN + "Running " + nProcs.replace("\n","") + bcolors.ENDC
         users = subprocess.check_output("ssh " + server +  " 'users'", shell=True)

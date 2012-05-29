@@ -40,6 +40,7 @@ for datapath in argv:
     surface = surf(param0, param1, normalizedData, warp_scale='auto')
     surface.actor.property.edge_visibility = True
     surface.actor.property.lighting = True
+    outline()
 
     myaxes = axes(xlabel='x', ylabel='y', zlabel='P(x,y)')
     myaxes.title_text_property.italic = False
@@ -50,10 +51,12 @@ for datapath in argv:
     myaxes.label_text_property.font_family = 'times'
     myaxes.axes.use_ranges = True
     myaxes.axes.corner_offset = 0.1
+    myaxes.axes.number_of_labels = 4
+    myaxes.axes.label_format = '%-#6.5g'
     
-    if nParticles == 2:
-        fig.scene.camera.position = [73.692558727450901, 74.463726085840136, 33.595723834665613]
-        fig.scene.camera.focal_point = [16.746857621650065, 17.518024980039424, -4.3680769025348729]
+    if int(nParticles) == 2:
+	fig.scene.camera.position = [-53.704645442930435, -35.89305209546697, 47.654859295240939]
+	fig.scene.camera.focal_point = [10.863864177105784, 18.410021530580558, -9.1276027894244116]
     fig.scene.render()
 
     savefig(datapath + "/density.png")

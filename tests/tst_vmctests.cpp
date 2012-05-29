@@ -64,14 +64,14 @@ public:
     void fullSlaterSixNoInteractionTest();
 
     // unfinished tests
-    void evolverTest();
     void diffusionMonteCarloTest();
     void evolutionaryMonteCarloTest();
+    void geneticMinimizerTest();
 private slots:
     // quick tests
     // slow tests
     // unfinished tests
-    void geneticMinimizerTest();
+    void evolverTest();
 
 private:
     Config *oldConfig;
@@ -833,33 +833,32 @@ void VmcTests::fullSlaterSixInteractionTest()
 void VmcTests::evolverTest()
 {
     //    QBENCHMARK {
-    double sum = 0;
-    double sumsq = 0;
-    for(int test = 0; test < 100; test++) {
-        std::cout << test << std::endl;
-        FunctionEvolver *evolver = new FunctionEvolver(16, 16, 2);
-        evolver->setRescaleLimits(1e-10, 1e10);
+    FunctionEvolver *evolver = new FunctionEvolver(16, 16, 2);
+    evolver->setRescaleLimits(1e-10, 1e10);
+    for(int step = 0; step < 20; step++) {
         evolver->evolve(500,250);
-        //        std::cout << evolver->fitnessResult << std::endl;
         evolver->calculate(evolver->allBestGenes);
 
-        //        ofstream data;
-        //        data.open("fitness.dat");
-        //        for(uint i = 0; i < evolver->x.n_elem; i++) {
-        //            data << evolver->x[i] << " " << evolver->result[i] << " " << evolver->fitnessResult[i] << std::endl;
-        //        }
-        //        data.close();
+        ofstream data;
+        ostringstream filename;
+        filename << "fitness" << step << ".dat";
+        data.open(filename.str().c_str());
+        for(uint i = 0; i < evolver->x.n_elem; i++) {
+            data << evolver->x[i] << " " << evolver->result[i] << " " << evolver->fitnessResult[i] << std::endl;
+        }
+        data.close();
 
+        double sum = 0;
+        double sumsq = 0;
         for(uint i = 0; i < evolver->x.n_elem; i++) {
             //            QVERIFY(fabs(evolver->result[i] - evolver->fitnessResult[i]) < 1e-1);
             double val = fabs(evolver->result[i] - evolver->fitnessResult[i]);
             sum += val;
             sumsq += val*val;
         }
-
-        delete evolver;
+        std::cout << "Sum: " << sum << " variance: " << (sum/1000. * sum/1000.) - sumsq/1000 << std::endl;
     }
-    std::cout << "Sum: " << sum << " variance: " << (sum/1000. * sum/1000.) - sumsq/1000 << std::endl;
+    delete evolver;
     //    }
 }
 

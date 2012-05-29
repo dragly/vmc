@@ -41,10 +41,12 @@ for datapath in argv:
     myaxes.label_text_property.bold = False
     myaxes.label_text_property.font_family = 'times'
     myaxes.axes.use_ranges = True
-    myaxes.axes.corner_offset = 0.02
+    myaxes.axes.corner_offset = 0.1
+    myaxes.axes.number_of_labels = 4
+    myaxes.axes.label_format = '%-#6.5g'
     
     # perspective view
-    fig.scene.camera.position = [21.583470159040861, -16.378051020433883, 10.231416057474506]
+    fig.scene.camera.position = [25, -20, 12]
     fig.scene.camera.focal_point = [5.3897238323904126, 5.434549130831372, -1.7158449313567394]
     fig.scene.render()
 

@@ -113,6 +113,9 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                 checkTerminalization(localEnergy);
             }
         }  //  end of loop over particles
+        if(!(cycle % 10000)) {
+            std::cout << "Energy from last 10000 cycles was " << m_energy / (cycle * nParticles) << std::endl;
+        }
     }
 //    std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
     m_energy /= (nCycles * nParticles);
