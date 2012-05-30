@@ -103,8 +103,8 @@ void DensityPlotter::makePlot()
             for (int cycle = 1; cycle <= m_nCycles; cycle++){
                 // new positions for all particles
                 for (int i = 1; i < config->nParticles(); i++) {
-                    r_new[i][0] = aMin + (aMax - aMin) * ran2(idum);
-                    r_new[i][1] = bMin + (bMax - bMin) * ran2(idum);
+                    r_new[i][0] = aMin + (aMax - aMin) * ran3(idum);
+                    r_new[i][1] = bMin + (bMax - bMin) * ran3(idum);
                 }  //  end of loop over particles
                 // compute probability
                 prob += m_wave->evaluate(r_new) * m_wave->evaluate(r_new)/* * (r_new[0][0] * r_new[0][0]  + r_new[0][1] * r_new[0][1])*/;

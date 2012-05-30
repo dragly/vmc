@@ -144,7 +144,7 @@ return mj*FAC;
  * \return Number between -1 and 1 with a close to gaussian distribution
  */
 double simpleGaussRandom(long *idum) {
-    return (-1 + 2 * ran2(idum)) + (-1 + 2 * ran2(idum)) + (-1 + 2 * ran2(idum));
+    return (-1 + 2 * ran3(idum)) + (-1 + 2 * ran3(idum)) + (-1 + 2 * ran3(idum));
 }
 
-// End: function ran2()
+// End: function ran3()

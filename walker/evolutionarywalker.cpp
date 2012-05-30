@@ -54,7 +54,7 @@ void EvolutionaryWalker::advance() {
 
             double weight = ratio*ratio * greensRatio;
             // Accept move according to Metropolis probability
-            if(weight > ran2(idum)) {
+            if(weight > ran3(idum)) {
                 rOld[i] = rNew[i];
                 wave->acceptMove(i);
                 quantumForceOld = quantumForceNew;
@@ -73,7 +73,7 @@ void EvolutionaryWalker::advance() {
         m_energy += localEnergyNew;
         m_changeInEnergySamples++;
 //                std::cout << "Alive walkers: " << nWalkersAlive << std::endl;
-//            std::cout << "Should make " << (int) (branchingFactor + ran2(idum)) << " copies" << std::endl;
+//            std::cout << "Should make " << (int) (branchingFactor + ran3(idum)) << " copies" << std::endl;
         localEnergyOld = localEnergyNew;
     } // END for every particle
 }

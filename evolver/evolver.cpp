@@ -85,7 +85,7 @@ void Evolver::rescale()
 {
     double lowLimit = log(lowScaleLimit);
     double highLimit = log(highScaleLimit);
-    double expScale = lowLimit + (highLimit - lowLimit) * ran2(idum);
+    double expScale = lowLimit + (highLimit - lowLimit) * ran3(idum);
     scale = pow(10,expScale);
 }
 
@@ -108,7 +108,7 @@ void Evolver::evolve(int nSteps, int populationMatchingPeriod)
                 for(int k = 0; k < nGenes; k++) {
                     // a random selection of half of the genes comes from one parent
                     int parentIndex;
-                    if(ran2(idum) > 0.5) {
+                    if(ran3(idum) > 0.5) {
                         parentIndex = parent1Index;
                     } else {
                         parentIndex = parent2Index;
@@ -124,9 +124,9 @@ void Evolver::evolve(int nSteps, int populationMatchingPeriod)
                 uint individualIndex = bestIndices[i][j];
                 vec &genes = populations[i][individualIndex]; // note the use of reference!
                 for(int k = 0; k < nGenes; k++) {
-                    int randomGene = ran2(idum) * nGenes;
+                    int randomGene = ran3(idum) * nGenes;
     //                double gauss = simpleGaussRandom(idum);
-                    double gauss = 2 * ran2(idum) - 1;
+                    double gauss = 2 * ran3(idum) - 1;
                     genes[randomGene] += gauss * scale;
                 }
             }
@@ -137,7 +137,7 @@ void Evolver::evolve(int nSteps, int populationMatchingPeriod)
             for(int j = 7. * nIndividuals / 8.; j < nIndividuals; j++) {
                 uint individualIndex = bestIndices[i][j];
                 for(int k = 0; k < nGenes; k++) {
-                    double gauss = 2 * ran2(idum) - 1;
+                    double gauss = 2 * ran3(idum) - 1;
                     populations[i][individualIndex][k] = allBestGenes[k] + gauss * scale;
                 }
             }
@@ -146,8 +146,8 @@ void Evolver::evolve(int nSteps, int populationMatchingPeriod)
         // Merge populations every populationMatching step. Adds the best from one population to the other population.
         if(!(cycle % populationMatchingPeriod)) {
             for(int i = 0; i < nPopulations / 2; i++) {
-                int population1Index = (int)(ran2(idum) * (nPopulations/2));
-                int population2Index = (int)((nPopulations/2) + ran2(idum) * (nPopulations/2));
+                int population1Index = (int)(ran3(idum) * (nPopulations/2));
+                int population2Index = (int)((nPopulations/2) + ran3(idum) * (nPopulations/2));
                 if(population1Index != population2Index) {
                     for(int j = 0; j < nIndividuals / 2; j++) {
                         uint bestIndex1 = bestIndices[population1Index][j];

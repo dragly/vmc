@@ -61,7 +61,7 @@ double EvolutionaryMonteCarlo::fitness(vec &genes, int population, int individua
 
 //            double branchingFactor = -exp(- 0.01 * (0.5 * (oldEnergy + newEnergy) - trialEnergy));
 //            std::cout << branchingFactor << std::endl;
-//            branchingSum += (int)( branchingFactor - ran2(idum));
+//            branchingSum += (int)( branchingFactor - ran3(idum));
             //            }
         }
     }
@@ -90,7 +90,7 @@ double EvolutionaryMonteCarlo::fitness(vec &genes, int population, int individua
     // return difference between trial energy and this individuals energy
     return fabs(meanEnergy - trialEnergy);
 //        return -branchingSum;
-//    return ran2(idum);
+//    return ran3(idum);
 }
 
 void EvolutionaryMonteCarlo::sample(int nCycles)
@@ -115,7 +115,7 @@ void EvolutionaryMonteCarlo::sample(int nCycles)
                 int positionIndex = k % nDimensions;
                 int moveIndex = walkerIndex + nWalkers * j;
                 populations[i][j][k] = moves[moveIndex][particleIndex][positionIndex];
-                //                populations[i][j][k] = ran2(idum) * 8;
+                //                populations[i][j][k] = ran3(idum) * 8;
             }
         }
     }

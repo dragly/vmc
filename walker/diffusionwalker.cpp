@@ -63,7 +63,7 @@ void DiffusionWalker::advance(double trialEnergy) {
 
             double weight = ratio*ratio * greensRatio;
             // Accept move according to Metropolis probability
-            if(weight > ran2(idum)) {
+            if(weight > ran3(idum)) {
                 rOld[i] = rNew[i];
                 wave->acceptMove(i);
                 quantumForceOld = quantumForceNew;
@@ -78,9 +78,10 @@ void DiffusionWalker::advance(double trialEnergy) {
         // Compute branching factor PB
         localEnergyNew = hamiltonian->energy(wave, rNew);
         localEnergyOld = hamiltonian->energy(wave, rOld);
-        double branchingFactor = exp(- timeStep * diffConstant * (0.5 * (localEnergyNew + localEnergyOld) - trialEnergy));
+//        double branchingFactor = exp(- timeStep * diffConstant * (0.5 * (localEnergyNew + localEnergyOld) - trialEnergy));
+        double branchingFactor = exp(- timeStep * (0.5 * (localEnergyNew + localEnergyOld) - trialEnergy));
         // Make int(PB + u) copies
-        int reproductions = int(branchingFactor + ran2(idum));
+        int reproductions = int(branchingFactor + ran3(idum));
         // Accumulate the energy and any observables weighted by PB
         m_energy += localEnergyNew * branchingFactor;
         m_changeInEnergySamples++;
@@ -102,7 +103,7 @@ void DiffusionWalker::advance(double trialEnergy) {
             }
         } // END if branching
 //                std::cout << "Alive walkers: " << nWalkersAlive << std::endl;
-//            std::cout << "Should make " << (int) (branchingFactor + ran2(idum)) << " copies" << std::endl;
+//            std::cout << "Should make " << (int) (branchingFactor + ran3(idum)) << " copies" << std::endl;
         localEnergyOld = localEnergyNew;
     } // END for every particle
 }

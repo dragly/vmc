@@ -144,7 +144,7 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
             std::cout << "Trial energy is now " << trialEnergy << " with " << nWalkersAlive << " walkers at cycle " << cycle << std::endl;
             // Renormalise the number of walkers to the target number by creating or deleting walkers
             //            while(nWalkersAlive > nWalkersIdeal) {
-            //                int randomWalker = ran2(idum) * nWalkersMax;
+            //                int randomWalker = ran3(idum) * nWalkersMax;
             //                if(aliveNew[randomWalker]) {
             //                    aliveNew[randomWalker] = false;
             //                    nWalkersAlive--;

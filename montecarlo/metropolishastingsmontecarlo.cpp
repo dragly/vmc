@@ -37,7 +37,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
     //  initial trial position, note calling with alpha
 //    for (int i = 0; i < nParticles; i++) {
 //        for (int j=0; j < nDimensions; j++) {
-//            rOld[i][j] = stepLength*(ran2(idumMC)-0.5);
+//            rOld[i][j] = stepLength*(ran3(idumMC)-0.5);
 //        }
 //        rNew[i] = rOld[i];
 //    }
@@ -74,7 +74,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
             double ratio = wave->ratio(rNew[i], i);
             double weight = ratio*ratio * greensRatio;
 //            std::cout << ratio << std::endl;
-            if(ran2(idumMC) < weight) {
+            if(ran3(idumMC) < weight) {
                 rOld[i] = rNew[i];
                 wave->acceptMove(i);
                 if(terminalized) {

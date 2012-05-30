@@ -46,7 +46,7 @@ void MonteCarlo::loadConfiguration(INIParser *settings)
 void MonteCarlo::randomizePositions() {
     for (int i = 0; i < nParticles; i++) {
         for (int j=0; j < nDimensions; j++) {
-            rOld[i][j] = rNew[i][j] = spawnRadius * (ran2(idumMC) - 0.5);
+            rOld[i][j] = rNew[i][j] = spawnRadius * (ran3(idumMC) - 0.5);
         }
     }
 }
