@@ -78,10 +78,11 @@ void DiffusionWalker::advance(double trialEnergy) {
             rNew[i] = rOld[i];
         }
         // Compute branching factor PB
-        localEnergyNew = hamiltonian->energy(wave, rOld);
+        localEnergyNew = hamiltonian->energy(wave, rNew);
 //        localEnergyOld = hamiltonian->energy(wave, rOld);
 //        double branchingFactor = exp(- timeStep * diffConstant * (0.5 * (localEnergyNew + localEnergyOld) - trialEnergy));
         double branchingFactor = exp(- timeStep * (0.5 * (localEnergyNew + localEnergyOld) - trialEnergy));
+//        std::cout << aliveNew() << aliveOld() << " " << branchingFactor << " " << trialEnergy << " " << localEnergyNew << " " << localEnergyOld << std::endl;
         // Make int(PB + u) copies
         int reproductions = int(branchingFactor + ran3(idum));
         // Accumulate the energy and any observables weighted by PB

@@ -38,6 +38,9 @@ void Walker::initialize(vec2 *positions)
     wave->gradient(positions, quantumForceNew);
     quantumForceOld = quantumForceNew;
     localEnergyOld = hamiltonian->energy(wave, rNew);
+    if(isnan(localEnergyOld)) {
+        std::cout << rNew[0] << rNew[1] << std::endl;
+    }
     localEnergyNew = localEnergyOld;
 }
 

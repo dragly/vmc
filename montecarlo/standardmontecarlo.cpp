@@ -53,8 +53,7 @@ void StandardMonteCarlo::sample(int nSamples)
     m_variationalGradient = zeros(2); // TODO make parameter-specific
     // TODO Optimize step length by Newton's method
     // loop over monte carlo cycles
-    int move = 0;
-    for (cycle = 0; cycle < nSamples; cycle++){
+    for (cycle = 0; cycle <= nSamples; cycle++){
         // new position
         for (int i = 0; i < nParticles; i++) {
             for (int j=0; j < nDimensions; j++) {
@@ -102,6 +101,9 @@ void StandardMonteCarlo::sample(int nSamples)
                             move++;
                         }
                     }
+                }
+                if(i == 0 && !(cycle % 10000) && cycle > 0) {
+                    std::cout << "Energy from last 10000 cycles was " << m_energy / (cycle * nParticles) << std::endl;
                 }
             } else {
                 checkTerminalization(localEnergy);
