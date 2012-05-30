@@ -49,14 +49,14 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
     int acceptances = 0;
     int rejections = 0;
     // loop over monte carlo cycles
-    for (int cycle = 0; cycle <= nCycles; cycle++){
+    for (cycle = 0; cycle <= nCycles; cycle++){
         // new trial position
         for (int i = 0; i < nParticles; i++) {
             wave->gradient(rOld, quantumForceOld);
             quantumForceOld *= 2;
             for (int k=0; k < nDimensions; k++) {
                 int qfIndex = i * nDimensions + k;
-                rNew[i][k]= rOld[i][k] +  diffConstant * quantumForceOld[qfIndex] * stepLength + sqrt(2 * diffConstant * stepLength) * simpleGaussRandom(idumMC);
+                rNew[i][k]= rOld[i][k] +  diffConstant * quantumForceOld[qfIndex] * stepLength + 2 * diffConstant * sqrt(stepLength) * simpleGaussRandom(idumMC);
             }
 
             // The Metropolis test is performed by moving one particle at the time
@@ -109,15 +109,15 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                         }
                     }
                 }
+                if(i == 0 && !(cycle % 10000) && cycle > 0) {
+                    std::cout << "Energy from last 10000 cycles was " << m_energy / (cycle * nParticles) << std::endl;
+                }
             } else {
                 checkTerminalization(localEnergy);
             }
         }  //  end of loop over particles
-        if(!(cycle % 10000)) {
-            std::cout << "Energy from last 10000 cycles was " << m_energy / (cycle * nParticles) << std::endl;
-        }
     }
-//    std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
+    std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
     m_energy /= (nCycles * nParticles);
     m_energySquared /= (nCycles * nParticles);
     m_variationalGradient = m_variationalGradient / (nCycles * nParticles);

@@ -1,4 +1,5 @@
 #include "random.h"
+#include <iostream>
 
 /*
 ** The function
@@ -93,45 +94,45 @@ double ran2(long *idum)
 
 double ran3(long *idum)
 {
-static int inext, inextp;
-static long ma[56]; // value 56 is special, do not modify
-static int iff = 0;
-long mj, mk;
-int i, ii, k;
+    static int inext, inextp;
+    static long ma[56]; // value 56 is special, do not modify
+    static int iff = 0;
+    long mj, mk;
+    int i, ii, k;
 
-if(*idum < 0 || iff == 0) { // initialization
-  iff = 1;
+    if(*idum < 0 || iff == 0) { // initialization
+        iff = 1;
 
-  mj = MSEED - (*idum < 0 ? -*idum : *idum);
-  mj %= MBIG;
-  ma[55] = mj; // initialize ma[55]
+        mj = MSEED - (*idum < 0 ? -*idum : *idum);
+        mj %= MBIG;
+        ma[55] = mj; // initialize ma[55]
 
-  for(i = 1, mk = 1; i <= 54; i++) { // initialize rest of table
-     ii = (21*i) % 55;
-ma[ii] = mk;
-mk = mj - mk;
-if(mk < MZ) mk += MBIG;
-mj = ma[ii];
-  }
+        for(i = 1, mk = 1; i <= 54; i++) { // initialize rest of table
+            ii = (21*i) % 55;
+            ma[ii] = mk;
+            mk = mj - mk;
+            if(mk < MZ) mk += MBIG;
+            mj = ma[ii];
+        }
 
-  for(k = 1; k <= 4; k++) { // randimize by "warming up" the generator
-     for(i = 1; i <= 55; i++) {
-ma[i] -= ma[1 + (i + 30) % 55];
-if(ma[i] < MZ) ma[i] += MBIG;
-}
-  }
+        for(k = 1; k <= 4; k++) { // randimize by "warming up" the generator
+            for(i = 1; i <= 55; i++) {
+                ma[i] -= ma[1 + (i + 30) % 55];
+                if(ma[i] < MZ) ma[i] += MBIG;
+            }
+        }
 
-  inext = 0; // prepare indices for first generator number
-  inextp = 31; // 31 is special
-  *idum = 1;
-}
+        inext = 0; // prepare indices for first generator number
+        inextp = 31; // 31 is special
+        *idum = 1;
+    }
 
-if(++inext == 56) inext = 1;
-if(++inextp == 56) inextp = 1;
-mj = ma[inext] - ma[inextp];
-if(mj < MZ) mj += MBIG;
-ma[inext] = mj;
-return mj*FAC;
+    if(++inext == 56) inext = 1;
+    if(++inextp == 56) inextp = 1;
+    mj = ma[inext] - ma[inextp];
+    if(mj < MZ) mj += MBIG;
+    ma[inext] = mj;
+    return mj*FAC;
 }
 #undef MBIG
 #undef MSEED

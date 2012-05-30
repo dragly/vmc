@@ -76,7 +76,7 @@ void MonteCarlo::checkTerminalization(double localEnergy) {
     if(!(cycle % 1000)) {
         double terminalizationAverage = terminalizationSum / terminalizationNum;
         diffAverage = fabs(terminalizationAverage - prevTerminalizationAverage);
-        if(diffAverage < 2 && terminalizationTrials > 25) {
+        if(diffAverage < 2 && terminalizationTrials > 100) {
             terminalized = true;
             cycle = 0;
         }

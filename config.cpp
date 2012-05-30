@@ -23,7 +23,7 @@ Config::Config(int myRank, int nProcesses) :
     m_monteCarloClass("MonteCarloStandard"),
     m_omega(1.0),
     m_interactionEnabled(true),
-    m_idum(-myRank*time(NULL)),
+    m_idum(-(1 + myRank)*time(NULL)),
     m_diffusionConstant(0.5)
 {
 }

@@ -22,29 +22,31 @@ void DiffusionWalker::advance(double trialEnergy) {
     m_energy = 0;
     for(int i = 0; i < nParticles; i++) {
         wave->gradient(rOld, quantumForceOld);
-        quantumForceOld *= 2;
+//        quantumForceOld *= 2;
         // Propose move (with quantum force)
         for(int k = 0; k < nDimensions; k++) {
             // TODO per cartesian component tau?
             int qfIndex = i * nDimensions + k;
             rNew[i][k] = rOld[i][k] + timeStep * diffConstant * quantumForceOld[qfIndex] + 2 * diffConstant * sqrt(timeStep) * simpleGaussRandom(idum);
+//            rNew[i][k] = rOld[i][k] + timeStep * diffConstant * quantumForceOld[qfIndex] + 2 * diffConstant * sqrt(timeStep) * randomVec[0];
 //                    std::cout << "i ndim k " << i * nDimensions + k << " " << quantumForceNew->n_elem << std::endl;
 //                    std::cout << "Quantum force " << j << " " << i << " " << k << " " << quantumForceNew[j][i * nDimensions + k] << std::endl;
 //                    std::cout << "Old/New: " << rOld[j][i][k] << " " << rNew[j][i][k] << std::endl;
         }
         double ratio = wave->ratio(rNew[i], i);
-//        quantumForceNew *= 2;
         // Apply fixed node approximation (keep sign or reject move)
         if(ratio > 0) {
             // Compute weight function
             wave->gradient(rNew, quantumForceNew);
 //            quantumForceNew *= 2;
             double argSum = 0;
-            for(int k = 0; k < nDimensions; k++) {
-                int qfIndex = i * nDimensions + k;
-                double quantumForceSum = quantumForceOld[qfIndex] + quantumForceNew[qfIndex];
-                double qfPositionDiff = 0.5 * timeStep * diffConstant * (quantumForceOld[qfIndex] - quantumForceNew[qfIndex]) - (rNew[i][k] - rOld[i][k]);
-                argSum += 0.5 * quantumForceSum * qfPositionDiff;
+            for(int j = 0; j < nDimensions; j++) { // TODO figure out if it is necessary to do this with all particles (is it not zero for non-moved particles?).
+                for(int k = 0; k < nDimensions; k++) {
+                    int qfIndex = j * nDimensions + k;
+                    double quantumForceSum = quantumForceOld[qfIndex] + quantumForceNew[qfIndex];
+                    double qfPositionDiff = 0.5 * timeStep * diffConstant * (quantumForceOld[qfIndex] - quantumForceNew[qfIndex]) - (rNew[j][k] - rOld[j][k]);
+                    argSum += 0.5 * quantumForceSum * qfPositionDiff;
+                }
             }
             double greensRatio = exp(argSum);
 
@@ -76,8 +78,8 @@ void DiffusionWalker::advance(double trialEnergy) {
             rNew[i] = rOld[i];
         }
         // Compute branching factor PB
-        localEnergyNew = hamiltonian->energy(wave, rNew);
-        localEnergyOld = hamiltonian->energy(wave, rOld);
+        localEnergyNew = hamiltonian->energy(wave, rOld);
+//        localEnergyOld = hamiltonian->energy(wave, rOld);
 //        double branchingFactor = exp(- timeStep * diffConstant * (0.5 * (localEnergyNew + localEnergyOld) - trialEnergy));
         double branchingFactor = exp(- timeStep * (0.5 * (localEnergyNew + localEnergyOld) - trialEnergy));
         // Make int(PB + u) copies
