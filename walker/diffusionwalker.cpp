@@ -27,18 +27,18 @@ void DiffusionWalker::advance(double trialEnergy) {
         for(int k = 0; k < nDimensions; k++) {
             // TODO per cartesian component tau?
             int qfIndex = i * nDimensions + k;
-            rNew[i][k] = rOld[i][k] + timeStep * diffConstant * quantumForceOld[qfIndex] + sqrt(2 * timeStep * diffConstant) * simpleGaussRandom(idum);
+            rNew[i][k] = rOld[i][k] + timeStep * diffConstant * quantumForceOld[qfIndex] + 2 * diffConstant * sqrt(timeStep) * simpleGaussRandom(idum);
 //                    std::cout << "i ndim k " << i * nDimensions + k << " " << quantumForceNew->n_elem << std::endl;
 //                    std::cout << "Quantum force " << j << " " << i << " " << k << " " << quantumForceNew[j][i * nDimensions + k] << std::endl;
 //                    std::cout << "Old/New: " << rOld[j][i][k] << " " << rNew[j][i][k] << std::endl;
         }
         double ratio = wave->ratio(rNew[i], i);
-        quantumForceNew *= 2;
+//        quantumForceNew *= 2;
         // Apply fixed node approximation (keep sign or reject move)
         if(ratio > 0) {
             // Compute weight function
             wave->gradient(rNew, quantumForceNew);
-            quantumForceNew *= 2;
+//            quantumForceNew *= 2;
             double argSum = 0;
             for(int k = 0; k < nDimensions; k++) {
                 int qfIndex = i * nDimensions + k;
@@ -85,7 +85,7 @@ void DiffusionWalker::advance(double trialEnergy) {
         // Accumulate the energy and any observables weighted by PB
         m_energy += localEnergyNew * branchingFactor;
         m_changeInEnergySamples++;
-        if(reproductions == 0) {
+        if(reproductions == 0 || localEnergyNew < trialEnergy - 1. / sqrt(timeStep) || localEnergyNew > trialEnergy + 1 / sqrt(timeStep)) {
             m_aliveNew = false;
         } else {
             if(reproductions > 1) {
