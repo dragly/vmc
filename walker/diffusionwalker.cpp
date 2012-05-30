@@ -22,7 +22,7 @@ void DiffusionWalker::advance(double trialEnergy) {
     m_energy = 0;
     for(int i = 0; i < nParticles; i++) {
         wave->gradient(rOld, quantumForceOld);
-//        quantumForceOld *= 2;
+        quantumForceOld *= 2;
         // Propose move (with quantum force)
         for(int k = 0; k < nDimensions; k++) {
             // TODO per cartesian component tau?
@@ -38,7 +38,7 @@ void DiffusionWalker::advance(double trialEnergy) {
         if(ratio > 0) {
             // Compute weight function
             wave->gradient(rNew, quantumForceNew);
-//            quantumForceNew *= 2;
+            quantumForceNew *= 2;
             double argSum = 0;
             for(int j = 0; j < nDimensions; j++) { // TODO figure out if it is necessary to do this with all particles (is it not zero for non-moved particles?).
                 for(int k = 0; k < nDimensions; k++) {
