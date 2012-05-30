@@ -4,6 +4,7 @@ try:
 except ImportError:
     from mayavi.mlab import *
 
+import scipy.ndimage as ndimage
 from numpy import *
 from matplotlib import rc
 from sys import argv
@@ -37,10 +38,13 @@ for datapath in argv:
 
     from numpy.linalg.linalg import norm
     normalizedData = data / norm(data)
-    surface = surf(param0, param1, normalizedData, warp_scale='auto')
+    
+    normalizedDataSmooth = ndimage.gaussian_filter(normalizedData, sigma=1.0, order=0)
+    
+    surface = surf(param0, param1, normalizedDataSmooth, warp_scale='auto')
     surface.actor.property.edge_visibility = True
     surface.actor.property.lighting = True
-    outline()
+    #outline()
 
     myaxes = axes(xlabel='x', ylabel='y', zlabel='P(x,y)')
     myaxes.title_text_property.italic = False
@@ -55,8 +59,10 @@ for datapath in argv:
     myaxes.axes.label_format = '%-#6.5g'
     
     if int(nParticles) == 2:
-	fig.scene.camera.position = [-53.704645442930435, -35.89305209546697, 47.654859295240939]
-	fig.scene.camera.focal_point = [10.863864177105784, 18.410021530580558, -9.1276027894244116]
+        fig.scene.camera.position = [-52.180466454173839, -19.827149342881295, 37.613833505235903]
+        fig.scene.camera.focal_point = [11.309528075254283, 18.824854213069088, -7.9780393346049383]
+    elif int(nParticles) == 6:
+        fig.scene.camera.position = [-83.367976780452835, -33.31347241689658, 60.149674418839126]
+        fig.scene.camera.focal_point = [9.5877242100828539, 23.27692598937039, -6.6013866059718787]
     fig.scene.render()
-
     savefig(datapath + "/density.png")

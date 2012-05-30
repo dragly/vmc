@@ -835,8 +835,8 @@ void VmcTests::evolverTest()
     //    QBENCHMARK {
     FunctionEvolver *evolver = new FunctionEvolver(16, 16, 2);
     evolver->setRescaleLimits(1e-10, 1e10);
-    for(int step = 0; step < 20; step++) {
-        evolver->evolve(500,250);
+    for(int step = 0; step < 100; step++) {
+        evolver->evolve(100,250);
         evolver->calculate(evolver->allBestGenes);
 
         ofstream data;
