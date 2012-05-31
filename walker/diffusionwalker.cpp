@@ -20,9 +20,11 @@ void DiffusionWalker::advance(double trialEnergy) {
     Walker::advance();
     m_changeInEnergySamples = 0;
     m_energy = 0;
+    m_acceptances = 0;
+    m_rejections = 0;
     for(int i = 0; i < nParticles; i++) {
-        wave->gradient(rOld, quantumForceOld);
-        quantumForceOld *= 2;
+//        wave->gradient(rOld, quantumForceOld);
+//        quantumForceOld *= 2;
         // Propose move (with quantum force)
         for(int k = 0; k < nDimensions; k++) {
             // TODO per cartesian component tau?
@@ -69,17 +71,21 @@ void DiffusionWalker::advance(double trialEnergy) {
                 wave->acceptMove(i);
                 quantumForceOld = quantumForceNew;
                 m_acceptances++;
+                localEnergyNew = hamiltonian->energy(wave, rOld);
             } else {
                 wave->rejectMove();
                 rNew[i] = rOld[i];
                 m_rejections++;
+                quantumForceNew = quantumForceOld;
+                localEnergyNew = localEnergyOld;
             }
         } else {
             wave->rejectMove();
             rNew[i] = rOld[i];
+            quantumForceNew = quantumForceOld;
+            localEnergyNew = localEnergyOld;
         }
         // Compute branching factor PB
-        localEnergyNew = hamiltonian->energy(wave, rOld);
 //        localEnergyOld = hamiltonian->energy(wave, rOld);
 //        double branchingFactor = exp(- timeStep * diffConstant * (0.5 * (localEnergyNew + localEnergyOld) - trialEnergy));
         double branchingFactor = exp(- timeStep * (0.5 * (localEnergyNew + localEnergyOld) - trialEnergy));
@@ -87,7 +93,7 @@ void DiffusionWalker::advance(double trialEnergy) {
         // Make int(PB + u) copies
         int reproductions = int(branchingFactor + ran3(idum));
         // Accumulate the energy and any observables weighted by PB
-        m_energy += localEnergyNew /** branchingFactor*/;
+        m_energy += localEnergyNew * branchingFactor;
         m_changeInEnergySamples++;
         if(reproductions == 0 || localEnergyNew < trialEnergy - 1. / sqrt(timeStep) || localEnergyNew > trialEnergy + 1 / sqrt(timeStep)) {
             m_aliveNew = false;

@@ -53,7 +53,8 @@ double HamiltonianIdeal::interactionPotentialEnergy(WaveFunction *wave, vec2 r[]
         for (int j = i+1; j < m_nParticles; j++) {
             double distanceSquared = 0;
             for (int k = 0; k < m_nDimensions; k++) {
-                distanceSquared += (r[i][k]-r[j][k])*(r[i][k]-r[j][k]);
+                double dist = (r[i][k]-r[j][k]);
+                distanceSquared += dist*dist;
             }
             interactionEnergy += 1/sqrt(distanceSquared);
         }

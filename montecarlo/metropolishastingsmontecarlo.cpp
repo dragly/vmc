@@ -35,12 +35,16 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
         nthMove = nCycles * nParticles / (nMoves);
     }
     //  initial trial position, note calling with alpha
-//    for (int i = 0; i < nParticles; i++) {
-//        for (int j=0; j < nDimensions; j++) {
-//            rOld[i][j] = stepLength*(ran3(idumMC)-0.5);
-//        }
-//        rNew[i] = rOld[i];
-//    }
+    //    for (int i = 0; i < nParticles; i++) {
+    //        for (int j=0; j < nDimensions; j++) {
+    //            rOld[i][j] = stepLength*(ran3(idumMC)-0.5);
+    //        }
+    //        rNew[i] = rOld[i];
+    //    }
+    ofstream positionFile;
+    if(recordMoves) {
+        positionFile.open("vmc-positions-init.dat");
+    }
     wave->initialize(rOld);
     //    wave->gradient(rOld, 0, waveGradientOld);
     wave->gradient(rOld, quantumForceOld);
@@ -72,7 +76,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
             double greensRatio = exp(argSum);
 
             double weight = ratio*ratio * greensRatio;
-//            std::cout << ratio << std::endl;
+            //            std::cout << ratio << std::endl;
             if(ran3(idumMC) < weight) {
                 rOld[i] = rNew[i];
                 wave->acceptMove(i);
@@ -100,6 +104,9 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                 m_energy += localEnergy;
                 m_energySquared += localEnergy*localEnergy;
                 if(recordMoves) {
+                    if(!(cycle % 10)) {
+                        positionFile << rOld[i][0] << " " << rOld[i][1] << std::endl;
+                    }
                     if(!(cycle % nthMove)) {
                         //                    std::cout << "Recording move " << move << " @ " << cycle << std::endl;
                         m_moves[move][i] = rOld[i];
@@ -115,6 +122,9 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                 checkTerminalization(localEnergy);
             }
         }  //  end of loop over particles
+    }
+    if(recordMoves) {
+        positionFile.close();
     }
     std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
     m_energy /= (nCycles * nParticles);
