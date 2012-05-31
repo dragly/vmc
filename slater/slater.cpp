@@ -179,6 +179,7 @@ void Slater::rejectMove() {
 }
 
 void Slater::gradient(vec2 r[], vec &rGradient) {
+    rGradient.zeros();
     for(int a = 0; a < nParticles; a++) {
         // TODO we are now recalculating the gradient for all particles, this could be avoided
         int movedParticle = a;

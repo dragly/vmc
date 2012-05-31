@@ -27,7 +27,7 @@ void DiffusionWalker::advance(double trialEnergy) {
         for(int k = 0; k < nDimensions; k++) {
             // TODO per cartesian component tau?
             int qfIndex = i * nDimensions + k;
-            rNew[i][k] = rOld[i][k] + timeStep * diffConstant * quantumForceOld[qfIndex] + 2 * diffConstant * sqrt(timeStep) * simpleGaussRandom(idum);
+            rNew[i][k] = rOld[i][k] + timeStep * diffConstant * quantumForceOld[qfIndex] + sqrt(2 * diffConstant * timeStep) * simpleGaussRandom(idum);
 //            rNew[i][k] = rOld[i][k] + timeStep * diffConstant * quantumForceOld[qfIndex] + 2 * diffConstant * sqrt(timeStep) * randomVec[0];
 //                    std::cout << "i ndim k " << i * nDimensions + k << " " << quantumForceNew->n_elem << std::endl;
 //                    std::cout << "Quantum force " << j << " " << i << " " << k << " " << quantumForceNew[j][i * nDimensions + k] << std::endl;
