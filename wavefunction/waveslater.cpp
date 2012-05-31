@@ -147,9 +147,9 @@ double WaveSlater::laplace(vec2 r[]) {
 //    std::cout << "down " << slaterDown->laplace(r, movedParticle) << std::endl;
 //        jastrow->calculateDistances(r);
 
-        vec slaterUpGradient = zeros<vec>(nParticles * nDimensions);
-        vec slaterDownGradient = zeros<vec>(nParticles * nDimensions);
-        vec jastrowGradient = zeros<vec>(nParticles * nDimensions);
+        slaterUpGradient.zeros();
+        slaterDownGradient.zeros();
+        jastrowGradient.zeros();
         slaterUp->gradient(r, slaterUpGradient);
         slaterDown->gradient(r, slaterDownGradient);
         jastrow->gradient(r, jastrowGradient);
@@ -166,9 +166,9 @@ void WaveSlater::gradient(vec2 r[], vec &rGradient) {
     if(!useAnalyticalGradient) {
         return gradientNumerical(r, rGradient);
     }
-    vec slaterUpGradient = zeros<vec>(nParticles * nDimensions);
-    vec slaterDownGradient = zeros<vec>(nParticles * nDimensions);
-    vec jastrowGradient = zeros<vec>(nParticles * nDimensions);
+    slaterUpGradient.zeros();
+    slaterDownGradient.zeros();
+    jastrowGradient.zeros();
     slaterUp->gradient(r, slaterUpGradient);
     slaterDown->gradient(r, slaterDownGradient);
     if(interactionEnabled) {
@@ -193,6 +193,7 @@ WaveFunction* WaveSlater::clone() {
     myCopy->currentEvaluation = this->currentEvaluation;
     myCopy->nParticles = this->nParticles;
     myCopy->nDimensions = this->nDimensions;
+    myCopy->initialize(rOld);
     return myCopy;
 }
 

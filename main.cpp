@@ -14,7 +14,8 @@ int main(int argc, char* argv[])
     app->runConfiguration();
     app->finalize();
     // A little output to help notice when the program is finished executing
-    system("kdialog --title 'vmc' --passivepopup 'Execution finished' 3");
+    int ret = system("kdialog --title 'vmc' --passivepopup 'Execution finished' 3");
+    (void)ret;
     return 0;
 }  //  end of main function
 

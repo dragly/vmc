@@ -110,18 +110,17 @@ double Jastrow::laplacePartial() {
 void Jastrow::gradient(vec2 r[], vec &rGradient)
 {
     rGradient.zeros();
-    for(int movedParticle = 0; movedParticle < nParticles; movedParticle++) {
-        int p = movedParticle;
+    for(int p = 0; p < nParticles; p++) {
         for(int i = 0; i < nParticles; i++) {
             if(i != p) {
                 // Optimized by writing as array operations instead of vector operations (18 % run time reduction)
                 for(int j = 0; j < nDimensions; j++) {
-                    rpiVec[j] = r[movedParticle][j] - r[i][j];
+                    rpiVec[j] = r[p][j] - r[i][j];
                 }
-                double rpi = distancesNew.at(i,p);
+                double rpi = norm(rpiVec,nDimensions);
                 for(int j = 0; j < nDimensions; j++) {
-                    double denominator = (1 + beta * distancesNew.at(i,p));
-                    int gradientIndex = movedParticle*nDimensions + j;
+                    double denominator = (1 + beta * rpi);
+                    int gradientIndex = p*nDimensions + j;
                     rGradient(gradientIndex) += a(p,i) * rpiVec[j] / ( rpi * denominator * denominator);
                 }
             }
@@ -174,7 +173,7 @@ double Jastrow::ratio(vec2 &r, int movedParticle)
 //    jastrowArgumentsNew = jastrowArgumentsOld;
 //    for(int i = 0; i < nParticles; i++) {
 //        for(int j = i + 1; j < nParticles; j++) {
-//            argumentChange += jastrowArgumentsOld.at(i,j) - jastrowArgumentsNew.at(i,j);
+//            argumentChange += jastrowArgumentsNew.at(i,j) - jastrowArgumentsOld.at(i,j);
 //        }
 //    }
     distancesNew = symmatu(distancesNew);

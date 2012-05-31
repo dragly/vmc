@@ -38,9 +38,9 @@ double HamiltonianIdeal::externalPotentialEnergy(WaveFunction *wave, vec2 r[])
         for (int j = 0; j < m_nDimensions; j++) {
             rSingleParticle += r[i][j]*r[i][j];
         }
-        externalEnergy += 0.5 * omega * omega * rSingleParticle;
+        externalEnergy += rSingleParticle;
     }
-    return externalEnergy;
+    return 0.5 * omega * omega * externalEnergy;
 }
 
 double HamiltonianIdeal::interactionPotentialEnergy(WaveFunction *wave, vec2 r[])
@@ -51,11 +51,11 @@ double HamiltonianIdeal::interactionPotentialEnergy(WaveFunction *wave, vec2 r[]
     // TODO Optimization - store an array of potential energies between particles and only update necessary parts (reduces use of sqrt)
     for (int i = 0; i < m_nParticles-1; i++) {
         for (int j = i+1; j < m_nParticles; j++) {
-            double r_12 = 0;
+            double distanceSquared = 0;
             for (int k = 0; k < m_nDimensions; k++) {
-                r_12 += (r[i][k]-r[j][k])*(r[i][k]-r[j][k]);
+                distanceSquared += (r[i][k]-r[j][k])*(r[i][k]-r[j][k]);
             }
-            interactionEnergy += 1/sqrt(r_12);
+            interactionEnergy += 1/sqrt(distanceSquared);
         }
     }
     return interactionEnergy;

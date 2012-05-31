@@ -39,6 +39,11 @@ public:
 
     // quick tests
     // slow tests
+    void fullIdealTest();
+    void fullIdealHastingsTest();
+    void fullIdealHastingsSlaterTest();
+    void fullSlaterSixInteractionTest();
+    void fullSlaterSixNoInteractionTest();
 
     // unfinished tests
     void diffusionMonteCarloTest();
@@ -66,11 +71,6 @@ private slots:
     void waveSlaterLaplaceTest();
     void waveSlaterGradientTest();
     // slow tests
-    void fullIdealTest();
-    void fullIdealHastingsTest();
-    void fullIdealHastingsSlaterTest();
-    void fullSlaterSixInteractionTest();
-    void fullSlaterSixNoInteractionTest();
     // unfinished tests
 
 private:
@@ -531,7 +531,7 @@ void VmcTests::waveSlaterGradientTest()
             for(int i = 0; i < nDimensions * nParticles; i++) {
                 //                std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
                 //                std::cout << "Diff: " << fabs(analyticalGradient[i] - numericalGradient[i]) << std::endl;
-                QVERIFY(fabs(analyticalGradient[i] - numericalGradient[i]) < 1e-2);
+                QVERIFY(fabs(analyticalGradient[i] - numericalGradient[i]) < 1e-6);
             }
         }
         delete waveSlater1;
@@ -580,7 +580,7 @@ void VmcTests::waveSlaterLaplaceTest()
             double numericalLaplace = waveSlater1->laplaceNumerical(r);
             //            std::cout << analyticalLaplace << " " << numericalLaplace << std::endl;
             //            std::cout << "Diff: " << fabs(analyticalLaplace - numericalLaplace) << std::endl;
-            QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 1e-5);
+            QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 1e-6);
         }
     }
 }

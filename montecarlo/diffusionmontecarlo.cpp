@@ -6,6 +6,12 @@
 #include "metropolishastingsmontecarlo.h"
 #include "../inih/ini.h"
 
+#include <iostream>
+#include <iomanip>
+
+using std::cout;
+using std::setprecision;
+
 DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config_) :
     MonteCarlo(config_),
     correlationStep(500),
@@ -121,6 +127,8 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
     double energySum = 0;
     int nEnergySamples = 0;
     int blockSamples = 0;
+    double energyAverageTotal = 0;
+    int avgcycles = 0;
     // For every cycle:
     for(int cycle = 0; cycle < nSamplesLocal; cycle++) {
         // For every walker (configuration)
@@ -141,18 +149,18 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
         if(cycle < nThermalizationCycles || !(cycle % blockLength)) {
             // Update trial energy ET to bring it closer to the current ensemble
             trialEnergy = meanEnergy;
-            std::cout << "Trial energy is now " << trialEnergy << " with " << nWalkersAlive << " walkers at cycle " << cycle << std::endl;
+            std::cout << "Trial energy is now " << setprecision(20) << trialEnergy << " with " << nWalkersAlive << " walkers at cycle " << cycle << std::endl;
             // Renormalise the number of walkers to the target number by creating or deleting walkers
-            //            while(nWalkersAlive > nWalkersIdeal) {
-            //                int randomWalker = ran3(idum) * nWalkersMax;
-            //                if(aliveNew[randomWalker]) {
-            //                    aliveNew[randomWalker] = false;
-            //                    nWalkersAlive--;
-            //                }
-            //            }
+//                        while(nWalkersAlive > nWalkersIdeal) {
+//                            int randomWalker = ran3(idumMC) * nWalkersMax;
+//                            if(walkers[randomWalker]->aliveNew()) {
+//                                walkers[randomWalker]->setAliveNew(false);
+//                                nWalkersAlive--;
+//                            }
+//                        }
 
-            energySum = 0;
-            nEnergySamples = 0;
+//            energySum = 0;
+//            nEnergySamples = 0;
 
 //            stringstream fileName;
 //            fileName << "positions-" << blockSamples << ".dat";
