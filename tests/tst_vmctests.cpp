@@ -42,7 +42,6 @@ public:
     void fullIdealTest();
     void fullIdealHastingsTest();
     void fullIdealHastingsSlaterTest();
-    void fullSlaterSixInteractionTest();
     void fullSlaterSixNoInteractionTest();
 
     // unfinished tests
@@ -71,6 +70,7 @@ private slots:
     void waveSlaterLaplaceTest();
     void waveSlaterGradientTest();
     // slow tests
+    void fullSlaterSixInteractionTest();
     // unfinished tests
 
 private:
@@ -512,25 +512,34 @@ void VmcTests::waveSlaterGradientTest()
             config1->setInteractionEnabled(true);
         }
         WaveSlater *waveSlater1 = new WaveSlater(config1);
+        WaveSlater *waveSlater2 = new WaveSlater(config1);
         vec2 *r = new vec2[nParticles];
+        vec2 *rNew = new vec2[nParticles];
         for(int i = 0; i < nParticles; i++) {
             r[i][0] = 4 * ran3(&idum) - 2;
             r[i][1] = 4 * ran3(&idum) - 2;
-            //            r[i][0] = 0.34 + i * 0.2;
-            //            r[i][1] = 0.12 + i * 0.42;
+            rNew[i][0] = r[i][0];
+            rNew[i][1] = r[i][1];
         }
-        for(int p = 1; p < 11; p++) {
-            parameters[0] = ran3(&idum);
-            parameters[1] = ran3(&idum);
-            waveSlater1->setParameters(parameters);
-            waveSlater1->initialize(r);
-            vec analyticalGradient = zeros<vec>(nParticles * nDimensions);
-            vec numericalGradient = zeros<vec>(nParticles * nDimensions);
-            waveSlater1->gradient(r, analyticalGradient);
-            waveSlater1->gradientNumerical(r, numericalGradient);
+        parameters[0] = ran3(&idum);
+        parameters[1] = ran3(&idum);
+        waveSlater1->setParameters(parameters);
+        waveSlater2->setParameters(parameters);
+        waveSlater1->initialize(r);
+        waveSlater2->initialize(r);
+        vec analyticalGradient = zeros<vec>(nParticles * nDimensions);
+        vec numericalGradient = zeros<vec>(nParticles * nDimensions);
+        for(int pos = 0; pos < 11; pos++) {
+            analyticalGradient.zeros();
+            numericalGradient.zeros();
+            rNew[0][0] = ran3(&idum);
+            waveSlater1->ratio(rNew[0], 0);
+            waveSlater2->ratio(rNew[0], 0);
+            waveSlater1->gradient(rNew, analyticalGradient);
+            waveSlater2->gradientNumerical(rNew, numericalGradient);
             for(int i = 0; i < nDimensions * nParticles; i++) {
-                //                std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
-                //                std::cout << "Diff: " << fabs(analyticalGradient[i] - numericalGradient[i]) << std::endl;
+//                                std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
+//                                std::cout << "Diff: " << fabs(analyticalGradient[i] - numericalGradient[i]) << std::endl;
                 QVERIFY(fabs(analyticalGradient[i] - numericalGradient[i]) < 1e-6);
             }
         }
@@ -804,7 +813,7 @@ void VmcTests::fullSlaterSixInteractionTest()
         Config *config1 = new Config(0,1);
         config1->setNParticles(6);
         config1->setNDimensions(2);
-        config1->setStepLength(0.0001);
+        config1->setStepLength(0.001);
         HamiltonianIdeal *hamiltonian = new HamiltonianIdeal(config1);
         config1->setHamiltonian(hamiltonian);
         config1->setInteractionEnabled(true);

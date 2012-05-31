@@ -117,7 +117,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
             }
         }  //  end of loop over particles
     }
-    std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
+//    std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
     m_energy /= (nCycles * nParticles);
     m_energySquared /= (nCycles * nParticles);
     m_variationalGradient = m_variationalGradient / (nCycles * nParticles);

@@ -16,7 +16,7 @@ GeneticMinimizer::GeneticMinimizer(Config *config) :
     wave(config->wave()),
     hamiltonian(config->hamiltonian())
 {
-    monteCarlo->setSampleVariationalGradient(true);
+    monteCarlo->setSampleVariationalGradient(false);
 }
 
 void GeneticMinimizer::loadConfiguration(INIParser *settings)

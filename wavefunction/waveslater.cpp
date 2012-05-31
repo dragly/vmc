@@ -47,6 +47,10 @@ WaveSlater::WaveSlater(Config *config) :
     }
     slaterUp = new Slater(config, orbitals, true);
     slaterDown = new Slater(config, orbitals, false);
+
+    slaterUpGradient = zeros<vec>(nParticles * nDimensions);
+    slaterDownGradient = zeros<vec>(nParticles * nDimensions);
+    jastrowGradient = zeros<vec>(nParticles * nDimensions);
 }
 
 WaveSlater::~WaveSlater() {

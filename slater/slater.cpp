@@ -179,7 +179,6 @@ void Slater::rejectMove() {
 }
 
 void Slater::gradient(vec2 r[], vec &rGradient) {
-    rGradient.zeros();
     for(int a = 0; a < nParticles; a++) {
         // TODO we are now recalculating the gradient for all particles, this could be avoided
         int movedParticle = a;
@@ -187,7 +186,7 @@ void Slater::gradient(vec2 r[], vec &rGradient) {
             int localParticle = movedParticle - particleIndexOffset;
             for(int j = 0; j < nParticles / 2; j++) {
                 orbitals[j]->gradient(r[movedParticle], orbitalGradient);
-                double inverseValue = previousInverse(j,localParticle);
+                double inverseValue = previousInverse(j, localParticle);
                 for(int l = 0; l < nDimensions; l++) {
                     int rGradientIndex = movedParticle * nDimensions + l;
                     rGradient[rGradientIndex] += orbitalGradient[l] * inverseValue;

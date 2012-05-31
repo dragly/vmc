@@ -111,10 +111,8 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
     vec2 **moves = initialMonteCarlo->moves();
     for(int j = 0; j < nWalkersAlive; j++) {
         walkers[j]->initialize(moves[j]);
-        if(j < nWalkersAlive) {
-            for(int i = 0; i < nParticles; i++) {
-                positionFile << moves[j][i][0] << "\t" << moves[j][i][1] << std::endl;
-            }
+        for(int i = 0; i < nParticles; i++) {
+            positionFile << moves[j][i][0] << " " << moves[j][i][1] << std::endl;
         }
     }
     positionFile.close();
@@ -127,8 +125,6 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
     double energySum = 0;
     int nEnergySamples = 0;
     int blockSamples = 0;
-    double energyAverageTotal = 0;
-    int avgcycles = 0;
     // For every cycle:
     for(int cycle = 0; cycle < nSamplesLocal; cycle++) {
         // For every walker (configuration)
@@ -186,7 +182,7 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
     for(int j = 0; j < nWalkersMax; j++) {
         if(walkers[j]->aliveOld()) {
             for(int i = 0; i < nParticles; i++) {
-                positionFile << walkers[j]->positionsNew()[i][0] << "\t" << walkers[j]->positionsNew()[i][0] << std::endl;
+                positionFile << walkers[j]->positionsNew()[i][0] << " " << walkers[j]->positionsNew()[i][1] << std::endl;
             }
         }
     }

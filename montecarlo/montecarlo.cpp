@@ -29,6 +29,7 @@ MonteCarlo::MonteCarlo(Config *config) :
     // allocate matrices which contain the position of the particles
     rOld = new vec2[nParticles];
     rNew = new vec2[nParticles];
+    m_moves = new vec2*[1];
     randomizePositions();
 }
 
@@ -74,15 +75,10 @@ void MonteCarlo::setRecordMoves(bool arg, int nMoves) {
 
 void MonteCarlo::checkTerminalization(double localEnergy) {
     if(!(cycle % 1000)) {
-        double terminalizationAverage = terminalizationSum / terminalizationNum;
-        diffAverage = fabs(terminalizationAverage - prevTerminalizationAverage);
-        if(diffAverage < 2 && terminalizationTrials > 100) {
+        if(terminalizationTrials > 100) {
             terminalized = true;
             cycle = 0;
         }
-        prevTerminalizationAverage = terminalizationAverage;
-        terminalizationSum = 0;
-        terminalizationNum = 1;
         terminalizationTrials++;
     }
     terminalizationSum += localEnergy;

@@ -28,7 +28,6 @@ void Orbital::setParameters(double *parameters)
   */
 double Orbital::evaluate(const vec2 &r) const
 {
-    double sqrtAlphaOmega = sqrt(omega * alpha);
     double Hx = Hermite::evaluate(m_nx, sqrtAlphaOmega*r[0]);
     double Hy = Hermite::evaluate(m_ny, sqrtAlphaOmega*r[1]);
     return Hx*Hy* exp(-alpha*omega*(r[0]*r[0] + r[1]*r[1])/2);
