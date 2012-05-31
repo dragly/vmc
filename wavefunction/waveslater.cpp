@@ -197,6 +197,15 @@ WaveFunction* WaveSlater::clone() {
     myCopy->currentEvaluation = this->currentEvaluation;
     myCopy->nParticles = this->nParticles;
     myCopy->nDimensions = this->nDimensions;
+    for(int i = 0; i < nParticles; i++) {
+        myCopy->rPlus[i] = this->rPlus[i];
+        myCopy->rMinus[i] = this->rMinus[i];
+        myCopy->rNew[i] = this->rNew[i];
+        myCopy->rOld[i] = this->rOld[i];
+    }
+    myCopy->slaterUpGradient = this->slaterUpGradient;
+    myCopy->slaterDownGradient = this->slaterDownGradient;
+    myCopy->jastrowGradient = this->jastrowGradient;
     myCopy->initialize(rOld);
     return myCopy;
 }

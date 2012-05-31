@@ -7,6 +7,8 @@
 #include <iostream>
 #include <iomanip>
 
+using std::setprecision;
+
 StandardMonteCarlo::StandardMonteCarlo(Config *config) :
     MonteCarlo(config),
     myRank(config->myRank()),
@@ -103,7 +105,7 @@ void StandardMonteCarlo::sample(int nSamples)
                     }
                 }
                 if(i == 0 && !(cycle % 10000) && cycle > 0) {
-                    std::cout << "Energy from last 10000 cycles was " << m_energy / (cycle * nParticles) << std::endl;
+                    std::cout << "Energy from last 10000 cycles was " << setprecision(10) <<  m_energy / (cycle * nParticles) << std::endl;
                 }
             } else {
                 checkTerminalization(localEnergy);

@@ -146,7 +146,7 @@ double Jastrow::evaluate(vec2 r[]) {
 double Jastrow::ratio(vec2 &r, int movedParticle)
 {
     rNew[movedParticle] = r;
-    // we only need to update the elements in the matrix that are affected by the move of one particle
+//    // we only need to update the elements in the matrix that are affected by the move of one particle
 
     double argumentChange = 0;
     vec2 diff;

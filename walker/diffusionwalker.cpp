@@ -22,7 +22,7 @@ void DiffusionWalker::advance(double trialEnergy) {
     m_energy = 0;
     m_acceptances = 0;
     m_rejections = 0;
-    for(int i = 0; i < nParticles; i++) {
+    for(int i = 0; i < nParticles && m_aliveNew; i++) {
 //        wave->gradient(rOld, quantumForceOld);
 //        quantumForceOld *= 2;
         // Propose move (with quantum force)
@@ -99,13 +99,15 @@ void DiffusionWalker::advance(double trialEnergy) {
             m_aliveNew = false;
         } else {
             if(reproductions > 1) {
+                std::cout << "Needs reproduction" << std::endl;
                 for(int repro = 1; repro < reproductions; repro++) {
                     for(int walkerIndex = 0; walkerIndex < nWalkersMax; walkerIndex++) {
-                        DiffusionWalker *otherWalker = otherWalkers[walkerIndex];
+                        DiffusionWalker *ressurectedWalker = otherWalkers[walkerIndex];
                         // find a dead walker to ressurect
-                        if(!otherWalker->aliveNew()) {
-                            otherWalker->setAliveNew(true);
-                            otherWalker->copyOtherWalker(this);
+                        if(!ressurectedWalker->aliveNew()) {
+                            std::cout << "Ressurecting " << walkerIndex << std::endl;
+                            ressurectedWalker->setAliveNew(true);
+                            ressurectedWalker->copyOtherWalker(this);
                             break;
                         }
                     }
@@ -116,10 +118,4 @@ void DiffusionWalker::advance(double trialEnergy) {
 //            std::cout << "Should make " << (int) (branchingFactor + ran3(idum)) << " copies" << std::endl;
         localEnergyOld = localEnergyNew;
     } // END for every particle
-}
-
-void DiffusionWalker::progressToNextStep()
-{
-    Walker::progressToNextStep();
-    m_aliveOld = m_aliveNew;
 }

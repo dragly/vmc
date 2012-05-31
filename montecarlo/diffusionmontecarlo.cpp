@@ -134,6 +134,7 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
             DiffusionWalker *walker = walkers[i];
             if(walker->aliveOld()) {
                 walker->advance(trialEnergy);
+
                 energySum += walker->energy();
                 nEnergySamples += walker->changeInEnergySamples();
                 totalEnergySum += walker->energy();
@@ -143,7 +144,12 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
                 nWalkersAlive++;
             } // END if walker alive
         } // END for each walker
-        double meanEnergy = energySum / nEnergySamples;
+        // Update state of every walker
+        for(int i = 0; i < nWalkersMax; i++) {
+            walkers[i]->setAliveOld(walkers[i]->aliveNew());
+        }
+        // Calculate the mean energy
+        double meanEnergy = energySum / double(nEnergySamples);
         energyFile << cycle << " " << meanEnergy << " " << nWalkersAlive << std::endl;
         //        std::cout << "Alive walkers: " << nWalkersAlive << "\xd" << std::endl;
         // Repeat configuration moves for about 100 - 1000 steps
@@ -163,19 +169,6 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
 //                                nWalkersAlive--;
 //                            }
 //                        }
-
-
-//            stringstream fileName;
-//            fileName << "positions-" << blockSamples << ".dat";
-//            scatterfile.open(fileName.str().c_str());
-//            for(int j = 0; j < nWalkersMax; j++) {
-//                if(walkers[j]->aliveOld()) {
-//                    for(int i = 0; i < nParticles; i++) {
-//                        scatterfile << walkers[j]->positionsNew()[i][0] << "\t" << walkers[j]->positionsNew()[i][1] << std::endl;
-//                    }
-//                }
-//            }
-//            scatterfile.close();
             blockSamples++;
             energySum = 0;
             nEnergySamples = 0;
@@ -197,11 +190,7 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
             }
         }
 
-        for(int i = 0; i < nWalkersMax; i++) {
-            //            std::cout << "Walkers alive " << aliveOld[walker] << " " << aliveNew[walker] << std::endl;
-            walkers[i]->progressToNextStep();
-            //            std::cout << "Walkers alive after " << aliveOld[walker] << " " << aliveNew[walker] << std::endl;
-        }
+
     }
     energyFile.close();
 

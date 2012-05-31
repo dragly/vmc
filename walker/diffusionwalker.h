@@ -35,8 +35,6 @@ public:
         return m_rejections;
     }
 
-    void progressToNextStep();
-
     void advance(double trialEnergy);
 private:
     DiffusionWalker** otherWalkers;

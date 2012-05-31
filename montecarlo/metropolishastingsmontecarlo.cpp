@@ -5,6 +5,10 @@
 #include "../utils.h"
 #include "../config.h"
 
+#include <iomanip>
+
+using std::setprecision;
+
 MetropolisHastingsMonteCarlo::MetropolisHastingsMonteCarlo(Config *config) :
     MonteCarlo(config),
     myRank(config->myRank()),
@@ -116,7 +120,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                     }
                 }
                 if(i == 0 && !(cycle % 10000) && cycle > 0) {
-                    std::cout << "Energy from last 10000 cycles was " << m_energy / (cycle * nParticles) << std::endl;
+                    std::cout << "Energy from last 10000 cycles was " << setprecision(16) << m_energy / (cycle * nParticles) << std::endl;
                 }
             } else {
                 checkTerminalization(localEnergy);

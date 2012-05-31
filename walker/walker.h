@@ -13,7 +13,6 @@ public:
     Walker(Config *config);
 
     virtual void advance() {}
-    virtual void progressToNextStep();
     virtual void initialize(vec2 *positions);
 
     virtual void copyOtherWalker(Walker *otherWalker);

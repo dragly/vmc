@@ -18,16 +18,6 @@ Walker::Walker(Config *config) :
 
 }
 
-void Walker::progressToNextStep()
-{
-//    std::cout << "NextStep" << std::endl;
-//    for(int i = 0; i < nParticles; i++) {
-//        rOld[i] = rNew[i];
-//    }
-//    localEnergyOld = localEnergyNew;
-//    quantumForceOld = quantumForceNew;
-}
-
 void Walker::initialize(vec2 *positions)
 {
     for(int i = 0; i < nParticles; i++) {
