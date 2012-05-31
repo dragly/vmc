@@ -43,6 +43,7 @@ public:
     void fullIdealHastingsTest();
     void fullIdealHastingsSlaterTest();
     void fullSlaterSixNoInteractionTest();
+    void fullSlaterSixInteractionTest();
 
     // unfinished tests
     void diffusionMonteCarloTest();
@@ -70,7 +71,6 @@ private slots:
     void waveSlaterLaplaceTest();
     void waveSlaterGradientTest();
     // slow tests
-    void fullSlaterSixInteractionTest();
     // unfinished tests
 
 private:
@@ -122,7 +122,7 @@ void VmcTests::waveSimpleLaplaceTest()
     double analyticalLaplace = waveSimple->laplace(r_old);
     waveSimple->setUseAnalyticalLaplace(false);
     double numericalLaplace = waveSimple->laplaceNumerical(r_old);
-    QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 0.001);
+    QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 1e-8);
 }
 
 void VmcTests::waveIdealLaplaceTest()
@@ -131,7 +131,9 @@ void VmcTests::waveIdealLaplaceTest()
     double analyticalLaplace = waveIdeal->laplace(r_old);
     waveIdeal->setUseAnalyticalLaplace(false);
     double numericalLaplace = waveIdeal->laplaceNumerical(r_old);
-    QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 0.001);
+//    std::cout << fabs(analyticalLaplace - numericalLaplace) << std::endl;
+//    std::cout << analyticalLaplace << " " << numericalLaplace << std::endl;
+    QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 1e-6);
 }
 
 void VmcTests::waveSimpleGradientTest()
@@ -318,7 +320,7 @@ void VmcTests::fullIdealHastingsTest()
     //  Do the mc sampling
     monteCarlo->sample(nCycles);
     energy = monteCarlo->energy();
-        std::cout << "Full ideal Hastings energy was " << energy << std::endl;
+    std::cout << "Full ideal Hastings energy was " << energy << std::endl;
     QVERIFY(fabs(energy - 3.000) < 1e-2);
 }
 
@@ -538,9 +540,9 @@ void VmcTests::waveSlaterGradientTest()
             waveSlater1->gradient(rNew, analyticalGradient);
             waveSlater2->gradientNumerical(rNew, numericalGradient);
             for(int i = 0; i < nDimensions * nParticles; i++) {
-//                                std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
-//                                std::cout << "Diff: " << fabs(analyticalGradient[i] - numericalGradient[i]) << std::endl;
-                QVERIFY(fabs(analyticalGradient[i] - numericalGradient[i]) < 1e-6);
+                //                                std::cout << analyticalGradient[i] << " " << numericalGradient[i] << std::endl;
+                //                                std::cout << "Diff: " << fabs(analyticalGradient[i] - numericalGradient[i]) << std::endl;
+                QVERIFY(fabs(analyticalGradient[i] - numericalGradient[i]) < 1e-8);
             }
         }
         delete waveSlater1;
@@ -560,36 +562,41 @@ void VmcTests::waveSlaterLaplaceTest()
     double parameters[2];
     long idum = -1;
     vec2 *r = new vec2[nParticles];
-    for(int i = 0; i < nParticles; i++) {
-        r[i][0] = 4 * ran3(&idum) - 2;
-        r[i][1] = 4 * ran3(&idum) - 2;
-    }
-
-    for(int w = 1; w < 11; w++) {
-        config1->setOmega(w * 0.1);
-        if(w > 5) {
-            //            std::cout << "Interaction enabled" << std::endl;
-            config1->setInteractionEnabled(true);
-        } else {
-            //            std::cout << "Interaction disabled" << std::endl;
-            config1->setInteractionEnabled(false);
+    for(int pos = 0; pos < 10; pos++) {
+        for(int i = 0; i < nParticles; i++) {
+            r[i][0] = 4 * ran3(&idum) - 2;
+            r[i][1] = 4 * ran3(&idum) - 2;
         }
-        WaveSlater *waveSlater1 = new WaveSlater(config1);
-        for(int p = 1; p < 10; p++) {
-            parameters[0] = ran3(&idum);
-            parameters[1] = ran3(&idum);
-            if(p > 5) {
+
+        for(int w = 1; w < 11; w++) {
+            config1->setOmega(w * 0.1);
+            if(w > 5) {
+                //            std::cout << "Interaction enabled" << std::endl;
                 config1->setInteractionEnabled(true);
             } else {
+                //            std::cout << "Interaction disabled" << std::endl;
                 config1->setInteractionEnabled(false);
             }
-            waveSlater1->setParameters(parameters);
-            waveSlater1->initialize(r);
-            double analyticalLaplace = waveSlater1->laplace(r);
-            double numericalLaplace = waveSlater1->laplaceNumerical(r);
-            //            std::cout << analyticalLaplace << " " << numericalLaplace << std::endl;
-            //            std::cout << "Diff: " << fabs(analyticalLaplace - numericalLaplace) << std::endl;
-            QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 1e-6);
+            WaveSlater *waveSlater1 = new WaveSlater(config1);
+            waveSlater1->setUseAnalyticalLaplace(true);
+            waveSlater1->setUseAnalyticalGradient(true);
+            for(int p = 1; p < 10; p++) {
+                parameters[0] = ran3(&idum);
+                parameters[1] = ran3(&idum);
+                if(p > 5) {
+                    config1->setInteractionEnabled(true);
+                } else {
+                    config1->setInteractionEnabled(false);
+                }
+                waveSlater1->setParameters(parameters);
+                waveSlater1->initialize(r);
+                double analyticalLaplace = waveSlater1->laplace(r);
+                double numericalLaplace = waveSlater1->laplaceNumerical(r);
+//                std::cout << analyticalLaplace << " " << numericalLaplace << std::endl;
+//                std::cout << "Diff: " << fabs(analyticalLaplace - numericalLaplace) << std::endl;
+                QVERIFY(fabs(analyticalLaplace - numericalLaplace) < 1e-5);
+            }
+            delete waveSlater1;
         }
     }
 }
@@ -719,17 +726,18 @@ void VmcTests::orbitalLaplaceTest()
 {
     int nParticles = 2;
     int nDimensions = 2;
-    double hstep = 0.00001;
+    double hstep = 0.0001;
     Config *config1 = new Config(0,1);
     config1->setNParticles(nParticles);
     config1->setNDimensions(nDimensions);
+    long idum = -11;
     double parameters[2];
     for(int nx = 0; nx < 5; nx++) {
         for(int ny = 0; ny < 5; ny++) {
             for(int p = 1; p < 11; p++) {
-                parameters[0] = 0.34 * p;
-                parameters[1] = 0.12 * p;
-                config1->setOmega(0.23 * p);
+                parameters[0] = ran3(&idum);
+                parameters[1] = ran3(&idum);
+                config1->setOmega(ran3(&idum));
                 //                std::cout << std::endl << "Orbital " << nx  << " " << ny << std::endl;
                 Orbital *orbital = new Orbital(nx,ny,config1);
                 orbital->setParameters(parameters);
@@ -739,8 +747,8 @@ void VmcTests::orbitalLaplaceTest()
                 vec2 rPos;
                 for(int i = 1; i < 10; i++) {
 
-                    rPos[0] = i*0.12;
-                    rPos[1] = i*0.05;
+                    rPos[0] = 4*ran3(&idum)-2;
+                    rPos[1] = 4*ran3(&idum)-2;
                     rPlus = rPos;
                     rMinus = rPos;
                     //                std::cout << rPos << std::endl;
@@ -758,9 +766,9 @@ void VmcTests::orbitalLaplaceTest()
                         //                    std::cout << partialLaplace << std::endl;
                         simpleLaplace += partialLaplace;
                     }
-                    //                    std::cout << analyticalLaplace << " " << simpleLaplace << std::endl;
-                    //                    std::cout << "diff: " << fabs(analyticalLaplace - simpleLaplace) << std::endl;
-                    QVERIFY(fabs(analyticalLaplace - simpleLaplace) < 1e-2);
+//                    std::cout << nx << ny << " " << i << p << analyticalLaplace << " " << simpleLaplace << " params: " << parameters[0] << " " << parameters[1] << " " << rPos[0] << " " << rPos[1] << std::endl;
+//                    std::cout << "diff: " << fabs(analyticalLaplace - simpleLaplace) << std::endl;
+                    QVERIFY(fabs(analyticalLaplace - simpleLaplace) < 4e-5);
                 }
                 delete orbital;
             }
@@ -912,8 +920,8 @@ void VmcTests::diffusionMonteCarloTest() {
     config->setOmega(1.0);
 
     double parameters[2];
-//        parameters[0] = 0.987;
-//        parameters[1] = 0.4;
+    //        parameters[0] = 0.987;
+    //        parameters[1] = 0.4;
     parameters[0] = 0.9303;
     parameters[1] = 0.5493;
     //    parameters[0] = 0.92;

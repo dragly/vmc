@@ -51,7 +51,7 @@ void Walker::copyOtherWalker(Walker *otherWalker) {
     }
     quantumForceNew = otherWalker->quantumForceNew;
     quantumForceOld = otherWalker->quantumForceOld;
-    wave->initialize(rNew);
+    wave->initialize(rOld);
     localEnergyNew = otherWalker->localEnergyNew;
     localEnergyOld = otherWalker->localEnergyOld;
 }

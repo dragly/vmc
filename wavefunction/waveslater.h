@@ -39,6 +39,7 @@ public:
     vec slaterUpGradient;
     vec slaterDownGradient;
     vec jastrowGradient;
+    void prepareGradient(vec2 &particlePosition, int movedParticle);
 private:
 
     Orbital **orbitals;

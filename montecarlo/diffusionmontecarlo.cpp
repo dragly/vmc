@@ -125,6 +125,11 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
     double energySum = 0;
     int nEnergySamples = 0;
     int blockSamples = 0;
+    double totalEnergySum = 0;
+    double nTotalEnergySamples = 0;
+    positionFile.open("dmc-positions-end.dat");
+    int acceptances = 0;
+    int rejections = 0;
     // For every cycle:
     for(int cycle = 0; cycle < nSamplesLocal; cycle++) {
         // For every walker (configuration)
@@ -135,6 +140,10 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
                 walker->advance(trialEnergy);
                 energySum += walker->energy();
                 nEnergySamples += walker->changeInEnergySamples();
+                totalEnergySum += walker->energy();
+                nTotalEnergySamples += walker->changeInEnergySamples();
+                acceptances += walker->acceptances();
+                rejections += walker->rejections();
                 nWalkersAlive++;
             } // END if walker alive
         } // END for each walker
@@ -144,8 +153,12 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
         // Repeat configuration moves for about 100 - 1000 steps
         if(cycle < nThermalizationCycles || !(cycle % blockLength)) {
             // Update trial energy ET to bring it closer to the current ensemble
-            trialEnergy = meanEnergy;
-            std::cout << "Trial energy is now " << setprecision(20) << trialEnergy << " with " << nWalkersAlive << " walkers at cycle " << cycle << std::endl;
+            if(cycle < nThermalizationCycles) {
+                trialEnergy = meanEnergy - log((double)nWalkersAlive / (double) nWalkersIdeal);
+            } else {
+                trialEnergy = meanEnergy;
+            }
+            std::cout << "Trial energy is now " << setprecision(20) << trialEnergy << ", average " << totalEnergySum / nTotalEnergySamples << ",  acceptance: " << acceptances / double(acceptances + rejections) << ", with " << nWalkersAlive << " walkers at cycle " << cycle << std::endl;
             // Renormalise the number of walkers to the target number by creating or deleting walkers
 //                        while(nWalkersAlive > nWalkersIdeal) {
 //                            int randomWalker = ran3(idumMC) * nWalkersMax;
@@ -155,8 +168,6 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
 //                            }
 //                        }
 
-//            energySum = 0;
-//            nEnergySamples = 0;
 
 //            stringstream fileName;
 //            fileName << "positions-" << blockSamples << ".dat";
@@ -170,6 +181,23 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
 //            }
 //            scatterfile.close();
             blockSamples++;
+            if(cycle > nThermalizationCycles) {
+                for(int j = 0; j < nWalkersMax; j++) {
+                    if(walkers[j]->aliveOld()) {
+                        for(int i = 0; i < nParticles; i++) {
+                            positionFile << walkers[j]->positionsNew()[i][0] << " " << walkers[j]->positionsNew()[i][1] << std::endl;
+                        }
+                    }
+                }
+            }
+            energySum = 0;
+            nEnergySamples = 0;
+            acceptances = 0;
+            rejections = 0;
+            if(cycle == nThermalizationCycles) {
+                totalEnergySum = 0;
+                nTotalEnergySamples = 0;
+            }
         }
         for(int i = 0; i < nWalkersMax; i++) {
             //            std::cout << "Walkers alive " << aliveOld[walker] << " " << aliveNew[walker] << std::endl;
@@ -178,14 +206,7 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
         }
     }
     energyFile.close();
-    positionFile.open("dmc-positions-end.dat");
-    for(int j = 0; j < nWalkersMax; j++) {
-        if(walkers[j]->aliveOld()) {
-            for(int i = 0; i < nParticles; i++) {
-                positionFile << walkers[j]->positionsNew()[i][0] << " " << walkers[j]->positionsNew()[i][1] << std::endl;
-            }
-        }
-    }
+
     positionFile.close();
 
     m_energy = trialEnergy;

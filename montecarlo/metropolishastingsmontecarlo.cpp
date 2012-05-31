@@ -56,10 +56,10 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
             quantumForceOld *= 2;
             for (int k=0; k < nDimensions; k++) {
                 int qfIndex = i * nDimensions + k;
-                rNew[i][k]= rOld[i][k] +  diffConstant * quantumForceOld[qfIndex] * stepLength + 2 * diffConstant * sqrt(stepLength) * simpleGaussRandom(idumMC);
+                rNew[i][k]= rOld[i][k] + stepLength * diffConstant * quantumForceOld[qfIndex] + 2 * diffConstant * sqrt(stepLength) * gaussianDeviate(idumMC);
             }
-
-            // The Metropolis test is performed by moving one particle at the time
+            double ratio = wave->ratio(rNew[i], i);
+            wave->prepareGradient(rNew[i], i);
             wave->gradient(rNew, quantumForceNew);
             quantumForceNew *= 2;
             double argSum = 0;
@@ -71,7 +71,6 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
             }
             double greensRatio = exp(argSum);
 
-            double ratio = wave->ratio(rNew[i], i);
             double weight = ratio*ratio * greensRatio;
 //            std::cout << ratio << std::endl;
             if(ran3(idumMC) < weight) {
@@ -117,7 +116,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
             }
         }  //  end of loop over particles
     }
-//    std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
+    std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
     m_energy /= (nCycles * nParticles);
     m_energySquared /= (nCycles * nParticles);
     m_variationalGradient = m_variationalGradient / (nCycles * nParticles);

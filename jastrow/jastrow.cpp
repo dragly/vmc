@@ -75,24 +75,24 @@ void Jastrow::rejectMove()
 }
 
 double Jastrow::argument(int i, int j, mat &distances) {
-    return (a(i,j) * distances.at(i,j)) / (1 + beta * distances.at(i,j));
+    return (a(i,j) * distances(i,j)) / (1 + beta * distances(i,j));
 }
 
 /*!
-  * \warning Named "partial" because it does not include the square gradient term. (8.46 in Leirvåg's thesis) This must be included manually.
+  * \warning Named "partial" because it does not include the square gradient term. (8.46 in Leirvåg's thesis) This must be included manually. This is done by WaveSlater in this code.
   */
-double Jastrow::laplacePartial() {
+double Jastrow::laplacePartial(vec2 r[]) {
     // Optimized by removing square gradient term. Reduced inclusive cost by 80 % !
     double laplaceSum = 0;
     for(int movedParticle = 0; movedParticle < nParticles; movedParticle++) {
         int p = movedParticle;
         for(int i = 0; i < nParticles; i++) {
             if(i != p) {
-//                double rpi = norm(r[p] - r[i],2);
-                double rpi = distancesNew.at(i,p);
-                double denominator = (1 + beta * rpi);
+                double rpi = norm(r[p] - r[i],2);
+//                double rpi = distancesOld.at(i,p);
                 double numerator = (1 - beta * rpi);
-                laplaceSum += a(p,i) * numerator / ( rpi * denominator * denominator * denominator);
+                double denominator = (1 + beta * rpi);
+                laplaceSum += a(i,p) * numerator / ( rpi * denominator * denominator * denominator);
             }
         }
     }
@@ -121,7 +121,7 @@ void Jastrow::gradient(vec2 r[], vec &rGradient)
                 for(int j = 0; j < nDimensions; j++) {
                     double denominator = (1 + beta * rpi);
                     int gradientIndex = p*nDimensions + j;
-                    rGradient(gradientIndex) += a(p,i) * rpiVec[j] / ( rpi * denominator * denominator);
+                    rGradient(gradientIndex) += a(i,p) * rpiVec[j] / ( rpi * denominator * denominator);
                 }
             }
         }
@@ -145,12 +145,9 @@ double Jastrow::evaluate(vec2 r[]) {
   */
 double Jastrow::ratio(vec2 &r, int movedParticle)
 {
-//    std::cout << "Moved particle " << movedParticle << std::endl;
     rNew[movedParticle] = r;
-//    for(int i = 0; i < nParticles; i++) {
-//        std::cout << "rNew[" << i << "] = " << rNew[i] << std::endl;
-//    }
     // we only need to update the elements in the matrix that are affected by the move of one particle
+
     double argumentChange = 0;
     vec2 diff;
     for(int i = 0; i < nParticles; i++) {
@@ -170,16 +167,11 @@ double Jastrow::ratio(vec2 &r, int movedParticle)
             argumentChange += jastrowArgumentsNew.at(row,col) - jastrowArgumentsOld.at(row,col);
         }
     }
-//    jastrowArgumentsNew = jastrowArgumentsOld;
-//    for(int i = 0; i < nParticles; i++) {
-//        for(int j = i + 1; j < nParticles; j++) {
-//            argumentChange += jastrowArgumentsNew.at(i,j) - jastrowArgumentsOld.at(i,j);
-//        }
-//    }
     distancesNew = symmatu(distancesNew);
     jastrowArgumentsNew = symmatu(jastrowArgumentsNew);
 
     return exp(argumentChange);
+//    return evaluate(rNew) / evaluate(rOld);
 }
 
 void Jastrow::setParameters(double *parameters)

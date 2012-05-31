@@ -30,7 +30,7 @@ double Orbital::evaluate(const vec2 &r) const
 {
     double Hx = Hermite::evaluate(m_nx, sqrtAlphaOmega*r[0]);
     double Hy = Hermite::evaluate(m_ny, sqrtAlphaOmega*r[1]);
-    return Hx*Hy* exp(-alpha*omega*(r[0]*r[0] + r[1]*r[1])/2);
+    return Hx*Hy* exp(-alphaOmega*(r[0]*r[0] + r[1]*r[1])/2);
 }
 
 void Orbital::gradient(const vec2 &r, vec2 &rGradient) const {

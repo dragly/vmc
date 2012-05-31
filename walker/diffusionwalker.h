@@ -28,6 +28,13 @@ public:
         return timeStep;
     }
 
+    int acceptances() {
+        return m_acceptances;
+    }
+    int rejections() {
+        return m_rejections;
+    }
+
     void progressToNextStep();
 
     void advance(double trialEnergy);
@@ -39,6 +46,8 @@ private:
     double timeStep;
     bool m_aliveNew;
     bool m_aliveOld;
+    int m_acceptances;
+    int m_rejections;
 };
 
 #endif // DIFFUSIONWALKER_H

@@ -75,8 +75,9 @@ void MonteCarlo::setRecordMoves(bool arg, int nMoves) {
 
 void MonteCarlo::checkTerminalization(double localEnergy) {
     if(!(cycle % 1000)) {
-        if(terminalizationTrials > 100) {
+        if(cycle >= 100000) {
             terminalized = true;
+            std::cout << "Thermalized after " << cycle << " cycles." << std::endl;
             cycle = 0;
         }
         terminalizationTrials++;

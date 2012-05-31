@@ -159,7 +159,7 @@ double WaveSlater::laplace(vec2 r[]) {
         jastrow->gradient(r, jastrowGradient);
 
         laplaceSum += dot(jastrowGradient, jastrowGradient);
-        laplaceSum += jastrow->laplacePartial();
+        laplaceSum += jastrow->laplacePartial(r);
 
         laplaceSum += 2 * dot(slaterUpGradient + slaterDownGradient, jastrowGradient);
     }
@@ -207,7 +207,7 @@ WaveFunction* WaveSlater::clone() {
 vec WaveSlater::variationalGradient() {
     vec varGradient = zeros(2);
 
-    // Gradient_slater;
+    // Gradient_slater;slaterUp
     varGradient(0) += slaterUp->variationalGradient();
     varGradient(0) += slaterDown->variationalGradient();
 
@@ -216,4 +216,15 @@ vec WaveSlater::variationalGradient() {
         varGradient(1) = jastrow->variationalGradient();
     }
     return varGradient;
+}
+
+void WaveSlater::prepareGradient(vec2 &particlePosition, int movedParticle) {
+    rNew[movedParticle] = particlePosition;
+    slaterUp->updateMatrix(particlePosition, movedParticle);
+    slaterUp->calculateInverse(movedParticle);
+//    slaterUp->calculateInverseNumerically();
+    slaterDown->updateMatrix(particlePosition, movedParticle);
+    slaterDown->calculateInverse(movedParticle);
+//    slaterDown->calculateInverseNumerically();
+//    jastrow->calculateDistances(rNew);
 }

@@ -49,20 +49,19 @@ void Slater::initialize(vec2 positions[])
   */
 void Slater::constructMatrix(vec2 r[]) {
     for(int i = 0; i < nParticles / 2; i++) {
-        rOld[i] = r[i];
+        int remoteIndex = -1;
+        if(spinUp) {
+            remoteIndex = i;
+        } else {
+            remoteIndex = i + particleIndexOffset;
+        }
+        rOld[i] = r[remoteIndex];
+        rNew[i] = r[remoteIndex];
         for(int j = 0; j < nParticles / 2; j++) {
-            int index = -1;
-            if(spinUp) {
-                index = i;
-            } else {
-                index = i + nParticles / 2;
-            }
-            previousMatrix(i,j) = orbitals[j]->evaluate(r[index]);
+            previousMatrix(i,j) = orbitals[j]->evaluate(r[remoteIndex]);
         }
     }
     currentMatrix = previousMatrix;
-    // TODO Remove this
-//    previousMatrix = randu<mat>(nParticles / 2, nParticles / 2);
 }
 
 double Slater::determinant(vec2 r[]) {
@@ -72,7 +71,7 @@ double Slater::determinant(vec2 r[]) {
 }
 
 /*!
-  * \warning You need to run ratio() before calling this function.
+  * \warning You need to run updateMatrix() before calling this function.
   */
 void Slater::calculateInverse(int movedParticle)
 {
@@ -89,9 +88,9 @@ void Slater::calculateInverse(int movedParticle)
         for(int i = 0; i < nParticles / 2; i++) {
             for(int j = 0; j < nParticles / 2; j++) {
                 if(p != j) {
-                    currentInverse.at(i,j) = previousInverse.at(i,j) - previousInverse.at(i,p) * S.at(j) / currentRatio;
+                    currentInverse(i,j) = previousInverse.at(i,j) - previousInverse.at(i,p) * S(j) / currentRatio;
                 } else {
-                    currentInverse.at(i,j) = previousInverse.at(i,j) / currentRatio;
+                    currentInverse(i,j) = previousInverse.at(i,p) / currentRatio;
                 }
             }
         }
@@ -124,6 +123,7 @@ void Slater::setPreviousMovedParticle(int movedParticle)
 void Slater::updateMatrix(vec2 &particlePosition, int movedParticle) {
     if(hasParticle(movedParticle)) {
         int localParticle = movedParticle - particleIndexOffset;
+        rNew[localParticle] = particlePosition;
         for(int j = 0; j < nParticles / 2; j++) {
             currentMatrix.at(localParticle,j) = orbitals[j]->evaluate(particlePosition);
         }
@@ -187,7 +187,7 @@ void Slater::gradient(vec2 r[], vec &rGradient) {
             int localParticle = movedParticle - particleIndexOffset;
             for(int j = 0; j < nParticles / 2; j++) {
                 orbitals[j]->gradient(r[movedParticle], orbitalGradient);
-                double inverseValue = previousInverse(j, localParticle);
+                double inverseValue = currentInverse(j, localParticle);
                 for(int l = 0; l < nDimensions; l++) {
                     int rGradientIndex = movedParticle * nDimensions + l;
                     rGradient[rGradientIndex] += orbitalGradient[l] * inverseValue;
