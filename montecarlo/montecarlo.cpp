@@ -50,9 +50,11 @@ void MonteCarlo::loadConfiguration(INIParser *settings)
 }
 
 void MonteCarlo::randomizePositions() {
+    std::cout << "Randomizing positions: " << std::endl;
     for (int i = 0; i < nParticles; i++) {
         for (int j=0; j < nDimensions; j++) {
-            rOld[i][j] = rNew[i][j] = spawnRadius * (ran3(idumMC) - 0.5);
+            rOld[i][j] = rNew[i][j] = spawnRadius * gaussianDeviate(idumMC);
+            std::cout << "rOld[" << i << "][" << j << "] = " << rOld[i][j] << std::endl;
         }
     }
 }

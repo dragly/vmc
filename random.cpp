@@ -161,8 +161,8 @@ double gaussianDeviate(long * idum)
     if ( idum < 0) iset =0;
     if (iset == 0) {
         do {
-            v1 = 2.*ran2(idum) -1.0;
-            v2 = 2.*ran2(idum) -1.0;
+            v1 = 2.*ran3(idum) -1.0;
+            v2 = 2.*ran3(idum) -1.0;
             rsq = v1*v1+v2*v2;
         } while (rsq >= 1.0 || rsq == 0.);
         fac = sqrt(-2.*log(rsq)/rsq);

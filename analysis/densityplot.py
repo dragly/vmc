@@ -3,13 +3,13 @@ try:
     from enthought.mayavi.mlab import *
 except ImportError:
     from mayavi.mlab import *
-
+import subprocess
 import scipy.ndimage as ndimage
 from numpy import *
 from matplotlib import rc
 from sys import argv
 import ConfigParser
-#options.offscreen = True
+options.offscreen = True
 first = True
 
 for datapath in argv:
@@ -71,3 +71,6 @@ for datapath in argv:
         fig.scene.camera.focal_point = [9.5877242100828539, 23.27692598937039, -6.6013866059718787]
     fig.scene.render()
     savefig(datapath + "/density.png")
+    subprocess.call("convert " + datapath + "/density.png -trim " + datapath + "/density-trim.png", shell=True)
+    
+    

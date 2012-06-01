@@ -33,12 +33,12 @@ void DiffusionWalker::advance(double trialEnergy) {
             rNew[i][k] = rOld[i][k] + timeStep * diffConstant * quantumForceOld[qfIndex] + 2 * diffConstant * sqrt(timeStep) * gaussianDeviate(idum);
 
         }
+        wave->prepareGradient(rNew[i], i);
+        wave->gradient(rNew, quantumForceNew);
         double ratio = wave->ratio(rNew[i], i);
         // Apply fixed node approximation (keep sign or reject move)
         if(ratio > 0) {
             // Compute weight function
-            wave->prepareGradient(rNew[i], i);
-            wave->gradient(rNew, quantumForceNew);
             quantumForceNew *= 2;
             double argSum = 0;
             for(int j = 0; j < nParticles; j++) { // TODO figure out if it is necessary to do this with all particles (is it not zero for non-moved particles?).
