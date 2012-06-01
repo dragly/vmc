@@ -18,7 +18,7 @@ public:
 
     mat matrix();
     mat inverse();
-    void calculateInverse(int movedParticle);
+    void updateInverse(vec2 &particlePosition, int movedParticle);
     void calculateInverseNumerically();
     void setPreviousMovedParticle(int movedParticle);
     double ratio(vec2 &particlePosition, int movedParticle);
@@ -29,7 +29,6 @@ public:
     bool hasParticle(int particleNumber) const;
     void rejectMove();
     void updateMatrix(vec2 &particlePosition, int movedParticle);
-    double variationalGradient();
 private:
     vec2 *rOld;
     vec2 *rNew;
@@ -46,9 +45,6 @@ private:
     int nParticles;
 
     int previousMovedParticle;
-
-    double previousRatio;
-    double currentRatio;
 
     int particleIndexOffset;
 

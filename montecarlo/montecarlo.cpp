@@ -29,8 +29,7 @@ MonteCarlo::MonteCarlo(Config *config) :
     nMoves(1),
     stepLength(config->stepLength()),
     storeEnergies(false),
-    spawnRadius(2),
-    sampleVariationalGradient(false)
+    spawnRadius(2)
 {
     // allocate matrices which contain the position of the particles
     rOld = new vec2[nParticles];

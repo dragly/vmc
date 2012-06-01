@@ -41,7 +41,6 @@ void Slater::initialize(vec2 positions[])
 {
     constructMatrix(positions);
     calculateInverseNumerically();
-    currentRatio = 1;
 }
 
 /*!
@@ -73,9 +72,10 @@ double Slater::determinant(vec2 r[]) {
 /*!
   * \warning You need to run updateMatrix() before calling this function.
   */
-void Slater::calculateInverse(int movedParticle)
+void Slater::updateInverse(vec2 &particlePosition, int movedParticle)
 {
     if(hasParticle(movedParticle)) {
+        double nowRatio = ratio(particlePosition, movedParticle);
         int localParticle = movedParticle - particleIndexOffset;
         int p = localParticle;
         vec S = zeros<vec>(nParticles / 2);
@@ -88,9 +88,9 @@ void Slater::calculateInverse(int movedParticle)
         for(int i = 0; i < nParticles / 2; i++) {
             for(int j = 0; j < nParticles / 2; j++) {
                 if(p != j) {
-                    currentInverse(i,j) = previousInverse.at(i,j) - previousInverse.at(i,p) * S(j) / currentRatio;
+                    currentInverse(i,j) = previousInverse.at(i,j) - previousInverse.at(i,p) * S(j) / nowRatio;
                 } else {
-                    currentInverse(i,j) = previousInverse.at(i,p) / currentRatio;
+                    currentInverse(i,j) = previousInverse.at(i,p) / nowRatio;
                 }
             }
         }
@@ -137,16 +137,14 @@ double Slater::ratio(vec2 &particlePosition, int movedParticle)
 {
     if(hasParticle(movedParticle)) {
         int localParticle = movedParticle - particleIndexOffset;
-        updateMatrix(particlePosition, movedParticle);
+//        updateMatrix(particlePosition, movedParticle);
         movedParticle = movedParticle - particleIndexOffset;
         double R = 0;
         for(int i = 0; i < nParticles / 2; i++) {
             R += currentMatrix.at(localParticle,i) * previousInverse.at(i, localParticle);
         }
-        currentRatio = R;
         return R;
     } else {
-        currentRatio = 1;
         return 1;
     }
 }
@@ -158,8 +156,7 @@ bool Slater::hasParticle(int particleNumber) const {
 void Slater::acceptMove(int movedParticle)
 {
     previousMatrix = currentMatrix;
-    previousRatio = currentRatio;
-    calculateInverse(movedParticle);
+//    calculateInverse(movedParticle);
     previousInverse = currentInverse;
     if(hasParticle(movedParticle)) {
         int localParticle = movedParticle - particleIndexOffset;
@@ -171,7 +168,6 @@ void Slater::rejectMove() {
     currentMatrix = previousMatrix;
     // TODO might not need to copy back the inverse
     currentInverse = previousInverse;
-    currentRatio = previousRatio;
     for(int i = 0; i < nParticles / 2; i++) {
         rNew[i] = rOld[i];
     }

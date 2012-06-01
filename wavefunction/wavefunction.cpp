@@ -153,11 +153,6 @@ void WaveFunction::initialize(vec2 r[]) {
     }
 }
 
-vec WaveFunction::variationalGradient() {
-    std::cout << "Zeros!" << std::endl;
-    return zeros(2);
-}
-
 WaveFunction::~WaveFunction()
 {
     delete [] rPlus;

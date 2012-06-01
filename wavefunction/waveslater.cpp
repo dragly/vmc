@@ -101,6 +101,8 @@ double WaveSlater::ratio(vec2 &particlePosition, int movedParticle) {
 //    for(int i = 0; i < nParticles; i++) {
 //        std::cout << std::setprecision(20) << rNew[i][0] << "," << rNew[i][1] << std::endl;
 //    }
+    slaterUp->updateMatrix(particlePosition, movedParticle);
+    slaterDown->updateMatrix(particlePosition, movedParticle);
     double theRatio = slaterUp->ratio(particlePosition, movedParticle) * slaterDown->ratio(particlePosition, movedParticle);
     if(interactionEnabled) {
         theRatio *= jastrow->ratio(particlePosition, movedParticle);
@@ -216,10 +218,10 @@ WaveFunction* WaveSlater::clone() {
 void WaveSlater::prepareGradient(vec2 &particlePosition, int movedParticle) {
     rNew[movedParticle] = particlePosition;
     slaterUp->updateMatrix(particlePosition, movedParticle);
-    slaterUp->calculateInverse(movedParticle);
+    slaterUp->updateInverse(particlePosition, movedParticle);
 //    slaterUp->calculateInverseNumerically();
     slaterDown->updateMatrix(particlePosition, movedParticle);
-    slaterDown->calculateInverse(movedParticle);
+    slaterDown->updateInverse(particlePosition, movedParticle);
 //    slaterDown->calculateInverseNumerically();
 //    jastrow->calculateDistances(rNew);
 }

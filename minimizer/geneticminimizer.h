@@ -43,8 +43,6 @@ private:
     int nSamplesEnd;
     int nCycles;
     vec* energies;
-    vec* variationalGradientProducts;
-    vec** variationalGradients;
 
     int nParticles;
     int nDimensions;

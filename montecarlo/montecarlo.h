@@ -28,9 +28,6 @@ public:
         return m_energySquared;
     }
 
-    vec variationalGradient() {
-        return m_variationalGradient;
-    }
     void setThermalizationEnabled(bool arg) {
         terminalized = !arg;
         terminalizationTrials = 0;
@@ -48,16 +45,12 @@ public:
     void setRecordMoves(bool arg, int nMoves);
     void recordMove(int i, int nthMove);
     void randomizePositions();
-    void setSampleVariationalGradient(bool arg) {
-        sampleVariationalGradient = arg;
-    }
 
 protected:
     Config *config;
     int nParticles;
     int nDimensions;
 
-    vec m_variationalGradient;
     double m_energy;
     double m_energySquared;
     double *m_allEnergies;

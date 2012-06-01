@@ -54,15 +54,14 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
     //    wave->gradient(rOld, 0, waveGradientOld);
     wave->gradient(rOld, quantumForceOld);
     quantumForceOld *= 2;
-    m_variationalGradient = zeros(2); // TODO make parameter-specific
     int acceptances = 0;
     int rejections = 0;
     // loop over monte carlo cycles
     for (cycle = 0; cycle <= nCycles; cycle++){
         // new trial position
         for (int i = 0; i < nParticles; i++) {
-            wave->gradient(rOld, quantumForceOld);
-            quantumForceOld *= 2;
+//            wave->gradient(rOld, quantumForceOld);
+//            quantumForceOld *= 2;
             for (int k=0; k < nDimensions; k++) {
                 int qfIndex = i * nDimensions + k;
                 rNew[i][k]= rOld[i][k] + stepLength * diffConstant * quantumForceOld[qfIndex] + 2 * diffConstant * sqrt(stepLength) * gaussianDeviate(idumMC);
@@ -78,15 +77,16 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                     double quantumForceSum = quantumForceOld[qfIndex] + quantumForceNew[qfIndex];
                     double qfPositionDiff = 0.5 * diffConstant * stepLength * (quantumForceOld[qfIndex] - quantumForceNew[qfIndex]) - (rNew[j][k] - rOld[j][k]);
                     argSum += 0.5 * quantumForceSum * qfPositionDiff;
+
                 }
             }
             double greensRatio = exp(argSum);
-
             double weight = ratio*ratio * greensRatio;
             //            std::cout << ratio << std::endl;
             if(ran3(idumMC) < weight) {
                 rOld[i] = rNew[i];
                 wave->acceptMove(i);
+                quantumForceOld = quantumForceNew;
                 if(terminalized) {
                     acceptances++;
                 }
@@ -94,14 +94,12 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
             } else {
                 rNew[i] = rOld[i]; // Move the particle back
                 wave->rejectMove();
+                quantumForceNew = quantumForceOld;
                 if(terminalized) {
                     rejections++;
                 }
             }
             localEnergy = hamiltonian->energy(wave, rOld);
-            if(sampleVariationalGradient) {
-                m_variationalGradient = m_variationalGradient + wave->variationalGradient();
-            }
             if(terminalized) {
                 if(storeEnergies) {
                     m_allEnergies[cycle] = localEnergy;
@@ -124,6 +122,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                 }
                 if(i == 0 && !(cycle % 10000) && cycle > 0) {
                     std::cout << "Cycle " << cycle << ". Current average energy is " << setprecision(16) << m_energy / (cycle * nParticles) << std::endl;
+                    std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
                 }
             } else {
                 checkTerminalization(localEnergy);
@@ -133,8 +132,6 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
     if(recordMoves) {
         positionFile.close();
     }
-    std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
     m_energy /= (nCycles * nParticles);
     m_energySquared /= (nCycles * nParticles);
-    m_variationalGradient = m_variationalGradient / (nCycles * nParticles);
 }
