@@ -66,6 +66,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                 int qfIndex = i * nDimensions + k;
                 rNew[i][k]= rOld[i][k] + stepLength * diffConstant * quantumForceOld[qfIndex] + 2 * diffConstant * sqrt(stepLength) * gaussianDeviate(idumMC);
             }
+            double ratio = wave->ratio(rNew[i], i);
             wave->prepareGradient(rNew[i], i);
             wave->gradient(rNew, quantumForceNew);
             quantumForceNew *= 2;
@@ -80,7 +81,6 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                 }
             }
             double greensRatio = exp(argSum);
-            double ratio = wave->ratio(rNew[i], i);
             double weight = ratio*ratio * greensRatio;
             //            std::cout << ratio << std::endl;
             if(ran3(idumMC) < weight) {

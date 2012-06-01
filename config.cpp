@@ -60,6 +60,9 @@ void Config::loadConfiguration(INIParser* settings) {
     m_monteCarloClass = settings->Get("MonteCarlo","class", "MonteCarloStandard");
     std::cout << m_monteCarloClass << std::endl;
     m_monteCarlo = MonteCarlo::fromName(m_monteCarloClass, this);
+    if(m_monteCarloClass == "MonteCarloMetropolisHastings" && m_stepLength > 0.05) {
+        std::cerr << "WARNING! You are running importance sampling with a big step length. This will likely cause errors in your results." << std::endl;
+    }
 //    m_monteCarlo = new MonteCarloStandard(this);
     if(m_monteCarlo == 0) {
         cerr << "Unknown Monte Carlo class '" << m_monteCarloClass << "'" << endl;

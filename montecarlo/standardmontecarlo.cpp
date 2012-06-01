@@ -52,6 +52,8 @@ void StandardMonteCarlo::sample(int nSamples)
 ////        firstSample = false;
 //    }
     wave->initialize(rOld);
+    int acceptances = 0;
+    int rejections = 0;
     // TODO Optimize step length by Newton's method
     // loop over monte carlo cycles
     for (cycle = 0; cycle <= nSamples; cycle++){
@@ -69,10 +71,12 @@ void StandardMonteCarlo::sample(int nSamples)
             if(ran3(idumMC) <= (ratio*ratio)) {
                 rOld[i] = rNew[i];
                 wave->acceptMove(i);
+                acceptances++;
                 //                std::cout << "Accepted" << std::endl;
             } else {
                 rNew[i] = rOld[i]; // Move the particle back
                 wave->rejectMove();
+                rejections++;
                 //                std::cout << "Denied" << std::endl;
             }
             //            std::cout << "Move decided" << std::endl;
@@ -101,7 +105,7 @@ void StandardMonteCarlo::sample(int nSamples)
                     }
                 }
                 if(i == 0 && !(cycle % 10000) && cycle > 0) {
-                    std::cout << "Energy from last 10000 cycles was " << setprecision(10) <<  m_energy / (cycle * nParticles) << std::endl;
+                    std::cout << "Cycle " << cycle << ", average energy is now " << setw(14) << setprecision(10) <<  m_energy / (cycle * nParticles) << " acceptance ratio: " << acceptances / double(acceptances + rejections) << std::endl;
                 }
             } else {
                 checkTerminalization(localEnergy);
