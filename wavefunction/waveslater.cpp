@@ -102,7 +102,9 @@ double WaveSlater::ratio(vec2 &particlePosition, int movedParticle) {
 //        std::cout << std::setprecision(20) << rNew[i][0] << "," << rNew[i][1] << std::endl;
 //    }
     slaterUp->updateMatrix(particlePosition, movedParticle);
+//    slaterUp->updateInverse(particlePosition, movedParticle);
     slaterDown->updateMatrix(particlePosition, movedParticle);
+//    slaterDown->updateInverse(particlePosition, movedParticle);
     double theRatio = slaterUp->ratio(particlePosition, movedParticle) * slaterDown->ratio(particlePosition, movedParticle);
     if(interactionEnabled) {
         theRatio *= jastrow->ratio(particlePosition, movedParticle);

@@ -162,7 +162,7 @@ double Jastrow::ratio(vec2 &r, int movedParticle)
                 col = i;
             }
             diff = rNew[i] - r;
-            distancesNew.at(row,col) = norm(diff,2);
+            distancesNew.at(row,col) = sqrt(dot(diff,diff));
             jastrowArgumentsNew.at(row,col) = argument(row,col,distancesNew);
             argumentChange += jastrowArgumentsNew.at(row,col) - jastrowArgumentsOld.at(row,col);
         }

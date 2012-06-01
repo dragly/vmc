@@ -47,21 +47,29 @@ void Slater::initialize(vec2 positions[])
   * \note The first half of the particles have spin up, while the others have spin down.
   */
 void Slater::constructMatrix(vec2 r[]) {
-    for(int i = 0; i < nParticles / 2; i++) {
-        int remoteIndex = -1;
-        if(spinUp) {
-            remoteIndex = i;
-        } else {
-            remoteIndex = i + particleIndexOffset;
-        }
-        rOld[i] = r[remoteIndex];
-        rNew[i] = r[remoteIndex];
-        for(int j = 0; j < nParticles / 2; j++) {
-            previousMatrix(i,j) = orbitals[j]->evaluate(r[remoteIndex]);
+    for(int i = 0; i < nParticles; i++) {
+        if(hasParticle(i)) {
+            int localIndex = i - particleIndexOffset;
+            rOld[localIndex] = r[i];
+            rNew[localIndex] = r[i];
+            for(int j = 0; j < nParticles / 2; j++) {
+                currentMatrix(localIndex,j) = orbitals[j]->evaluate(r[i]);
+            }
         }
     }
-    currentMatrix = previousMatrix;
+    previousMatrix = currentMatrix;
 }
+
+void Slater::updateMatrix(vec2 &particlePosition, int movedParticle) {
+    if(hasParticle(movedParticle)) {
+        int localParticle = movedParticle - particleIndexOffset;
+        rNew[localParticle] = particlePosition;
+        for(int j = 0; j < nParticles / 2; j++) {
+            currentMatrix(localParticle,j) = orbitals[j]->evaluate(particlePosition);
+        }
+    }
+}
+
 
 double Slater::determinant(vec2 r[]) {
     constructMatrix(r);
@@ -101,8 +109,8 @@ void Slater::updateInverse(vec2 &particlePosition, int movedParticle)
 int nExceptions = 0;
 void Slater::calculateInverseNumerically() {
     try {
-        previousInverse = inv(previousMatrix);
-        currentInverse = previousInverse;
+        currentInverse = inv(currentMatrix);
+        previousInverse = currentInverse;
     } catch(std::runtime_error &e) {
         std::cout << matrix() << std::endl;
         std::cout << "Caught inverse exception! Setting inverse to large random matrix." << std::endl;
@@ -119,25 +127,14 @@ void Slater::setPreviousMovedParticle(int movedParticle)
 {
     previousMovedParticle = movedParticle;
 }
-
-void Slater::updateMatrix(vec2 &particlePosition, int movedParticle) {
-    if(hasParticle(movedParticle)) {
-        int localParticle = movedParticle - particleIndexOffset;
-        rNew[localParticle] = particlePosition;
-        for(int j = 0; j < nParticles / 2; j++) {
-            currentMatrix.at(localParticle,j) = orbitals[j]->evaluate(particlePosition);
-        }
-    }
-}
-
 /*!
   * \note The first half of the particles have spin up, while the others have spin down.
+  * \warning Call updateMatrix() before calling this function!
   */
 double Slater::ratio(vec2 &particlePosition, int movedParticle)
 {
     if(hasParticle(movedParticle)) {
         int localParticle = movedParticle - particleIndexOffset;
-//        updateMatrix(particlePosition, movedParticle);
         movedParticle = movedParticle - particleIndexOffset;
         double R = 0;
         for(int i = 0; i < nParticles / 2; i++) {
@@ -156,7 +153,6 @@ bool Slater::hasParticle(int particleNumber) const {
 void Slater::acceptMove(int movedParticle)
 {
     previousMatrix = currentMatrix;
-//    calculateInverse(movedParticle);
     previousInverse = currentInverse;
     if(hasParticle(movedParticle)) {
         int localParticle = movedParticle - particleIndexOffset;

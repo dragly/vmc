@@ -39,11 +39,6 @@ public:
 
     // quick tests
     // slow tests
-    void fullIdealTest();
-    void fullIdealHastingsTest();
-    void fullIdealHastingsSlaterTest();
-    void fullSlaterSixNoInteractionTest();
-    void fullSlaterSixInteractionTest();
 
     // unfinished tests
     void diffusionMonteCarloTest();
@@ -62,7 +57,6 @@ private slots:
     void twoOrbitalsOneWavefunctionTest();
     void slaterFourParticleTest();
     void waveSlaterSixParticleTest();
-    void slaterRatioTest();
     void orbitalLaplaceTest();
     void jastrowTest();
     void jastrowRatioTest();
@@ -70,7 +64,13 @@ private slots:
     void slaterInverse();
     void waveSlaterLaplaceTest();
     void waveSlaterGradientTest();
+    void slaterRatioTest();
     // slow tests
+    void fullIdealTest();
+    void fullIdealHastingsTest();
+    void fullIdealHastingsSlaterTest();
+    void fullSlaterSixNoInteractionTest();
+    void fullSlaterSixInteractionTest();
     // unfinished tests
 
 private:
@@ -215,8 +215,8 @@ void VmcTests::slaterInverse() {
                     r[movedParticle].at(j) = ran3(&idum);
                 }
                 //                std::cout << "movedParticle:" << movedParticle << std::endl;
-                slater1->ratio(r[movedParticle] , movedParticle);
-                slater1->calculateInverse(movedParticle);
+                slater1->updateMatrix(r[movedParticle], movedParticle);
+                slater1->updateInverse(r[movedParticle], movedParticle);
                 mat analyticalInverse = slater1->inverse();
                 slater2->initialize(r);
                 mat numericalInverse = slater2->inverse();
@@ -240,6 +240,7 @@ void VmcTests::slaterRatioTest() {
     config1->setNDimensions(2);
     config1->setNParticles(4);
     Orbital **orbitals = new Orbital*[4];
+    long idummy = -22;
     for(int i = 0; i < 4; i++) {
         orbitals[i] = new Orbital(0,i,config1);
     }
@@ -248,23 +249,24 @@ void VmcTests::slaterRatioTest() {
     int movedParticle = 1;
     for(int i = 0; i < config1->nParticles(); i++) {
         for(int j = 0; j < config1->nDimensions(); j++) {
-            rOld[i].at(j) = 0.2 * i * config1->nDimensions() + j * 0.1 + 0.24;
+            rOld[i].at(j) = 4 * ran3(&idummy) - 2;
         }
         rNew[i] = rOld[i];
     }
-    rNew[movedParticle].at(0) = 1;
-    rNew[movedParticle].at(1) = 2;
+    rNew[movedParticle].at(0) = 4 * ran3(&idummy) - 2;
+    rNew[movedParticle].at(1) = 4 * ran3(&idummy) - 2;
     Slater* slater1 = new Slater(config1, orbitals, true);
     Slater* slater2 = new Slater(config1, orbitals, true);
     for(int a = 1; a < 10; a++) {
         double parameters[2];
-        parameters[0] = a * 0.19;
-        parameters[1] = a * 0.23;
+        parameters[0] = ran3(&idummy);
+        parameters[1] = ran3(&idummy);
         for(int i = 0; i < 4; i++) {
             orbitals[i]->setParameters(parameters);
         }
         double simpleRatio = slater1->determinant(rNew) / slater1->determinant(rOld);
         slater2->initialize(rOld);
+        slater2->updateMatrix(rNew[movedParticle], movedParticle);
         //    slater2->setPreviousMovedParticle(1);
         double fancyRatio = slater2->ratio(rNew[movedParticle], movedParticle);
         QCOMPARE(simpleRatio, fancyRatio);
