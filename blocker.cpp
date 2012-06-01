@@ -19,10 +19,16 @@ using namespace std;
 #include "inih/ini.h"
 #include "config.h"
 
+// disable annoying unused parameter warnings from the MPI library which we don't have any control over
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#include <mpi.h>
+// Enable warnings again
+#pragma GCC diagnostic warning "-Wunused-parameter"
+
 // TODO make sure that the Blocker class actually does what it is supposed to
 
 Blocker::Blocker(Config* config_) :
-    nProcesses(config_->nProcesses()),
+    m_nProcesses(config_->m_nProcesses()),
     nBlockSamples(41),
     minBlockSize(1),
     maxBlockSize(10000),
@@ -32,10 +38,10 @@ Blocker::Blocker(Config* config_) :
 
 void Blocker::loadConfiguration(INIParser *settings)
 {
-    nBlockSamples = settings->GetDouble("Blocking", "nBlockSamples", nBlockSamples);
-    minBlockSize = settings->GetDouble("Blocking", "minBlockSize", minBlockSize);
-    maxBlockSize = settings->GetDouble("Blocking", "maxBlockSize", maxBlockSize);
-    scratchDir = settings->GetString("Blocking", "scratchDir", "/scratch/blocking");
+            nBlockSamples = settings->GetDouble("Blocking", "nBlockSamples", nBlockSamples);
+            minBlockSize = settings->GetDouble("Blocking", "minBlockSize", minBlockSize);
+            maxBlockSize = settings->GetDouble("Blocking", "maxBlockSize", maxBlockSize);
+            scratchDir = settings->GetString("Blocking", "scratchDir", "/scratch/blocking");
 }
 
 void Blocker::runBlocking() {
@@ -56,10 +62,10 @@ void Blocker::runBlocking() {
     }
 
     nLocal = result.st_size / sizeof(double);
-    nSamples = nLocal * nProcesses;
+    nSamples = nLocal * m_nProcesses;
 
     double *monteCarloResults = new double[nSamples];
-    for(int i = 0; i < nProcesses; i++) {
+    for(int i = 0; i < m_nProcesses; i++) {
         ostringstream ost;
         std::cout << "Opening file " << i << std::endl;
         ost << path.str() << "/blocks_rank" << i << ".dat";

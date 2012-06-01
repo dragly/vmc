@@ -47,6 +47,7 @@ public:
     }
 
     ~WaveFunction();
+    virtual void outputProperties();
 protected:
     Config *config;
     int nParticles;

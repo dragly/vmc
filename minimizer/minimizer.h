@@ -28,7 +28,7 @@ public:
 protected:
     Config *config;
     int m_rank;
-    int m_nProcesses;
+    int m_m_nProcesses;
     int m_nParticles;
     int m_nDimensions;
     // monte carlo settings

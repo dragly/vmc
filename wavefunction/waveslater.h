@@ -35,11 +35,15 @@ public:
     Slater *slaterDown;
     Jastrow *jastrow;
     ~WaveSlater();
+    void prepareGradient(vec2 &particlePosition, int movedParticle);
+    void outputProperties() {
+        WaveFunction::outputProperties();
+        std::cout << interactionEnabled << std::endl;
+    }
+private:
     vec slaterUpGradient;
     vec slaterDownGradient;
     vec jastrowGradient;
-    void prepareGradient(vec2 &particlePosition, int movedParticle);
-private:
 
     Orbital **orbitals;
     bool interactionEnabled;

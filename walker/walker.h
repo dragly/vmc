@@ -49,6 +49,7 @@ protected:
     double m_energy;
     long *idum;
     int m_changeInEnergySamples;
+    bool isCopyFromOtherWalker;
 };
 
 #endif // WALKER_H

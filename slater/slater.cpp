@@ -149,7 +149,6 @@ double Slater::ratio(vec2 &particlePosition, int movedParticle)
         currentRatio = 1;
         return 1;
     }
-    rNew[movedParticle] = particlePosition;
 }
 
 bool Slater::hasParticle(int particleNumber) const {
@@ -223,18 +222,4 @@ mat Slater::inverse() {
 
 mat Slater::matrix() {
     return currentMatrix;
-}
-
-/*!
-  * \note Based on code by Sigve Bøe Skattum https://github.com/sigvebs/VMC2
-  */
-double Slater::variationalGradient() {
-    double gradient = 0;
-    for (int i = 0; i < nParticles / 2; i++) {
-        for (int j = 0; j < nParticles / 2; j++) {
-            gradient += currentInverse(i, j) * orbitals[j]->variationalDerivative(rOld[j]);
-        }
-    }
-
-    return gradient;
 }

@@ -24,7 +24,6 @@ public:
     void rejectMove();
     ~Jastrow();
     double laplacePartial(vec2 r[]);
-    double variationalGradient();
 private:
     int nParticles;
     int nDimensions;

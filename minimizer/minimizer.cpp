@@ -23,6 +23,6 @@ using namespace std;
 Minimizer::Minimizer(Config *config) :
     config(config),
     m_rank(config->myRank()),
-    m_nProcesses(config->nProcesses())
+    m_m_nProcesses(config->m_nProcesses())
 {
 }

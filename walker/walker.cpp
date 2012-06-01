@@ -5,7 +5,8 @@ Walker::Walker(Config *config) :
     nDimensions(config->nDimensions()),
     hamiltonian(config->hamiltonian()),
     m_energy(0),
-    idum(config->idum())
+    idum(config->idum()),
+    isCopyFromOtherWalker(false)
 {
     wave = config->wave()->clone();
 //    wave = config->wave();
@@ -35,6 +36,7 @@ void Walker::initialize(vec2 *positions)
 }
 
 void Walker::copyOtherWalker(Walker *otherWalker) {
+    isCopyFromOtherWalker = true;
     for(int i = 0; i < nParticles; i++) {
         rNew[i] = otherWalker->rNew[i];
         rOld[i] = otherWalker->rOld[i];

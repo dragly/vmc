@@ -1,10 +1,3 @@
-#include <string>
-#include <stdio.h>
-
-#include <armadillo>
-
-#include <assert.h>
-
 #include "wavefunction.h"
 
 #include "../matrix.h"
@@ -15,6 +8,19 @@
 #include "waveslater.h"
 #include "../config.h"
 #include "../inih/ini.h"
+
+#include <string>
+#include <stdio.h>
+
+#include <armadillo>
+
+#include <assert.h>
+
+// disable annoying unused parameter warnings from the MPI library which we don't have any control over
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#include <mpi.h>
+// Enable warnings again
+#pragma GCC diagnostic warning "-Wunused-parameter"
 
 WaveFunction::WaveFunction(Config *config) :
     config(config),
@@ -68,8 +74,8 @@ void WaveFunction::gradientNumerical(vec2 r[], vec &rGradient)
 {
     double waveEvaluation = evaluate(r);
     for (int i = 0; i < nParticles; i++) {
-            rPlus[i] = rMinus[i] = r[i];
-            rPlus[i] = rMinus[i] = r[i];
+        rPlus[i] = rMinus[i] = r[i];
+        rPlus[i] = rMinus[i] = r[i];
     }
     for (int i = 0; i < nParticles; i++) {
         for (int j = 0; j < nDimensions; j++) {
@@ -140,7 +146,7 @@ void WaveFunction::rejectMove() {
 }
 
 void WaveFunction::initialize(vec2 r[]) {
-//    previousEvaluation = evaluate(r);
+    //    previousEvaluation = evaluate(r);
     for(int i = 0; i < nParticles; i++) {
         rNew[i] = r[i];
         rOld[i] = r[i];
@@ -156,4 +162,11 @@ WaveFunction::~WaveFunction()
 {
     delete [] rPlus;
     delete [] rMinus;
+}
+
+void WaveFunction::outputProperties() {
+    std::cout << config << " " << nParticles << " " << nDimensions
+              << " " << parameters[0] << " " << parameters[1] << " " << rPlus[0][0]
+              << " " << rMinus[0][0] << " " << rNew[0][0] << " " << rOld[0][0]
+              << " " << previousEvaluation << " " << currentEvaluation << " " << useAnalyticalLaplace << " " << useAnalyticalGradient << std::endl;
 }

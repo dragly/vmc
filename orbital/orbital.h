@@ -22,7 +22,6 @@ public:
     double laplace(const vec2 &r);
     double nx() { return m_nx; }
     double ny() { return m_ny; }
-    double variationalDerivative(const vec2 &r);
 private:
     // the quantum numbers, one for each dimension in this problem
     double m_nx;

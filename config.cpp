@@ -12,9 +12,9 @@
 
 using namespace std;
 
-Config::Config(int myRank, int nProcesses) :
+Config::Config(int myRank, int m_nProcesses) :
     m_rank(myRank),
-    m_nProcesses(nProcesses),
+    m_m_nProcesses(m_nProcesses),
     m_nParticles(2),
     m_nDimensions(2),
     m_stepLength(1.0),
@@ -23,7 +23,7 @@ Config::Config(int myRank, int nProcesses) :
     m_monteCarloClass("MonteCarloStandard"),
     m_omega(1.0),
     m_interactionEnabled(true),
-    m_idum(-(1 + myRank)*time(NULL)),
+    m_idum(-(1 + myRank)*time(NULL) / 100000), // TODO figure out why this must be divided by 1000000
     m_diffusionConstant(0.5)
 {
 }

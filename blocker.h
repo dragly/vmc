@@ -14,7 +14,7 @@ public:
     void blocking(double *values, int nValues, int blockSize, double *result);
     void loadConfiguration(INIParser *settings);
 private:
-    int nProcesses;
+    int m_nProcesses;
     int nBlockSamples;
     int minBlockSize;
     int maxBlockSize;

@@ -9,7 +9,7 @@ from numpy import *
 from matplotlib import rc
 from sys import argv
 import ConfigParser
-options.offscreen = True
+#options.offscreen = True
 first = True
 
 for datapath in argv:
@@ -22,6 +22,7 @@ for datapath in argv:
         configFileName = datapath + "/config.ini"
         config.read(configFileName)
         nParticles = config.get("General", "nParticles")
+        omega = config.get("General", "omega")
 
         param0 = loadtxt(datapath + "/density-grid-x.dat")
         param1 = loadtxt(datapath + "/density-grid-y.dat")
@@ -59,8 +60,12 @@ for datapath in argv:
     myaxes.axes.label_format = '%-#6.5g'
     
     if int(nParticles) == 2:
-        fig.scene.camera.position = [-52.180466454173839, -19.827149342881295, 37.613833505235903]
-        fig.scene.camera.focal_point = [11.309528075254283, 18.824854213069088, -7.9780393346049383]
+        if float(omega) < 0.20:
+            fig.scene.camera.position = [-67.71549063812715, -40.106253119177815, 46.165393868709053]
+            fig.scene.camera.focal_point = [7.0100876053923837, 10.725553380622589, -22.308587977075494]          
+        else:
+            fig.scene.camera.position = [-52.180466454173839, -19.827149342881295, 37.613833505235903]
+            fig.scene.camera.focal_point = [11.309528075254283, 18.824854213069088, -7.9780393346049383]
     elif int(nParticles) == 6:
         fig.scene.camera.position = [-83.367976780452835, -33.31347241689658, 60.149674418839126]
         fig.scene.camera.focal_point = [9.5877242100828539, 23.27692598937039, -6.6013866059718787]

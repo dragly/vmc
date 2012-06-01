@@ -1,16 +1,3 @@
-#include <stdlib.h>
-#include <iostream>
-#include <stdio.h>
-#include <fstream>
-#include <stdio.h>
-#include <string.h>
-
-// disable annoying unused parameter warnings from the MPI library which we don't have any control over
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#include <mpi.h>
-// Enable warnings again
-#pragma GCC diagnostic warning "-Wunused-parameter"
-
 #include "densityplotter.h"
 
 #include "wavefunction/wavefunction.h"
@@ -19,13 +6,30 @@
 #include "montecarlo/standardmontecarlo.h"
 #include "matrix.h"
 #include "random.h"
+#include <stdlib.h>
+#include <iostream>
+#include <stdio.h>
+#include <fstream>
+#include <stdio.h>
+#include <string.h>
+#include <iomanip>
 
-using namespace std;
+// disable annoying unused parameter warnings from the MPI library which we don't have any control over
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#include <mpi.h>
+// Enable warnings again
+#pragma GCC diagnostic warning "-Wunused-parameter"
+
+using std::cout;
+using std::setw;
+using std::endl;
+using std::setprecision;
 
 DensityPlotter::DensityPlotter(Config *config_) :
     config(config_),
     idum(config->idum())
 {
+    std::cout << config->myRank() << " got idum " << *idum << std::endl;
     if(config->nDimensions() != 2) {
         cerr << "Density plots only implemented for two dimensions!" << endl;
         exit(928);
@@ -62,11 +66,13 @@ void DensityPlotter::loadConfiguration(INIParser *settings)
     bMin = atof(settings->Get("DensityPlotter", "bMin", "-6.0").c_str());
     aSteps = settings->GetDouble("DensityPlotter", "aSteps", 51);
     bSteps = settings->GetDouble("DensityPlotter", "bSteps", 51);
+    std::cout << config->myRank() << " loading " << aMax << " " << aMin << " " << bMax << " " << bMin << std::endl;
+
 }
 
-void DensityPlotter::divideSteps(int myRank, int nProcesses, int totalSteps, StepConfig *stepConfig) {
-    stepConfig->firstStep = (int)(myRank * totalSteps / nProcesses);
-    stepConfig->lastStep = (int)((myRank + 1) * totalSteps / nProcesses) - 1;
+void DensityPlotter::divideSteps(int myRank, int m_nProcesses, int totalSteps, StepConfig *stepConfig) {
+    stepConfig->firstStep = (int)(myRank * totalSteps / m_nProcesses);
+    stepConfig->lastStep = (int)((myRank + 1) * totalSteps / m_nProcesses) - 1;
     stepConfig->nSteps = stepConfig->lastStep - stepConfig->firstStep + 1;
 }
 
@@ -82,8 +88,8 @@ void DensityPlotter::makePlot()
     }
     StepConfig myStepConfig;
     // split up the data for each process
-    divideSteps(config->myRank(), config->nProcesses(), aSteps, &myStepConfig);
-    for(int i = 0; i < config->nProcesses(); i++) {
+    divideSteps(config->myRank(), config->m_nProcesses(), aSteps, &myStepConfig);
+    for(int i = 0; i < config->m_nProcesses(); i++) {
         if(config->myRank() == i) {
             cout << myStepConfig.firstStep << " " << myStepConfig.lastStep << " " << myStepConfig.nSteps << endl;
             cout.flush();
@@ -95,7 +101,6 @@ void DensityPlotter::makePlot()
     // loop over positions
     for(int aStep = 0; aStep < myStepConfig.nSteps; aStep++) {
         for(int bStep = 0; bStep < bSteps; bStep++) {
-            std::cout << "Calculating for a=" << aStep << " b=" << bStep << std::endl;
             r_new[0][0] = aMin + aStep * da + myStepConfig.firstStep * da;
             r_new[0][1] = bMin + bStep * db;
             double prob = 0;
@@ -103,20 +108,25 @@ void DensityPlotter::makePlot()
             for (int cycle = 1; cycle <= m_nCycles; cycle++){
                 // new positions for all particles
                 for (int i = 1; i < config->nParticles(); i++) {
-                    r_new[i][0] = aMin + (aMax - aMin) * ran3(idum);
-                    r_new[i][1] = bMin + (bMax - bMin) * ran3(idum);
+                    double random1 = ran3(idum);
+                    double random2 = ran3(idum);
+                    r_new[i][0] = aMin + (aMax - aMin) * random1;
+                    r_new[i][1] = bMin + (bMax - bMin) * random2;
                 }  //  end of loop over particles
+                m_wave->initialize(r_new);
                 // compute probability
                 prob += m_wave->evaluate(r_new) * m_wave->evaluate(r_new)/* * (r_new[0][0] * r_new[0][0]  + r_new[0][1] * r_new[0][1])*/;
             }   // end of loop over MC trials
-            myProbability[aStep][bStep] = prob / m_nCycles;
+            myProbability[aStep][bStep] = prob / double(m_nCycles);
+            std::cout << "Rank " << config->myRank() << " Calculated for a=" << setw(10) << setprecision(8) << r_new[0][0] << " b="  << setw(10) << setprecision(8) << r_new[0][1] << " got probability "  << setw(10) << setprecision(8) << myProbability[aStep][bStep] << std::endl;
+            flush(cout);
         }
     }
     if(config->myRank() == 0) {
         // collect all the data in the main matrix
-        for(int i = 1; i < config->nProcesses(); i++) {
+        for(int i = 1; i < config->m_nProcesses(); i++) {
             StepConfig stepConfig;
-            divideSteps(i, config->nProcesses(), aSteps, &stepConfig);
+            divideSteps(i, config->m_nProcesses(), aSteps, &stepConfig);
             MPI_Recv(probability[stepConfig.firstStep], stepConfig.nSteps * bSteps, MPI_DOUBLE, i, 100, MPI_COMM_WORLD, &status);
         }
         memcpy(probability, myProbability, myStepConfig.nSteps * sizeof(double));

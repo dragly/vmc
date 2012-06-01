@@ -24,7 +24,7 @@ private:
     double alpha;
     double beta;
     int myRank;
-    int nProcesses;
+    int m_nProcesses;
     double *allEnergies;
     WaveFunction *wave;
     MonteCarlo *monteCarlo;

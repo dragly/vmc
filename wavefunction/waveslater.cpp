@@ -84,10 +84,13 @@ double WaveSlater::evaluate(vec2 r[])
         normFactorial *= i;
     }
 //    std::cout << "Evaluation:\n " << slaterUp->matrix() << std::endl << "Norm factorial: " << normFactorial << std::endl;
-    double evaluation = 1 / sqrt(normFactorial) * slaterUp->determinant(r) * slaterDown->determinant(r);
+    double evaluation = 1. / sqrt(normFactorial) * slaterUp->determinant(r) * slaterDown->determinant(r);
 //    std::cout << "determinant:" << slaterUp->determinant(r) << std::endl << slaterUp->matrix() << std::endl;
     if(interactionEnabled) {
         evaluation *= jastrow->evaluate(r);
+    }
+    if(evaluation == 0) {
+        std::cerr << "WARNING: Wave evaluated as zero! " << slaterUp->determinant(r) << " " << slaterDown->determinant(r) << " " << jastrow->evaluate(r) << std::endl;
     }
     return evaluation;
 }
@@ -206,25 +209,8 @@ WaveFunction* WaveSlater::clone() {
     myCopy->slaterUpGradient = this->slaterUpGradient;
     myCopy->slaterDownGradient = this->slaterDownGradient;
     myCopy->jastrowGradient = this->jastrowGradient;
-    myCopy->initialize(rOld);
+//    myCopy->initialize(rOld);
     return myCopy;
-}
-
-/*!
-  * \note Based on code by Sigve Bøe Skattum https://github.com/sigvebs/VMC2
-  */
-vec WaveSlater::variationalGradient() {
-    vec varGradient = zeros(2);
-
-    // Gradient_slater;slaterUp
-    varGradient(0) += slaterUp->variationalGradient();
-    varGradient(0) += slaterDown->variationalGradient();
-
-    // Gradient Jastrow.
-    if (interactionEnabled) {
-        varGradient(1) = jastrow->variationalGradient();
-    }
-    return varGradient;
 }
 
 void WaveSlater::prepareGradient(vec2 &particlePosition, int movedParticle) {

@@ -72,24 +72,3 @@ double Orbital::laplace(const vec2 &r) {
 //    std::cout << doubleDerivativeY << std::endl;
     return doubleDerivativeX + doubleDerivativeY;
 }
-
-/*!
-  * \note Implementation based on code by Sigve Bøe Skattum (https://github.com/sigvebs/VMC2)
-  */
-double Orbital::variationalDerivative(const vec2 &r) {
-    double derivative;
-    double rSquared = dot(r, r);
-
-    double Hx = Hermite::evaluate(nx(), sqrtAlphaOmega * r[0]);
-    double Hy = Hermite::evaluate(ny(), sqrtAlphaOmega * r[1]);
-
-    derivative = -0.5 * omega * rSquared;
-
-    if (nx() > 0) {
-        derivative += r[0] * nx() * sqrtOmegaOverAlpha * Hermite::evaluate(nx() - 1, sqrtAlphaOmega * r[0]) / Hx;
-    }
-    if (ny() > 0) {
-        derivative += r[1] * ny() * sqrtOmegaOverAlpha * Hermite::evaluate(ny() - 1, sqrtAlphaOmega * r[1]) / Hy;
-    }
-    return derivative * evaluate(r);
-}

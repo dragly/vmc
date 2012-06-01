@@ -47,7 +47,7 @@ void Jastrow::calculateDistances(vec2 r[]) {
         rNew[i] = r[i];
         for(int j = i + 1; j < nParticles; j++) {
             diff = (r[i] - r[j]);
-            distancesNew.at(i,j) = sqrt(dot(diff,diff));
+            distancesNew.at(i,j) = norm(diff,2);
             jastrowArgumentsNew.at(i,j) = argument(i,j,distancesNew);
         }
     }
@@ -177,26 +177,4 @@ double Jastrow::ratio(vec2 &r, int movedParticle)
 void Jastrow::setParameters(double *parameters)
 {
     beta = parameters[1];
-}
-
-/*!
-  * \note Based on code by Sigve Bøe Skattum https://github.com/sigvebs/VMC2
-  */
-double Jastrow::variationalGradient() {
-    double rSquared = 0;
-    double rNorm = 0;
-    double value = 1;
-
-    for (int i = 0; i < nParticles; i++) {
-        for (int j = i + 1; j < nParticles; j++) {
-            rSquared = 0;
-            for (int k = 0; k < nDimensions; k++) {
-                rSquared += (distancesNew(i, k) - distancesNew(j, k)) * (distancesNew(i, k) - distancesNew(j, k));
-            }
-            rNorm = sqrt(rSquared);
-            value += a(i, j) * rSquared / ((1 + beta * rNorm)*(1 + beta * rNorm));
-        }
-    }
-
-    return -value;
 }

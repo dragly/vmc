@@ -99,13 +99,11 @@ void DiffusionWalker::advance(double trialEnergy) {
             m_aliveNew = false;
         } else {
             if(reproductions > 1) {
-                std::cout << "Needs reproduction" << std::endl;
                 for(int repro = 1; repro < reproductions; repro++) {
                     for(int walkerIndex = 0; walkerIndex < nWalkersMax; walkerIndex++) {
                         DiffusionWalker *ressurectedWalker = otherWalkers[walkerIndex];
                         // find a dead walker to ressurect
                         if(!ressurectedWalker->aliveNew()) {
-                            std::cout << "Ressurecting " << walkerIndex << std::endl;
                             ressurectedWalker->setAliveNew(true);
                             ressurectedWalker->copyOtherWalker(this);
                             break;

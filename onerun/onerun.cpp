@@ -19,7 +19,7 @@
 
 OneRun::OneRun(Config *config_) :
     myRank(config_->myRank()),
-    nProcesses(config_->nProcesses()),
+    m_nProcesses(config_->m_nProcesses()),
     wave(config_->wave()),
     monteCarlo(config_->monteCarlo()),
     hamiltonian(config_->hamiltonian()),
@@ -61,7 +61,7 @@ void OneRun::run() {
         double totalCumulativeEnergySquared;
         double cumulativeEnergy;
         double cumulativeEnergySquared;
-        double nTotalSamples = nSamples*nProcesses;
+        double nTotalSamples = nSamples*m_nProcesses;
 
         double parameters[2];
 
@@ -78,12 +78,12 @@ void OneRun::run() {
         double totalCumulativeEnergyDummy;
         MPI_Reduce(&cumulativeEnergy, &totalCumulativeEnergyDummy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
-        totalCumulativeEnergy = totalCumulativeEnergyDummy / nProcesses;
+        totalCumulativeEnergy = totalCumulativeEnergyDummy / m_nProcesses;
 
         double totalCumulativeEnergySquaredDummy;
         MPI_Reduce(&cumulativeEnergySquared, &totalCumulativeEnergySquaredDummy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
-        totalCumulativeEnergySquared = totalCumulativeEnergySquaredDummy / nProcesses;
+        totalCumulativeEnergySquared = totalCumulativeEnergySquaredDummy / m_nProcesses;
 
         timeEnd = MPI_Wtime();
         totalTime = timeEnd-timeStart;

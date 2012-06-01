@@ -9,6 +9,12 @@
 #include <iostream>
 #include <iomanip>
 
+// disable annoying unused parameter warnings from the MPI library which we don't have any control over
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#include <mpi.h>
+// Enable warnings again
+#pragma GCC diagnostic warning "-Wunused-parameter"
+
 using std::cout;
 using std::setprecision;
 
@@ -23,8 +29,8 @@ DiffusionMonteCarlo::DiffusionMonteCarlo(Config *config_) :
     initialMonteCarlo(config->monteCarlo()),
     timeStep(0.0001)
 {
-    parameters[0] = 0;
-    parameters[1] = 0;
+    parameters[0] = 1;
+    parameters[1] = 1;
     config->wave()->setParameters(parameters);
     //    rNew = new vec2*[nWalkersMax];
     //    for(int i = 0; i < nWalkersMax; i++) {
@@ -85,6 +91,7 @@ void DiffusionMonteCarlo::loadConfiguration(INIParser *settings) {
     parameters[0] = alpha;
     parameters[1] = beta;
     updateWalkerParameters();
+    wave->setParameters(parameters);
 }
 
 void DiffusionMonteCarlo::sample() {
@@ -101,7 +108,7 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
     // Initialize ensemble of walkers from VMC best guess
     initialMonteCarlo->setRecordMoves(true, nWalkersAlive * nParticles);
     initialMonteCarlo->setThermalizationEnabled(true);
-//    initialMonteCarlo->setThermalizationEnabled(false); // TODO set true
+    //    initialMonteCarlo->setThermalizationEnabled(false); // TODO set true
     initialMonteCarlo->sample(nWalkersAlive * correlationStep);
     double trialEnergy = initialMonteCarlo->energy();
     std::cout << "Done initializing. Initial trial energy was " << trialEnergy << std::endl;
@@ -162,13 +169,13 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
             }
             std::cout << "Trial energy is now " << setw(14) << setprecision(10) << trialEnergy << ", average " << setw(14) << setprecision(10) << totalEnergySum / nTotalEnergySamples << ",  acceptance: " << setw(8) <<  setprecision(6) << acceptances / double(acceptances + rejections) << ", with " << nWalkersAlive << " walkers at cycle " << cycle << std::endl;
             // Renormalise the number of walkers to the target number by creating or deleting walkers
-//                        while(nWalkersAlive > nWalkersIdeal) {
-//                            int randomWalker = ran3(idumMC) * nWalkersMax;
-//                            if(walkers[randomWalker]->aliveNew()) {
-//                                walkers[randomWalker]->setAliveNew(false);
-//                                nWalkersAlive--;
-//                            }
-//                        }
+            //                        while(nWalkersAlive > nWalkersIdeal) {
+            //                            int randomWalker = ran3(idumMC) * nWalkersMax;
+            //                            if(walkers[randomWalker]->aliveNew()) {
+            //                                walkers[randomWalker]->setAliveNew(false);
+            //                                nWalkersAlive--;
+            //                            }
+            //                        }
             blockSamples++;
             energySum = 0;
             nEnergySamples = 0;

@@ -50,6 +50,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
         positionFile.open("vmc-positions-init.dat");
     }
     wave->initialize(rOld);
+
     //    wave->gradient(rOld, 0, waveGradientOld);
     wave->gradient(rOld, quantumForceOld);
     quantumForceOld *= 2;
@@ -71,11 +72,13 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
             wave->gradient(rNew, quantumForceNew);
             quantumForceNew *= 2;
             double argSum = 0;
-            for(int k = 0; k < nDimensions; k++) {
-                int qfIndex = i * nDimensions + k;
-                double quantumForceSum = quantumForceOld[qfIndex] + quantumForceNew[qfIndex];
-                double qfPositionDiff = 0.5 * diffConstant * stepLength * (quantumForceOld[qfIndex] - quantumForceNew[qfIndex]) - (rNew[i][k] - rOld[i][k]);
-                argSum += 0.5 * quantumForceSum * qfPositionDiff;
+            for(int j = 0; j < nParticles; j++) {
+                for(int k = 0; k < nDimensions; k++) {
+                    int qfIndex = j * nDimensions + k;
+                    double quantumForceSum = quantumForceOld[qfIndex] + quantumForceNew[qfIndex];
+                    double qfPositionDiff = 0.5 * diffConstant * stepLength * (quantumForceOld[qfIndex] - quantumForceNew[qfIndex]) - (rNew[j][k] - rOld[j][k]);
+                    argSum += 0.5 * quantumForceSum * qfPositionDiff;
+                }
             }
             double greensRatio = exp(argSum);
 
@@ -120,7 +123,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                     }
                 }
                 if(i == 0 && !(cycle % 10000) && cycle > 0) {
-                    std::cout << "Energy from last 10000 cycles was " << setprecision(16) << m_energy / (cycle * nParticles) << std::endl;
+                    std::cout << "Cycle " << cycle << ". Current average energy is " << setprecision(16) << m_energy / (cycle * nParticles) << std::endl;
                 }
             } else {
                 checkTerminalization(localEnergy);

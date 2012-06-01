@@ -38,13 +38,13 @@ StandardMinimizer::StandardMinimizer(Config *config) :
 
 void StandardMinimizer::loadConfiguration(INIParser *settings)
 {
-    m_settings = settings;
-    m_nSamples = settings->GetDouble("MinimizerStandard","nCycles", 1000);
-    nVariations = settings->GetDouble("MinimizerStandard","nVariations", 11);    //  default number of variations
-    alphaStart = settings->GetDouble("MinimizerStandard","alphaStart", 0);    //  default number of variations
-    alphaEnd= settings->GetDouble("MinimizerStandard","alphaEnd", 1);    //  default number of variations
-    betaStart = settings->GetDouble("MinimizerStandard","betaStart", 0);    //  default number of variations
-    betaEnd = settings->GetDouble("MinimizerStandard","betaEnd", 1);    //  default number of variations
+            m_settings = settings;
+            m_nSamples = settings->GetDouble("MinimizerStandard","nCycles", 1000);
+            nVariations = settings->GetDouble("MinimizerStandard","nVariations", 11);    //  default number of variations
+            alphaStart = settings->GetDouble("MinimizerStandard","alphaStart", 0);    //  default number of variations
+            alphaEnd= settings->GetDouble("MinimizerStandard","alphaEnd", 1);    //  default number of variations
+            betaStart = settings->GetDouble("MinimizerStandard","betaStart", 0);    //  default number of variations
+            betaEnd = settings->GetDouble("MinimizerStandard","betaEnd", 1);    //  default number of variations
 }
 
 void StandardMinimizer::runMinimizer()
@@ -78,7 +78,7 @@ void StandardMinimizer::runMinimizer()
     parameter0Map = zeros<mat>(nVariations, nVariations);
     parameter1Map = zeros<mat>(nVariations, nVariations);
 
-    total_number_cycles = m_nSamples*config->nProcesses();
+    total_number_cycles = m_nSamples*config->m_nProcesses();
 
     // array to store all energies for last variation of alpha
 
@@ -117,13 +117,13 @@ void StandardMinimizer::runMinimizer()
             if(m_rank == 0) {
                 std::cout << totalCumulativeEnergyDummy << std::endl;
             }
-            totalCumulativeEnergy(i,j) = totalCumulativeEnergyDummy / m_nProcesses;
+            totalCumulativeEnergy(i,j) = totalCumulativeEnergyDummy / m_m_nProcesses;
 
             double cumulativeEnergySquaredDummy = cumulativeEnergySquared(i,j);
             double totalCumulativeEnergySquaredDummy = totalCumulativeEnergySquared(i,j);
             MPI_Reduce(&cumulativeEnergySquaredDummy, &totalCumulativeEnergySquaredDummy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
-            totalCumulativeEnergySquared(i,j) = totalCumulativeEnergySquaredDummy / m_nProcesses;
+            totalCumulativeEnergySquared(i,j) = totalCumulativeEnergySquaredDummy / m_m_nProcesses;
         }
     }
     timeEnd = MPI_Wtime();
@@ -149,7 +149,7 @@ void StandardMinimizer::runMinimizer()
         varianceFile.open(outfilename.c_str());
         outfilename = "errors.dat";
         errorFile.open(outfilename.c_str());
-        cout << "Time = " <<  totalTime  << " on number of processors: "  << config->nProcesses()  << endl;
+        cout << "Time = " <<  totalTime  << " on number of processors: "  << config->m_nProcesses()  << endl;
         for(int i=0; i < nVariations; i++){
             for(int j=0; j < nVariations; j++){
                 double energy = totalCumulativeEnergy(i,j) ;

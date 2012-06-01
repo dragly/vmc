@@ -14,12 +14,12 @@ using namespace std;
 class Config
 {
 public:
-    Config(int myRank, int nProcesses);
+    Config(int myRank, int m_nProcesses);
     int myRank() {
         return m_rank;
     }
-    int nProcesses() const  {
-        return m_nProcesses;
+    int m_nProcesses() const  {
+        return m_m_nProcesses;
     }
     int nDimensions() const {
         return m_nDimensions;
@@ -111,7 +111,7 @@ public:
 
 private:
     int m_rank;
-    int m_nProcesses;
+    int m_m_nProcesses;
     int m_nParticles;
     int m_nDimensions;
     double m_stepLength;
