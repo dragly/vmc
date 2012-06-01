@@ -35,7 +35,6 @@ public:
     Slater *slaterDown;
     Jastrow *jastrow;
     ~WaveSlater();
-    vec variationalGradient();
     vec slaterUpGradient;
     vec slaterDownGradient;
     vec jastrowGradient;
