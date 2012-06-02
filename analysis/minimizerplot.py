@@ -7,6 +7,8 @@ except ImportError:
 from numpy import *
 from matplotlib import rc
 from sys import argv
+import matplotlib as mpl
+mpl.rcParams['font.family'] = 'serif'
 options.offscreen = True
 first = True
 
@@ -51,10 +53,11 @@ for datapath in argv:
     fig.scene.render()
 
     savefig(datapath + "/minimizer.png")
+    subprocess.call("convert " + datapath + "/minimizer.png -trim " + datapath + "/minimizer-alpha.png", shell=True)
     
     # alpha view
-    fig.scene.x_plus_view()
-    savefig(datapath + "/minimizer-alpha.png")
+    #fig.scene.x_plus_view()
+    #savefig(datapath + "/minimizer-alpha.png")
     
     # alpha view
     fig.scene.x_plus_view()
@@ -62,6 +65,7 @@ for datapath in argv:
     myaxes.axes.y_axis_visibility = False
     myaxes.axes.z_axis_visibility = True
     savefig(datapath + "/minimizer-alpha.png")
+    subprocess.call("convert " + datapath + "/minimizer-alpha.png -trim " + datapath + "/minimizer-alpha-trim.png", shell=True)
     
     # beta view
     fig.scene.y_plus_view()
@@ -71,3 +75,5 @@ for datapath in argv:
     myaxes.axes.y_axis_visibility = True
     myaxes.axes.z_axis_visibility = False
     savefig(datapath + "/minimizer-beta.png")
+    subprocess.call("convert " + datapath + "/minimizer-beta.png -trim " + datapath + "/minimizer-beta-trim.png", shell=True)
+    

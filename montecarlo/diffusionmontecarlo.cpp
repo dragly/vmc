@@ -106,6 +106,7 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
 {
     std::cout << "Running VMC to initialize DMC" << std::endl;
     // Initialize ensemble of walkers from VMC best guess
+    initialMonteCarlo->setOutputEnergies(true);
     initialMonteCarlo->setRecordMoves(true, nWalkersAlive * nParticles);
     initialMonteCarlo->setThermalizationEnabled(true);
     //    initialMonteCarlo->setThermalizationEnabled(false); // TODO set true
@@ -187,7 +188,7 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
             }
         }
 
-        if(cycle > nThermalizationCycles && !(cycle % 10)) {
+        if(cycle > nThermalizationCycles && !(cycle % (nSamplesLocal / (800 / nParticles)))) {
             for(int j = 0; j < nWalkersMax; j++) {
                 if(walkers[j]->aliveOld()) {
                     for(int i = 0; i < nParticles; i++) {

@@ -109,7 +109,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                 m_energy += localEnergy;
                 m_energySquared += localEnergy*localEnergy;
                 if(recordMoves) {
-                    if(!(cycle % 10)) {
+                    if(!(cycle % nCycles / (200000 / nParticles))) {
                         positionFile << rOld[i][0] << " " << rOld[i][1] << std::endl;
                     }
                     if(!(cycle % nthMove)) {
@@ -120,7 +120,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                         }
                     }
                 }
-                if(i == 0 && !(cycle % 10000) && cycle > 0) {
+                if(outputEnergies && i == 0 && !(cycle % 10000) && cycle > 0) {
                     std::cout << "Cycle " << cycle << ". Current average energy is " << setprecision(16) << m_energy / (cycle * nParticles) << std::endl;
                     std::cout << "Acceptance ratio: " << (double)acceptances / (double)(rejections + acceptances) << std::endl;
                 }

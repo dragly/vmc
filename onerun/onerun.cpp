@@ -69,6 +69,7 @@ void OneRun::run() {
         parameters[1] = beta;
 
         wave->setParameters(parameters);
+        monteCarlo->setOutputEnergies(true);
         monteCarlo->sample(nSamples);
 
         cumulativeEnergy = monteCarlo->energy();

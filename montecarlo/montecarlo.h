@@ -41,6 +41,10 @@ public:
         storeEnergies = arg;
     }
 
+    void setOutputEnergies(bool arg) {
+        outputEnergies = arg;
+    }
+
     void checkTerminalization(double localEnergy);
     void setRecordMoves(bool arg, int nMoves);
     void recordMove(int i, int nthMove);
@@ -82,6 +86,7 @@ protected:
     double spawnRadius;
 
     bool sampleVariationalGradient;
+    bool outputEnergies;
 };
 
 #endif // MONTECARLO_H
