@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 import matplotlib as mpl
 mpl.rcParams['font.family'] = 'serif'
+mpl.rcParams['font.size'] = '16'
 import subprocess
 import scipy.ndimage as ndimage
+from scipy.interpolate import interp1d
 from numpy import *
 from matplotlib import rc
 from sys import argv
 import ConfigParser
+from numpy.linalg.linalg import norm
 
 first = True
 
@@ -15,7 +18,7 @@ for datapath in argv:
         from enthought.mayavi.mlab import *
     except ImportError:
         from mayavi.mlab import *
-    options.offscreen = True
+    #options.offscreen = True
     
     if first:
 	first = False
@@ -36,13 +39,32 @@ for datapath in argv:
         continue
     print "Plotting " + datapath
     
+    if len(data.shape) == 1:
+	print "Fixing radial plot!"
+	f2 = interp1d(param0, data, kind='cubic')
+	param = concatenate((-param0[::-1], param0))
+	mygrid = meshgrid(param,param)
+	radius = sqrt(mygrid[0]**2 + mygrid[1]**2)
+	radius = radius + (param0.max() - radius) * ( radius > param0.max())
+	param0old = param0
+	param1old = param1
+	dataold = data
+	param0 = mygrid[1]
+	param1 = mygrid[0]
+	data = f2(radius)
+    
     fig = figure(size=(1280,960))
 
     fig.scene.background = (1.0, 1.0, 1.0)
     fig.scene.foreground = (0.0, 0.0, 0.0)
 
-    from numpy.linalg.linalg import norm
-    normalizedData = data / norm(data)
+    theNorm = norm(data)
+    if theNorm == inf:
+	theNorm = data.max()
+    if theNorm == inf:
+	print "Found infinite data value. Skipping..."
+        continue
+    normalizedData = data / theNorm
     
     normalizedDataSmooth = ndimage.gaussian_filter(normalizedData, sigma=1.0, order=0)
     
@@ -82,7 +104,8 @@ for datapath in argv:
     from pylab import *
     figure()
     imshow(normalizedDataSmooth, extent=(param0.min(), param0.max(), param1.min(), param1.max()), origin="lower", interpolation='bilinear')
-    colorbar()
+    cb = colorbar(format='$%g$')
+    
     contour(param0, param1, normalizedDataSmooth, colors="k")
     ax = axes()
     formatter = mpl.ticker.FormatStrFormatter('$%g$')

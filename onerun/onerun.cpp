@@ -107,6 +107,13 @@ void OneRun::run() {
             dataFile << setprecision(20) << error << std::endl;
 
             dataFile.close();
+
+
+            ofstream energyPartsFile;
+            energyPartsFile.open("energyparts.dat");
+            energyPartsFile << hamiltonian->totalsString() << std::endl;
+            energyPartsFile.close();
+
         }
         writeBlockData();
         MPI_Barrier(MPI_COMM_WORLD);
@@ -118,6 +125,7 @@ void OneRun::run() {
 }
 
 void OneRun::writeBlockData() {
+    std::cout << "Writing blocking data" << std::endl;
     ofstream blockofile;
     // Setting output file name for this myRank:
     ostringstream fileName;

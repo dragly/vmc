@@ -188,7 +188,7 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
             }
         }
 
-        if(cycle > nThermalizationCycles && !(cycle % (nSamplesLocal / (800 / nParticles)))) {
+        if(cycle > nThermalizationCycles && !(cycle % (nSamplesLocal / (8000 / nParticles)))) {
             for(int j = 0; j < nWalkersMax; j++) {
                 if(walkers[j]->aliveOld()) {
                     for(int i = 0; i < nParticles; i++) {

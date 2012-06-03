@@ -10,6 +10,27 @@ Hamiltonian::Hamiltonian(Config *config) :
 {
 }
 
+void Hamiltonian::resetTotalEnergies()
+{
+    m_totalPotentialEnergy = 0;
+    m_totalKineticEnergy = 0;
+}
+
+void Hamiltonian::outputTotals()
+{
+    double totalEnergy = totalKineticEnergy() + totalPotentialEnergy();
+    std::cout << "Kinetic energy: " << totalKineticEnergy() / (totalEnergy) << " potential energy: " << totalPotentialEnergy() / (totalEnergy) << std::endl;
+}
+
+string Hamiltonian::totalsString()
+{
+    double totalEnergy = totalKineticEnergy() + totalPotentialEnergy();
+    stringstream myString;
+    myString << totalKineticEnergy() / (totalEnergy) << " " << totalPotentialEnergy() / (totalEnergy);
+    return myString.str();
+}
+
+
 Hamiltonian *Hamiltonian::fromName(string hamiltonianClass, Config *config)
 {
     if(hamiltonianClass == "HamiltonianSimple") {

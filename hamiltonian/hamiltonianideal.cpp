@@ -4,6 +4,11 @@
 #include "../wavefunction/wavefunction.h"
 #include "../config.h"
 #include <math.h>
+#include <iomanip>
+
+using std::cout;
+using std::endl;
+using std::setprecision;
 
 HamiltonianIdeal::HamiltonianIdeal(Config *config) :
     Hamiltonian(config),
@@ -40,7 +45,9 @@ double HamiltonianIdeal::externalPotentialEnergy(WaveFunction *wave, vec2 r[])
         }
         externalEnergy += rSingleParticle;
     }
-    return 0.5 * omega * omega * externalEnergy;
+    externalEnergy = 0.5 * omega * omega * externalEnergy;
+    m_totalExternalPotentialEnergy += externalEnergy;
+    return externalEnergy;
 }
 
 double HamiltonianIdeal::interactionPotentialEnergy(WaveFunction *wave, vec2 r[])
@@ -59,5 +66,26 @@ double HamiltonianIdeal::interactionPotentialEnergy(WaveFunction *wave, vec2 r[]
             interactionEnergy += 1/sqrt(distanceSquared);
         }
     }
+    m_totalInteractionPotentialEnergy += interactionEnergy;
     return interactionEnergy;
+}
+
+void HamiltonianIdeal::resetTotalEnergies() {
+    Hamiltonian::resetTotalEnergies();
+    m_totalExternalPotentialEnergy = 0;
+    m_totalInteractionPotentialEnergy = 0;
+}
+
+string HamiltonianIdeal::totalsString()
+{
+    double totalEnergy = totalKineticEnergy() + totalPotentialEnergy();
+    stringstream myString;
+    myString << totalKineticEnergy() / (totalEnergy) << " " << totalInteractionPotentialEnergy() / (totalEnergy) << " " << totalExternalPotentialEnergy() / (totalEnergy);
+    return myString.str();
+}
+
+void HamiltonianIdeal::outputTotals()
+{
+    double totalEnergy = totalKineticEnergy() + totalPotentialEnergy();
+    std::cout << "Kinetic energy: " << setprecision(3) << totalKineticEnergy() / (totalEnergy) << " interactive potential energy: " << setprecision(3) << totalInteractionPotentialEnergy() / (totalEnergy) << " external potential energy: " << setprecision(3) << totalExternalPotentialEnergy() / (totalEnergy) << std::endl;
 }

@@ -98,20 +98,31 @@ void DensityPlotter::makePlot()
     }
     // allocate my portion of the whole cake
     myProbability = (double**)matrix(myStepConfig.nSteps, bSteps, sizeof(double));
+
+    // If the user has requested a one-line plot, set the edges of the other particles to "all" of space, including negative values
+    double localAMin = aMin;
+    double localBMin = bMin;
+    if(aMin > 0 && aMax > 0) {
+        localAMin = -aMax;
+    }
+    if(bMin > 0 && bMax > 0) {
+        localBMin = -bMax;
+    }
     // loop over positions
     for(int aStep = 0; aStep < myStepConfig.nSteps; aStep++) {
         for(int bStep = 0; bStep < bSteps; bStep++) {
             r_new[0][0] = aMin + aStep * da + myStepConfig.firstStep * da;
             r_new[0][1] = bMin + bStep * db;
             double prob = 0;
+
             // loop over monte carlo cycles
             for (int cycle = 1; cycle <= m_nCycles; cycle++){
                 // new positions for all particles
                 for (int i = 1; i < config->nParticles(); i++) {
                     double random1 = ran3(idum);
                     double random2 = ran3(idum);
-                    r_new[i][0] = aMin + (aMax - aMin) * random1;
-                    r_new[i][1] = bMin + (bMax - bMin) * random2;
+                    r_new[i][0] = localAMin + (aMax - localAMin) * random1;
+                    r_new[i][1] = localBMin + (bMax - localBMin) * random2;
                 }  //  end of loop over particles
                 m_wave->initialize(r_new);
                 // compute probability

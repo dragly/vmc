@@ -14,7 +14,21 @@ public:
     double potentialEnergy(WaveFunction *wave, vec2 r[]);
     double externalPotentialEnergy(WaveFunction *wave, vec2 r[]);
     double interactionPotentialEnergy(WaveFunction *wave, vec2 r[]);
+
+    double totalExternalPotentialEnergy() {
+        return m_totalExternalPotentialEnergy;
+    }
+    double totalInteractionPotentialEnergy() {
+        return m_totalInteractionPotentialEnergy;
+    }
+    void resetTotalEnergies();
+    string totalsString();
+    void outputTotals();
+
+private:
     double omega;
+    double m_totalExternalPotentialEnergy;
+    double m_totalInteractionPotentialEnergy;
 };
 
 #endif // HAMILTONIANIDEAL_H

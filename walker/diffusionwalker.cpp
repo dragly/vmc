@@ -85,6 +85,8 @@ void DiffusionWalker::advance(double trialEnergy) {
             quantumForceNew = quantumForceOld;
             localEnergyNew = localEnergyOld;
         }
+
+        // TODO: Try to remove the branching and have a look at the distribution afterwards
         // Compute branching factor PB
 //        localEnergyOld = hamiltonian->energy(wave, rOld);
 //        double branchingFactor = exp(- timeStep * diffConstant * (0.5 * (localEnergyNew + localEnergyOld) - trialEnergy));
@@ -95,6 +97,7 @@ void DiffusionWalker::advance(double trialEnergy) {
         // Accumulate the energy and any observables weighted by PB
         m_energy += localEnergyNew * branchingFactor;
         m_changeInEnergySamples++;
+        reproductions = 1; // TODO REMOVE THIS!
         if(reproductions == 0 || localEnergyNew < trialEnergy - 1. / sqrt(timeStep) || localEnergyNew > trialEnergy + 1 / sqrt(timeStep)) {
             m_aliveNew = false;
         } else {

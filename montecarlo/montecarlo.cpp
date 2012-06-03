@@ -85,6 +85,7 @@ void MonteCarlo::checkTerminalization(double localEnergy) {
     if(!(cycle % 1000)) {
         if(cycle >= 100000) {
             terminalized = true;
+            hamiltonian->resetTotalEnergies();
             std::cout << "Thermalized after " << cycle << " cycles." << std::endl;
             cycle = 0;
         }
