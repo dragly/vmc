@@ -7,6 +7,7 @@ except ImportError:
 from numpy import *
 from matplotlib import rc
 from sys import argv
+import subprocess
 import matplotlib as mpl
 mpl.rcParams['font.family'] = 'serif'
 options.offscreen = True
@@ -35,7 +36,7 @@ for datapath in argv:
     
     myoutline = outline()
 
-    myaxes = axes(xlabel='a', ylabel='b', zlabel='E')
+    myaxes = axes(xlabel=r'alpha', ylabel=r'beta', zlabel='E')
     myaxes.title_text_property.italic = False
     myaxes.title_text_property.bold = False
     myaxes.title_text_property.font_family = 'times'
@@ -53,7 +54,7 @@ for datapath in argv:
     fig.scene.render()
 
     savefig(datapath + "/minimizer.png")
-    subprocess.call("convert " + datapath + "/minimizer.png -trim " + datapath + "/minimizer-alpha.png", shell=True)
+    subprocess.call("convert " + datapath + "/minimizer.png -trim " + datapath + "/minimizer-trim.png", shell=True)
     
     # alpha view
     #fig.scene.x_plus_view()

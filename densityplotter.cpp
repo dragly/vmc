@@ -102,11 +102,13 @@ void DensityPlotter::makePlot()
     // If the user has requested a one-line plot, set the edges of the other particles to "all" of space, including negative values
     double localAMin = aMin;
     double localBMin = bMin;
+    double localBMax = bMin;
     if(aMin > 0 && aMax > 0) {
         localAMin = -aMax;
     }
     if(bMin > 0 && bMax > 0) {
-        localBMin = -bMax;
+        localBMin = -aMax;
+        localBMax = aMax;
     }
     // loop over positions
     for(int aStep = 0; aStep < myStepConfig.nSteps; aStep++) {
@@ -122,7 +124,7 @@ void DensityPlotter::makePlot()
                     double random1 = ran3(idum);
                     double random2 = ran3(idum);
                     r_new[i][0] = localAMin + (aMax - localAMin) * random1;
-                    r_new[i][1] = localBMin + (bMax - localBMin) * random2;
+                    r_new[i][1] = localBMin + (localBMax - localBMin) * random2;
                 }  //  end of loop over particles
                 m_wave->initialize(r_new);
                 // compute probability
