@@ -30,6 +30,7 @@ for datapath in argv:
         config.read(configFileName)
         nParticles = config.get("General", "nParticles")
         omega = config.get("General", "omega")
+        interactionEnabled = config.get("General", "interactionEnabled")
 
         param0 = loadtxt(datapath + "/density-grid-x.dat")
         param1 = loadtxt(datapath + "/density-grid-y.dat")
@@ -87,12 +88,16 @@ for datapath in argv:
     
     if int(nParticles) == 2:
         if float(omega) < 0.20:
-            fig.scene.camera.position = [-69.07717592751338, -43.634636030649105, 42.06008568491923]
-            fig.scene.camera.focal_point = [5.6484023160060648, 7.1971704691513159, -26.413896160865278]     
+            if int(interactionEnabled) == 1:
+                fig.scene.camera.position = [-69.07717592751338, -43.634636030649105, 42.06008568491923]
+                fig.scene.camera.focal_point = [5.6484023160060648, 7.1971704691513159, -26.413896160865278]
+            else:
+                fig.scene.camera.position = [-130.15462231655081, -55.070211536142182, 69.052751208107793]
+                fig.scene.camera.focal_point = [3.1338385760929293, 19.62068397344872, -19.336533181132019]
         else:
             fig.scene.camera.position = [-52.180466454173839, -19.827149342881295, 37.613833505235903]
             fig.scene.camera.focal_point = [11.309528075254283, 18.824854213069088, -7.9780393346049383]
-    elif int(nParticles) == 6:
+    else:
         aavava=0
     #    fig.scene.camera.position = [-83.367976780452835, -33.31347241689658, 60.149674418839126]
     #    fig.scene.camera.focal_point = [9.5877242100828539, 23.27692598937039, -6.6013866059718787]
@@ -111,4 +116,6 @@ for datapath in argv:
     formatter = mpl.ticker.FormatStrFormatter('$%g$')
     ax.xaxis.set_major_formatter(formatter) 
     ax.yaxis.set_major_formatter(formatter)
+    xlabel(r"$x$")
+    xlabel(r"$y$")
     savefig(datapath + "/density2d.pdf")

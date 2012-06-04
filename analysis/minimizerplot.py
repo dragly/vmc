@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
-try:
-    from enthought.mayavi.mlab import *
-except ImportError:
-    from mayavi.mlab import *
+
 
 from numpy import *
 from matplotlib import rc
 from sys import argv
+import subprocess
 import matplotlib as mpl
 mpl.rcParams['font.family'] = 'serif'
-options.offscreen = True
+mpl.rcParams['font.size'] = '16'
 first = True
 
 for datapath in argv:
+    try:
+	from enthought.mayavi.mlab import *
+	options.offscreen = True
+    except ImportError:
+	from mayavi.mlab import *
     if first:
 	first = False
 	continue
@@ -35,7 +38,7 @@ for datapath in argv:
     
     myoutline = outline()
 
-    myaxes = axes(xlabel='a', ylabel='b', zlabel='E')
+    myaxes = axes(xlabel=r'alpha', ylabel=r'beta', zlabel='E')
     myaxes.title_text_property.italic = False
     myaxes.title_text_property.bold = False
     myaxes.title_text_property.font_family = 'times'
@@ -53,27 +56,41 @@ for datapath in argv:
     fig.scene.render()
 
     savefig(datapath + "/minimizer.png")
-    subprocess.call("convert " + datapath + "/minimizer.png -trim " + datapath + "/minimizer-alpha.png", shell=True)
+    subprocess.call("convert " + datapath + "/minimizer.png -trim " + datapath + "/minimizer-trim.png", shell=True)
     
     # alpha view
     #fig.scene.x_plus_view()
     #savefig(datapath + "/minimizer-alpha.png")
     
     # alpha view
-    fig.scene.x_plus_view()
+    fig.scene.x_minus_view()
     fig.scene.parallel_projection = True
     myaxes.axes.y_axis_visibility = False
     myaxes.axes.z_axis_visibility = True
     savefig(datapath + "/minimizer-alpha.png")
-    subprocess.call("convert " + datapath + "/minimizer-alpha.png -trim " + datapath + "/minimizer-alpha-trim.png", shell=True)
+    subprocess.call("convert " + datapath + "/minimizer-beta.png -trim " + datapath + "/minimizer-alpha-trim.png", shell=True)
     
     # beta view
-    fig.scene.y_plus_view()
-    fig.scene.camera.set_roll(180)
+    fig.scene.y_minus_view()
+    fig.scene.camera.set_roll(0)
     fig.scene.parallel_projection = True
     myaxes.axes.x_axis_visibility = True
     myaxes.axes.y_axis_visibility = True
     myaxes.axes.z_axis_visibility = False
     savefig(datapath + "/minimizer-beta.png")
-    subprocess.call("convert " + datapath + "/minimizer-beta.png -trim " + datapath + "/minimizer-beta-trim.png", shell=True)
+    subprocess.call("convert " + datapath + "/minimizer-alpha.png -trim " + datapath + "/minimizer-beta-trim.png", shell=True)
     
+    # plot 2D
+    from pylab import *
+    figure()
+    imshow(transpose(data), extent=(param0.min(), param0.max(), param1.min(), param1.max()), origin="lower", interpolation='bilinear')
+    cb = colorbar(format='$%g$')
+    title(r"Energy")
+    contour(param0, param1, data, colors="k")
+    ax = axes()
+    formatter = mpl.ticker.FormatStrFormatter('$%g$')
+    ax.xaxis.set_major_formatter(formatter) 
+    ax.yaxis.set_major_formatter(formatter)
+    xlabel(r"$\alpha$")
+    xlabel(r"$\beta$")
+    savefig(datapath + "/minimizer2d.pdf")
