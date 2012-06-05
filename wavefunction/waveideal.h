@@ -6,6 +6,9 @@
 using namespace arma;
 #include <iostream>
 
+/*!
+  * \brief Used for the two-particle case with interaction.
+  */
 class WaveIdeal : public WaveFunction
 {
 public:

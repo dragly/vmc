@@ -4,6 +4,9 @@
 #include "montecarlo.h"
 #include "../walker/diffusionwalker.h"
 
+/*!
+  * \brief Implements the diffusion Monte Carlo algorithm
+  */
 class DiffusionMonteCarlo : public MonteCarlo
 {
 public:

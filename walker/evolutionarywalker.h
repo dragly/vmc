@@ -3,6 +3,9 @@
 
 #include "walker.h"
 
+/*!
+  * \brief Not used. See EvolutionaryMonteCarlo.
+  */
 class EvolutionaryWalker : public Walker
 {
 public:

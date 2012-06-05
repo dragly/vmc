@@ -24,6 +24,9 @@ GeneticMinimizer::GeneticMinimizer(Config *config) :
 {
 }
 
+/*!
+  * Loads the configuration from the config.ini file
+  */
 void GeneticMinimizer::loadConfiguration(INIParser *settings)
 {
     nGenes = settings->GetDouble("GeneticMinimizer","nGenes", 2);
@@ -39,10 +42,16 @@ void GeneticMinimizer::loadConfiguration(INIParser *settings)
     setPopulationData(nGenes, nIndividuals, nPopulations);
 }
 
+/*!
+  * Begins the evolution, but has its own loop that only evolves a few steps at the time.
+  * This is to improve the method by changing the rescale limits and number of samples for each
+  * evolutionary step.
+  */
 void GeneticMinimizer::runMinimizer()
 {
     ofstream dataFile;
     dataFile.open("minimizer-evolutionary.dat");
+
     energies = new vec[nPopulations];
     for(int i = 0; i < nPopulations; i++) {
         energies[i] = zeros<vec>(nIndividuals);
@@ -76,6 +85,11 @@ void GeneticMinimizer::runMinimizer()
     delete [] energies;
 }
 
+/*!
+  * The fitness function samples the energy using the given Monte Carlo algorithm. The number of samples
+  * is controlled by the runMinimizer function and the settings in the config.ini file.
+  * Each individual returns its energy. The fitness function is interpreted as "lower is better".
+  */
 double GeneticMinimizer::fitness(vec &coefficients, int population, int individual)
 {
     double parameters[2];

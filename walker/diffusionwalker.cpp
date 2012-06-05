@@ -16,6 +16,10 @@ DiffusionWalker::DiffusionWalker(Config *config, DiffusionWalker **otherWalkers_
 {
 }
 
+/*!
+ * \brief DiffusionWalker::advance suggests a move, accepts/rejects it, samples the energy, kills itself or spawns walkers if necessary
+ * \param trialEnergy
+ */
 void DiffusionWalker::advance(double trialEnergy) {
     Walker::advance();
     m_changeInEnergySamples = 0;

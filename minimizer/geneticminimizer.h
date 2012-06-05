@@ -11,10 +11,12 @@ using namespace arma;
 class EvolutionaryWalker;
 
 /*!
-    An evolutionary approach to minimizing the energy by selection of
-    the parameters. This class is written with the intention to be as
-    general as possible with regards to the problem and could hopefully
-    be used for a completely different problem.
+  *  \brief An evolutionary approach to minimizing the energy by selection of
+  *  the parameters.
+  *
+  *  This class is written with the intention to be as
+  *  general as possible with regards to the problem and could hopefully
+  *  be used for a completely different physical system.
 */
 class GeneticMinimizer : public Minimizer, public Evolver
 {

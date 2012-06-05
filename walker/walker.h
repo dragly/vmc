@@ -6,6 +6,9 @@
 
 using namespace arma;
 
+/*!
+  * \brief A general class that defines a Monte Carlo walker
+  */
 class Walker
 {
 //    friend class Walker;

@@ -37,6 +37,10 @@ Slater::~Slater() {
     delete [] rNew;
 }
 
+/*!
+ * \brief Slater::initialize constructs the matrix and calculates the inverse numerically
+ * \param positions
+ */
 void Slater::initialize(vec2 positions[])
 {
     constructMatrix(positions);
@@ -44,6 +48,7 @@ void Slater::initialize(vec2 positions[])
 }
 
 /*!
+ * \brief Slater::constructMatrix constructs the matrix by use of the orbitals and particle positions
   * \note The first half of the particles have spin up, while the others have spin down.
   */
 void Slater::constructMatrix(vec2 r[]) {
@@ -60,6 +65,11 @@ void Slater::constructMatrix(vec2 r[]) {
     previousMatrix = currentMatrix;
 }
 
+/*!
+ * \brief Slater::updateMatrix changes the parts of the matrix affected by the moved particle's new position
+ * \param particlePosition The new position for the moved particle
+ * \param movedParticle The index of the moved particle
+ */
 void Slater::updateMatrix(vec2 &particlePosition, int movedParticle) {
     if(hasParticle(movedParticle)) {
         int localParticle = movedParticle - particleIndexOffset;
@@ -78,6 +88,9 @@ double Slater::determinant(vec2 r[]) {
 }
 
 /*!
+ * \brief Slater::updateInverse changes the parts of the inverse matrix affected by the moved particle's new position
+ * \param particlePosition The new position for the moved particle
+ * \param movedParticle The index of the moved particle
   * \warning You need to run updateMatrix() before calling this function.
   */
 void Slater::updateInverse(vec2 &particlePosition, int movedParticle)
@@ -107,6 +120,10 @@ void Slater::updateInverse(vec2 &particlePosition, int movedParticle)
 }
 
 int nExceptions = 0;
+/*!
+ * \brief Slater::calculateInverseNumerically Calculates the inverse numerically given the current matrix.
+ * Uses Armadillo to calculate the inverse and listens to exceptions due to singular matrices
+ */
 void Slater::calculateInverseNumerically() {
     try {
         currentInverse = inv(currentMatrix);
@@ -123,6 +140,10 @@ void Slater::calculateInverseNumerically() {
     }
 }
 
+/*!
+ * \brief Slater::setPreviousMovedParticle not used, left for reference
+ * \param movedParticle
+ */
 void Slater::setPreviousMovedParticle(int movedParticle)
 {
     previousMovedParticle = movedParticle;
@@ -146,10 +167,19 @@ double Slater::ratio(vec2 &particlePosition, int movedParticle)
     }
 }
 
+/*!
+ * \brief Slater::hasParticle checks if a particle number is considered a part of this Slater determinant based on whether this is a spin up or down determinant.
+ * \param particleNumber
+ * \return true if part of this determinant.
+ */
 bool Slater::hasParticle(int particleNumber) const {
     return (spinUp && particleNumber < nParticles / 2) || (!spinUp && particleNumber >= nParticles / 2);
 }
 
+/*!
+ * \brief Slater::acceptMove updates the internal positions and sets the previous matrix and inverse to the current
+ * \param movedParticle
+ */
 void Slater::acceptMove(int movedParticle)
 {
     previousMatrix = currentMatrix;
@@ -160,6 +190,9 @@ void Slater::acceptMove(int movedParticle)
     }
 }
 
+/*!
+ * \brief Slater::rejectMove resets the current matrix to the previous and resets positions as well
+ */
 void Slater::rejectMove() {
     currentMatrix = previousMatrix;
     // TODO might not need to copy back the inverse
@@ -169,6 +202,11 @@ void Slater::rejectMove() {
     }
 }
 
+/*!
+ * \brief Slater::gradient calculates the Slater gradient ratio analytically as described in the project paper
+ * \param r
+ * \param rGradient a reference to a vec object that should store the gradient - must be of nDimensions * nParticles size from before
+ */
 void Slater::gradient(vec2 r[], vec &rGradient) {
     rGradient.zeros();
     for(int a = 0; a < nParticles; a++) {
@@ -188,6 +226,11 @@ void Slater::gradient(vec2 r[], vec &rGradient) {
     }
 }
 
+/*!
+ * \brief Slater::laplace calculates the Slater-Laplace ratio analytically as described in the project paper
+ * \param r
+ * \return the value of the Slater-Laplace ratio
+ */
 double Slater::laplace(vec2 r[])
 {
     // TODO we are now recalculating the laplace for all particles, this could be avoided

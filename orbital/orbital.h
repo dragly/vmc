@@ -9,7 +9,7 @@
 using namespace arma;
 
 /*!
-  A class that contains the single particle wave function.
+  \brief Contains the single particle wave function.
   */
 class Orbital
 {

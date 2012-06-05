@@ -5,6 +5,11 @@
 
 using namespace arma;
 
+/*!
+  * \brief Class that performs a genetic algorithm.
+  *
+  * This class must be inherited and have its fitness function defined to be used.
+  */
 class Evolver
 {
 public:

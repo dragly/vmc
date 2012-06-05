@@ -7,6 +7,9 @@ using namespace arma;
 #include "../hamiltonian/hamiltonian.h"
 #include "../wavefunction/wavefunction.h"
 
+/*!
+  * \brief Implements the Metropolis Hastings algortihm
+  */
 class MetropolisHastingsMonteCarlo : public MonteCarlo
 {
 public:

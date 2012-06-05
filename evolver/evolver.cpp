@@ -15,6 +15,11 @@ Evolver::Evolver(int nGenes, int nIndividuals, int nPopulations)
     setPopulationData(nGenes, nIndividuals, nPopulations);
 }
 
+/*!
+  * Defines the number of genes, populations and individuals and allocates memory to these.
+  * \warning This must be called only once, as there is no memory clean up if called twice!
+  * \todo Fix memory leak
+  */
 void Evolver::setPopulationData(int nGenes, int nIndividuals, int nPopulations) {
     idum = new long;
     *idum = -1*time(NULL);
@@ -55,6 +60,9 @@ Evolver::~Evolver()
     delete [] bestIndices;
 }
 
+/*!
+  * Updates the scoreboard over which individuals are best within each population.
+  */
 void Evolver::updateBest()
 {
     for(int i = 0; i < nPopulations; i++) {
@@ -81,6 +89,10 @@ void Evolver::updateBest()
     }
 }
 
+/*!
+  * Updates the scaling of new suggestions for mutations within the given scale. This works logarithmically so that it is a uniform probability for the
+  * logarithmic powers between the scale limits.
+  */
 void Evolver::rescale()
 {
     double lowLimit = log(lowScaleLimit);
@@ -89,6 +101,11 @@ void Evolver::rescale()
     scale = pow(10,expScale);
 }
 
+/*!
+  * The evolutionary algorithm. Runs for the given number of cycles, uses the fitness function on all individuals' genes and ranks them each cycle.
+  * Then the best individuals are mated to produce offspring while the offspring and worst individuals are mutated. Some new individuals are introduced.
+  * See the report for more information.
+  */
 void Evolver::evolve(int nSteps, int populationMatchingPeriod)
 {
     if(cycle == 0) {

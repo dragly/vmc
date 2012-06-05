@@ -1,3 +1,9 @@
+/*!
+  * \mainpage FYS4411 Diffusion and Variational Monte Carlo
+  *
+  * These pages contain the documentation for the code used in the FYS4411 project for variational and diffusion Monte Carlo calculations on quantum dots.
+  */
+
 // Begin of main program
 
 // TODO: Convert every vector to armadillo code ...

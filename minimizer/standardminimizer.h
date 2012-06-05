@@ -15,6 +15,9 @@ class MonteCarlo;
 
 using namespace std;
 
+/*!
+  * \brief Scans the parametric space and saves the energies to file for plotting
+  */
 class StandardMinimizer : public Minimizer
 {
 public:

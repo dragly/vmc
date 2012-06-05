@@ -33,6 +33,10 @@ Jastrow::~Jastrow() {
     delete [] rNew;
 }
 
+/*!
+ * \brief Jastrow::initialize calculates the distances and jastrow arguments for an initial position
+ * \param positions
+ */
 void Jastrow::initialize(vec2 positions[]) {
     calculateDistances(positions);
     distancesOld = distancesNew;
@@ -40,7 +44,9 @@ void Jastrow::initialize(vec2 positions[]) {
 }
 
 /*!
-  */
+ * \brief Jastrow::calculateDistances sets the distance and argument matrix based on the given positions
+ * \param r
+ */
 void Jastrow::calculateDistances(vec2 r[]) {
     vec2 diff;
     for(int i = 0; i < nParticles; i++) {
@@ -55,6 +61,10 @@ void Jastrow::calculateDistances(vec2 r[]) {
     jastrowArgumentsNew = symmatu(jastrowArgumentsNew); // reflect the upper triangle to the lower
 }
 
+/*!
+ * \brief Jastrow::acceptMove sets the old distance and argument matrices to their new values
+ * \param movedParticle
+ */
 void Jastrow::acceptMove(int movedParticle)
 {
     (void)movedParticle;
@@ -65,6 +75,9 @@ void Jastrow::acceptMove(int movedParticle)
     jastrowArgumentsOld = jastrowArgumentsNew;
 }
 
+/*!
+ * \brief Jastrow::rejectMove sets the new distance and argument matrices to their old values
+ */
 void Jastrow::rejectMove()
 {
     for(int i = 0; i < nParticles; i++) {
@@ -79,6 +92,7 @@ double Jastrow::argument(int i, int j, mat &distances) {
 }
 
 /*!
+ * Jastrow::laplacePartial calculates the Jastrow Laplace ratio, except for the gradient dot term
   * \warning Named "partial" because it does not include the square gradient term. (8.46 in Leirvåg's thesis) This must be included manually. This is done by WaveSlater in this code.
   */
 double Jastrow::laplacePartial(vec2 r[]) {
@@ -101,7 +115,7 @@ double Jastrow::laplacePartial(vec2 r[]) {
 }
 
 /*!
- * \brief Jastrow::gradient
+ * \brief Jastrow::gradient calculates the gradient analytically
  * \param r
  * \param movedParticlea
  * \param rGradient
@@ -128,6 +142,11 @@ void Jastrow::gradient(vec2 r[], vec &rGradient)
     }
 }
 
+/*!
+ * \brief Jastrow::evaluate calculates the Jastrow part of the wave function
+ * \param r
+ * \return
+ */
 double Jastrow::evaluate(vec2 r[]) {
     double wf = 1;
 
@@ -141,6 +160,7 @@ double Jastrow::evaluate(vec2 r[]) {
 }
 
 /*!
+ * Jastrow::ratio calculates the Jastrow ratio
   * \note The distance and Jastrow argument matrices only have values in their upper right triangle.
   */
 double Jastrow::ratio(vec2 &r, int movedParticle)

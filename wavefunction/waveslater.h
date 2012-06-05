@@ -17,6 +17,9 @@ class Orbital;
   Wavefunction class that uses the Slater determinant to handle a general
   number of particles.
 */
+/*!
+  * \brief Used for the many-body case with interaction.
+  */
 class WaveSlater : public WaveFunction
 {
 public:

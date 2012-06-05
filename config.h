@@ -11,6 +11,9 @@
 class INIParser;
 using namespace std;
 
+/*!
+  * Handles the main configuration that is shared between the classes. Must be passed as an object to most classes at initialization.
+  */
 class Config
 {
 public:

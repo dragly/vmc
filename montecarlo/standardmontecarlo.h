@@ -8,6 +8,9 @@ using namespace arma;
 #include "../wavefunction/wavefunction.h"
 #include "../config.h"
 
+/*!
+  * \brief Implements the brute force Monte Carlo algorithm.
+  */
 class StandardMonteCarlo : public MonteCarlo
 {
 public:

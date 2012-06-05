@@ -7,6 +7,9 @@
 
 class Config;
 
+/*!
+  * \brief A tested approach to an evolutionary diffusion Monte Carlo algorithm. Doesn't work. Yet.
+  */
 class EvolutionaryMonteCarlo : public MonteCarlo, public Evolver
 {
 public:

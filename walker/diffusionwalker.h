@@ -3,6 +3,9 @@
 
 #include "walker.h"
 
+/*!
+  * \brief A walker which implements the diffusion Monte Carlo algorithm
+  */
 class DiffusionWalker : public Walker
 {
 public:

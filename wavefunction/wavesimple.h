@@ -8,6 +8,9 @@
 using namespace std;
 using namespace arma;
 
+/*!
+* \brief Used for the two particle case without interaction
+  */
 class WaveSimple : public WaveFunction
 {
 public:

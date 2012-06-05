@@ -10,6 +10,9 @@ using std::cout;
 using std::endl;
 using std::setprecision;
 
+/*!
+  * Constructs an Hamiltonian of the type used in the report
+  */
 HamiltonianIdeal::HamiltonianIdeal(Config *config) :
     Hamiltonian(config),
     omega(config->omega())
@@ -17,11 +20,17 @@ HamiltonianIdeal::HamiltonianIdeal(Config *config) :
 }
 int ntries = 0;
 
+/*!
+  * Calculates the kinetic energy as $-\frac{1}{2} \frac{1}{\Psi} \nabla^2 \Psi$
+  */
 double HamiltonianIdeal::kineticEnergy(WaveFunction *wave, vec2 r[])
 {
     return -0.5*wave->laplace(r);
 }
 
+/*!
+  * Returns the sum of external potential and interaction potential energy.
+  */
 double HamiltonianIdeal::potentialEnergy(WaveFunction *wave, vec2 r[])
 {
     double ePotential = 0;
@@ -32,6 +41,9 @@ double HamiltonianIdeal::potentialEnergy(WaveFunction *wave, vec2 r[])
     return ePotential;
 }
 
+/*!
+  * Returns the energy from the harmonic oscillator potential
+  */
 double HamiltonianIdeal::externalPotentialEnergy(WaveFunction *wave, vec2 r[])
 {
     (void)wave;
@@ -50,6 +62,9 @@ double HamiltonianIdeal::externalPotentialEnergy(WaveFunction *wave, vec2 r[])
     return externalEnergy;
 }
 
+/*!
+  * Returns the energy from the particle interaction.
+  */
 double HamiltonianIdeal::interactionPotentialEnergy(WaveFunction *wave, vec2 r[])
 {
     (void)wave;

@@ -7,6 +7,9 @@ using namespace arma;
 
 class Config;
 
+/*!
+  * \brief Defines the Jastrow factor in the wave function
+  */
 class Jastrow
 {
 public:

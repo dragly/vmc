@@ -6,6 +6,9 @@
 
 class INIParser;
 
+/*!
+  * \brief The Monte Carlo superclass defining expected values from a Monte Carlo class
+  */
 class MonteCarlo
 {
 public:

@@ -10,6 +10,9 @@ using namespace std;
 class INIParser;
 class Config;
 
+/*!
+  * \brief Superclass that defines a wave function.
+  */
 class WaveFunction
 {
 public:

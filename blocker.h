@@ -6,6 +6,10 @@ class Config;
 
 #include <string>
 
+
+/*!
+  * This class opens a blocking file and performs statistical analysis on that file.
+  */
 class Blocker
 {
 public:

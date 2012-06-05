@@ -10,6 +10,9 @@ using namespace std;
 class WaveFunction;
 class Config;
 
+/*!
+  * \brief Superclass that defines the functions needed for a Hamiltonian class
+  */
 class Hamiltonian
 {
 public:

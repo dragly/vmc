@@ -8,6 +8,10 @@
 
 using namespace arma;
 
+/*!
+ * \brief WaveSlater::WaveSlater implements the Slater and Jastrow factor into a WaveFunction.
+ * \param config A Config class with preloaded configuration
+ */
 WaveSlater::WaveSlater(Config *config) :
     WaveFunction(config),
     interactionEnabled(config->interactionEnabled())
@@ -77,6 +81,11 @@ void WaveSlater::setParameters(double *parameters) {
     jastrow->setParameters(parameters);
 }
 
+/*!
+ * \brief WaveSlater::evaluate Evaluates the wave function.
+ * \param r The position to evaluate the wave function
+ * \return The value of the wave function
+ */
 double WaveSlater::evaluate(vec2 r[])
 {
     double normFactorial = 1;
@@ -95,6 +104,12 @@ double WaveSlater::evaluate(vec2 r[])
     return evaluation;
 }
 
+/*!
+ * \brief WaveSlater::ratio Uses the Slater and Jastrow ratios to calculate the wave function ratio.
+ * \param particlePosition
+ * \param movedParticle
+ * \return The ratio
+ */
 double WaveSlater::ratio(vec2 &particlePosition, int movedParticle) {
     rNew[movedParticle] = particlePosition;
 //    std::cout << "after:" << std::endl;
@@ -113,6 +128,10 @@ double WaveSlater::ratio(vec2 &particlePosition, int movedParticle) {
 //    return WaveFunction::ratio(rParticle, movedParticle);
 }
 
+/*!
+ * \brief WaveSlater::initialize Initializes the wave function and the Slater and Jastrow factors
+ * \param positions
+ */
 void WaveSlater::initialize(vec2 positions[]) {
     slaterUp->initialize(positions);
     slaterDown->initialize(positions);
@@ -125,6 +144,10 @@ void WaveSlater::initialize(vec2 positions[]) {
 //    // TODO Set last moved particle for slater or something
 //}
 // TODO update matrices with new values for moved particle
+/*!
+ * \brief WaveSlater::acceptMove Calls the acceptMove functions in Slater and Jastrow to for instance update the Slater matrix.
+ * \param movedParticle
+ */
 void WaveSlater::acceptMove(int movedParticle) {
     WaveFunction::acceptMove(movedParticle);
     slaterUp->acceptMove(movedParticle);
@@ -132,6 +155,9 @@ void WaveSlater::acceptMove(int movedParticle) {
     jastrow->acceptMove(movedParticle);
 }
 
+/*!
+ * \brief WaveSlater::rejectMove calls the rejectMove functions in the Slater and Jastrow classes that for instance resets the Slater matrix.
+ */
 void WaveSlater::rejectMove() {
     WaveFunction::rejectMove();
     slaterUp->rejectMove();
@@ -144,7 +170,7 @@ void WaveSlater::rejectMove() {
  * The equation used to construct this function is from eq. 16.16 in Hjorth-Jensen's Lecture Notes.
  * \param r An array of position
  * \param movedParticle The index of the particle which was last moved
- * \return Laplace to wave ratio \f$\frac{\del^2 \Psi}{\Psi}\f$
+ * \return Laplace to wave ratio \f$\frac{\nabla^2 \Psi}{\Psi}\f$
  */
 double WaveSlater::laplace(vec2 r[]) {
     if(!useAnalyticalLaplace) {
@@ -173,6 +199,11 @@ double WaveSlater::laplace(vec2 r[]) {
     return laplaceSum;
 }
 
+/*!
+ * \brief WaveSlater::gradient calculates the gradient for a given configuration
+ * \param r
+ * \param rGradient A nParticles * nDimensions gradient where each particle's gradient is found in the i * nDimensions and (i+1) * nDimensions indices
+ */
 void WaveSlater::gradient(vec2 r[], vec &rGradient) {
     if(!useAnalyticalGradient) {
         return gradientNumerical(r, rGradient);
@@ -217,6 +248,11 @@ WaveFunction* WaveSlater::clone() {
     return myCopy;
 }
 
+/*!
+ * \brief WaveSlater::prepareGradient updates the Slater matrix and inverse to prepare for gradient calculations
+ * \param particlePosition The new position for the moved particle
+ * \param movedParticle The index of the moved particle
+ */
 void WaveSlater::prepareGradient(vec2 &particlePosition, int movedParticle) {
     rNew[movedParticle] = particlePosition;
     slaterUp->updateMatrix(particlePosition, movedParticle);

@@ -35,6 +35,10 @@ void Walker::initialize(vec2 *positions)
     localEnergyNew = localEnergyOld;
 }
 
+/*!
+ * \brief Walker::copyOtherWalker makes a copy of all properties in the other walker into this walker
+ * \param otherWalker
+ */
 void Walker::copyOtherWalker(Walker *otherWalker) {
     isCopyFromOtherWalker = true;
     for(int i = 0; i < nParticles; i++) {

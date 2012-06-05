@@ -7,6 +7,11 @@ using namespace arma;
 class Config;
 class Orbital;
 
+/*!
+  * \brief Handles the single particle wave functions in a matrix
+  *
+  * Also calculates the inverse and the determinant of this matrix.
+  */
 class Slater
 {
 public:

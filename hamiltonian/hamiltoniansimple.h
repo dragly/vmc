@@ -4,6 +4,10 @@
 #include <armadillo>
 using namespace arma;
 #include "hamiltonian.h"
+
+/*!
+  * \brief A simple Hamiltonian used during development and to test HamiltonianIdeal
+  */
 class HamiltonianSimple : public Hamiltonian
 {
 public:

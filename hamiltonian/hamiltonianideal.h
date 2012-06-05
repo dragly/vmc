@@ -6,6 +6,9 @@ using namespace arma;
 
 #include "hamiltonian.h"
 
+/*!
+  * \brief The Hamiltonian used in the project
+  */
 class HamiltonianIdeal : public Hamiltonian
 {
 public:

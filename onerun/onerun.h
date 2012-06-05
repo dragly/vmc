@@ -10,6 +10,9 @@ class Blocker;
 
 #include <string>
 
+/*!
+  * \brief Runs a variational Monte Carlo run with a given MonteCarlo class for a set of parameters
+  */
 class OneRun
 {
 public:

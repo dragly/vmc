@@ -36,6 +36,9 @@ Blocker::Blocker(Config* config_) :
 {
 }
 
+/*!
+  * Loads the configuration from the config.ini file
+  */
 void Blocker::loadConfiguration(INIParser *settings)
 {
             nBlockSamples = settings->GetDouble("Blocking", "nBlockSamples", nBlockSamples);
@@ -44,6 +47,10 @@ void Blocker::loadConfiguration(INIParser *settings)
             scratchDir = settings->GetString("Blocking", "scratchDir", "/scratch/blocking");
 }
 
+/*!
+  * The main function in the Blocker class
+  * Opens all blocking files, merges their data and calculates the means and variance for different block sizes.
+  */
 void Blocker::runBlocking() {
     // load block data
     struct stat result;
@@ -97,6 +104,9 @@ void Blocker::runBlocking() {
     outfile.close();
 }
 
+/*!
+  * Calculates the mean and variance for a given block size.
+  */
 void Blocker::blocking(double *values, int nValues, int blockSize, double *result) {
     int nBlocks = nValues / blockSize;
     double totalBlockSum = 0;
