@@ -4,6 +4,7 @@
 #include "../random.h"
 #include "../utils.h"
 #include "../config.h"
+//#include "../libnpy/npy.h"
 
 #include <iomanip>
 
@@ -45,10 +46,6 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
     //        }
     //        rNew[i] = rOld[i];
     //    }
-    ofstream positionFile;
-    if(recordMoves) {
-        positionFile.open("vmc-positions-init.dat");
-    }
     wave->initialize(rOld);
 
     //    wave->gradient(rOld, 0, waveGradientOld);
@@ -57,7 +54,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
     int acceptances = 0;
     int rejections = 0;
     // loop over monte carlo cycles
-    for (cycle = 0; cycle <= nCycles; cycle++){
+    for (cycle = 0; cycle < nCycles; cycle++){
         // new trial position
         for (int i = 0; i < nParticles; i++) {
 //            wave->gradient(rOld, quantumForceOld);
@@ -109,8 +106,8 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                 m_energy += localEnergy;
                 m_energySquared += localEnergy*localEnergy;
                 if(recordMoves) {
-                    if(!(cycle % nCycles / (1000000 / nParticles))) {
-                        positionFile << rOld[i][0] << " " << rOld[i][1] << std::endl;
+                    if(!(cycle % nCycles / int(1e9 / nParticles))) { // store 10^x positions
+                        writePositionToFile(rOld[i]);
                     }
                     if(!(cycle % nthMove)) {
                         //                    std::cout << "Recording move " << move << " @ " << cycle << std::endl;
@@ -120,17 +117,18 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
                         }
                     }
                 }
-                if(outputEnergies && i == 0 && !(cycle % 10000) && cycle > 0) {
-                    std::cout << "Cycle " << cycle << ". Current average energy is " << setprecision(16) << m_energy / (cycle * nParticles) << ". Acceptance ratio: " << setprecision(6) << (double)acceptances / (double)(rejections + acceptances) << std::endl;
-                    hamiltonian->outputTotals();
-                }
             } else {
                 checkTerminalization(localEnergy);
+                if(terminalized) {
+                    i = -1;
+                }
+            }
+
+            if(outputEnergies && i == nParticles - 1 && !(cycle % 10000) && cycle > 0) {
+                std::cout << "Cycle " << cycle << ". Current average energy is " << setprecision(16) << m_energy / ((cycle + 1)* nParticles) << ". Acceptance ratio: " << setprecision(6) << (double)acceptances / (double)(rejections + acceptances) << " local energy " << setprecision(10) << localEnergy << std::endl;
+                hamiltonian->outputTotals();
             }
         }  //  end of loop over particles
-    }
-    if(recordMoves) {
-        positionFile.close();
     }
     m_energy /= (nCycles * nParticles);
     m_energySquared /= (nCycles * nParticles);

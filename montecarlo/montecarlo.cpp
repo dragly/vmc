@@ -40,6 +40,9 @@ MonteCarlo::MonteCarlo(Config *config) :
 }
 
 MonteCarlo::~MonteCarlo() {
+    if(movesFile.is_open()) {
+        movesFile.close();
+    }
     delete [] m_moves;
     delete [] rOld;
     delete [] rNew;
@@ -47,15 +50,13 @@ MonteCarlo::~MonteCarlo() {
 
 void MonteCarlo::loadConfiguration(INIParser *settings)
 {
-    spawnRadius = settings->GetDouble("MonteCarlo", "spawnRadius", spawnRadius);
+    setSpawnRadius(settings->GetDouble("MonteCarlo", "spawnRadius", spawnRadius));
 }
 
 void MonteCarlo::randomizePositions() {
-    std::cout << "Randomizing positions: " << std::endl;
     for (int i = 0; i < nParticles; i++) {
         for (int j=0; j < nDimensions; j++) {
             rOld[i][j] = rNew[i][j] = spawnRadius * gaussianDeviate(idumMC);
-            std::cout << "rOld[" << i << "][" << j << "] = " << rOld[i][j] << std::endl;
         }
     }
 }
@@ -71,26 +72,49 @@ MonteCarlo* MonteCarlo::fromName(string monteCarloClass, Config *config)
     }
 }
 
-void MonteCarlo::setRecordMoves(bool arg, int nMoves) {
+void MonteCarlo::setSpawnRadius(double arg)
+{
+    spawnRadius = arg;
+    randomizePositions();
+}
+
+void MonteCarlo::setRecordMoves(bool arg, int nMoves, string fileName) {
     this->recordMoves = arg;
-    this->nMoves = nMoves;
-    delete [] m_moves;
-    m_moves = new vec2*[nMoves];
-    for(int i = 0; i < nMoves; i++) {
-        m_moves[i] = new vec2[nParticles];
+    if(nMoves > 0 && arg) {
+        this->nMoves = nMoves;
+        delete [] m_moves;
+        m_moves = new vec2*[nMoves];
+        for(int i = 0; i < nMoves; i++) {
+            m_moves[i] = new vec2[nParticles];
+        }
+    }
+    if(arg) {
+        std::cout << "Opening moves file " << fileName << std::endl;
+        movesFile.open(fileName.c_str(), ios::out | ios::binary);
+        if(!movesFile.is_open()) {
+            std::cerr << "Could not open file " << fileName << "!" << std::endl;
+            exit(951);
+        }
     }
 }
 
 void MonteCarlo::checkTerminalization(double localEnergy) {
-    if(!(cycle % 1000)) {
+    if(!(cycle % 10000)) {
         if(cycle >= 100000) {
             terminalized = true;
             hamiltonian->resetTotalEnergies();
             std::cout << "Thermalized after " << cycle << " cycles." << std::endl;
             cycle = 0;
+            m_energy = 0;
         }
         terminalizationTrials++;
     }
     terminalizationSum += localEnergy;
     terminalizationNum++;
+}
+
+void MonteCarlo::writePositionToFile(vec2 &position) {
+    if(movesFile.is_open()) {
+        movesFile.write((char*)(&position[0]), nDimensions*sizeof(double));
+    }
 }

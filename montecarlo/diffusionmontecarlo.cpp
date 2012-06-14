@@ -107,7 +107,7 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
     std::cout << "Running VMC to initialize DMC" << std::endl;
     // Initialize ensemble of walkers from VMC best guess
     initialMonteCarlo->setOutputEnergies(true);
-    initialMonteCarlo->setRecordMoves(true, nWalkersAlive * nParticles);
+    initialMonteCarlo->setRecordMoves(true, nWalkersAlive * nParticles, "vmc-positions.dat");
     initialMonteCarlo->setThermalizationEnabled(true);
     //    initialMonteCarlo->setThermalizationEnabled(false); // TODO set true
     initialMonteCarlo->sample(nWalkersAlive * correlationStep);
@@ -123,8 +123,8 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
 
     ofstream energyFile;
     energyFile.open("dmc-energies.dat");
-    ofstream positionFile;
-    positionFile.open("dmc-positions-end.dat");
+
+    setRecordMoves(true, 0, "dmc-positions.dat");
 
     int blockLength = 100;
     double energySum = 0;
@@ -187,12 +187,16 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
                 nTotalEnergySamples = 0;
             }
         }
-
-        if(cycle > nThermalizationCycles && !(cycle % (nSamplesLocal / (8000 / nParticles)))) {
+        int testNum = nSamplesLocal * nParticles * nWalkersAlive / 1e9;
+        int modulusA = 0;
+        if(testNum > 0) {
+            modulusA = cycle % testNum;
+        }
+        if(cycle > nThermalizationCycles && !modulusA) { // store 10^x positions
             for(int j = 0; j < nWalkersMax; j++) {
                 if(walkers[j]->aliveOld()) {
                     for(int i = 0; i < nParticles; i++) {
-                        positionFile << walkers[j]->positionsNew()[i][0] << " " << walkers[j]->positionsNew()[i][1] << std::endl;
+                        writePositionToFile(walkers[j]->positionsNew()[i]);
                     }
                 }
             }
@@ -201,8 +205,6 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
 
     }
     energyFile.close();
-
-    positionFile.close();
 
     m_energy = trialEnergy;
 }

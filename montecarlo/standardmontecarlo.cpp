@@ -56,12 +56,13 @@ void StandardMonteCarlo::sample(int nSamples)
     int rejections = 0;
     // TODO Optimize step length by Newton's method
     // loop over monte carlo cycles
-    for (cycle = 0; cycle <= nSamples; cycle++){
+    for (cycle = 0; cycle < nSamples; cycle++){
         // new position
         for (int i = 0; i < nParticles; i++) {
             for (int j=0; j < nDimensions; j++) {
                 rNew[i][j] = rOld[i][j] + stepLength*(ran3(idumMC)-0.5);
             }
+            wave->prepareGradient(rNew[i],i);
             double ratio = wave->ratio(rNew[i], i);
             //            std::cout << "Ratio calculated " << std::endl;
             //            for(int i = 0; i < nParticles; i++) {
@@ -96,6 +97,9 @@ void StandardMonteCarlo::sample(int nSamples)
                 m_energy += localEnergy;
                 m_energySquared += localEnergy*localEnergy;
                 if(recordMoves) {
+                    if(!(cycle % nSamples / int(1e9 / nParticles))) { // store 10^x positions
+                        writePositionToFile(rOld[i]);
+                    }
                     if(!(cycle % nthMove)) {
                         //                    std::cout << "Recording move " << move << " @ " << cycle << std::endl;
                         m_moves[move][i] = rOld[i];
@@ -104,18 +108,22 @@ void StandardMonteCarlo::sample(int nSamples)
                         }
                     }
                 }
-                if(i == 0 && !(cycle % 10000) && cycle > 0) {
-                    std::cout << "Cycle " << cycle << ", average energy is now " << setw(14) << setprecision(10) <<  m_energy / (cycle * nParticles) << " acceptance ratio: " << acceptances / double(acceptances + rejections) << std::endl;
-                }
             } else {
                 checkTerminalization(localEnergy);
+                if(terminalized) {
+                    i = -1;
+                }
             }
 
+            if(outputEnergies && i == nParticles - 1 && !(cycle % 10000) && cycle > 0) {
+                std::cout << "Cycle " << cycle << ". Current average energy is " << setprecision(16) << m_energy / ((cycle + 1)* nParticles) << ". Acceptance ratio: " << setprecision(6) << (double)acceptances / (double)(rejections + acceptances) << " local energy " << setprecision(10) << localEnergy << std::endl;
+                hamiltonian->outputTotals();
+            }
 
         }   // end of loop over MC trials
     }  //  end of loop over particles
-    m_energy /= (nSamples * nParticles);
-    m_energySquared /= (nSamples * nParticles);
+    m_energy /= ((nSamples) * nParticles);
+    m_energySquared /= ((nSamples) * nParticles);
     //    std::cout << "Done sampling. Had " << terminalizationTrials << " terminalization trials with the last diff at " << diffAverage << std::endl;
 }
 

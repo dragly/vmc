@@ -38,15 +38,6 @@ public:
     void waveSimpleGradientTest(); // TODO - consider implementing this again
 
     // quick tests
-    // slow tests
-
-    // unfinished tests
-    void diffusionMonteCarloTest();
-    void evolutionaryMonteCarloTest();
-    void geneticMinimizerTest();
-    void evolverTest();
-private slots:
-    // quick tests
     void orbitalGradientTest();
     void initTestCase();
     void orbitalTest();
@@ -69,8 +60,17 @@ private slots:
     void fullIdealTest();
     void fullIdealHastingsTest();
     void fullIdealHastingsSlaterTest();
-    void fullSlaterSixNoInteractionTest();
     void fullSlaterSixInteractionTest();
+
+    // unfinished tests
+    void diffusionMonteCarloTest();
+    void evolutionaryMonteCarloTest();
+    void geneticMinimizerTest();
+    void evolverTest();
+private slots:
+    // quick tests
+    // slow tests
+    void fullSlaterSixNoInteractionTest();
     // unfinished tests
 
 private:
@@ -801,13 +801,15 @@ void VmcTests::fullSlaterSixNoInteractionTest()
     parameters[0] = 1.0;
     parameters[1] = 1.0;
     waveSlater1->setParameters(parameters);
-    int nCycles = 50000;
+    int nCycles = 500000;
     //    waveSlater1->setUseAnalyticalLaplace(false);
     MetropolisHastingsMonteCarlo *monteCarlo1 = new MetropolisHastingsMonteCarlo(config1);
+    monteCarlo1->setOutputEnergies(true);
+    monteCarlo1->setSpawnRadius(2);
     //  Do the mc sampling
     monteCarlo1->sample(nCycles);
     double energy = monteCarlo1->energy();
-    cout << "Six non-interacting energy was " << fabs(energy) << endl;
+    cout << "Six non-interacting energy was " << setprecision(10) << fabs(energy) << endl;
     QVERIFY(fabs(energy - 10) < 1e-2);
 }
 

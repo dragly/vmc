@@ -4,7 +4,7 @@
 #include "walker.h"
 
 /*!
-  * \brief Not used. See EvolutionaryMonteCarlo.
+  * \brief Not used. \see EvolutionaryMonteCarlo.
   */
 class EvolutionaryWalker : public Walker
 {

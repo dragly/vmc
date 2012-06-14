@@ -101,7 +101,6 @@ void DiffusionWalker::advance(double trialEnergy) {
         // Accumulate the energy and any observables weighted by PB
         m_energy += localEnergyNew * branchingFactor;
         m_changeInEnergySamples++;
-        reproductions = 1; // TODO REMOVE THIS!
         if(reproductions == 0 || localEnergyNew < trialEnergy - 1. / sqrt(timeStep) || localEnergyNew > trialEnergy + 1 / sqrt(timeStep)) {
             m_aliveNew = false;
         } else {

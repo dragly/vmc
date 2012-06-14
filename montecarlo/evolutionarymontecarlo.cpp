@@ -97,7 +97,7 @@ void EvolutionaryMonteCarlo::sample(int nCycles)
 {
     // Initialize ensemble of walkers from VMC best guess
     MetropolisHastingsMonteCarlo *initialMonteCarlo = new MetropolisHastingsMonteCarlo(config);
-    initialMonteCarlo->setRecordMoves(true, nPopulations * nIndividuals * nParticles * nWalkers);
+    initialMonteCarlo->setRecordMoves(true, nPopulations * nIndividuals * nParticles * nWalkers, "evo-positions.dat");
     initialMonteCarlo->setThermalizationEnabled(true);
     initialMonteCarlo->sample(nWalkers * nIndividuals * nPopulations * correlationStep);
     trialEnergy = initialMonteCarlo->energy();

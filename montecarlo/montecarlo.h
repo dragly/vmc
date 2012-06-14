@@ -48,11 +48,14 @@ public:
         outputEnergies = arg;
     }
 
+    void setSpawnRadius(double arg);
+
     void checkTerminalization(double localEnergy);
-    void setRecordMoves(bool arg, int nMoves);
     void recordMove(int i, int nthMove);
     void randomizePositions();
 
+    void writePositionToFile(vec2 &position);
+    void setRecordMoves(bool arg, int nMoves, string fileName);
 protected:
     Config *config;
     int nParticles;
@@ -87,6 +90,8 @@ protected:
     double stepLength;
     bool storeEnergies;
     double spawnRadius;
+
+    ofstream movesFile;
 
     bool sampleVariationalGradient;
     bool outputEnergies;

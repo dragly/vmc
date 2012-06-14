@@ -88,6 +88,7 @@ void MainApplication::loadConfiguration()
 void MainApplication::runConfiguration()
 {
     loadConfiguration();
+    double startTime = MPI_Wtime();
     if(m_mode == MinimizerMode) {
         Minimizer *minimizer = new StandardMinimizer(m_config);
         // Make sure the config is loaded by one processor at the time
@@ -162,6 +163,15 @@ void MainApplication::runConfiguration()
         cerr << __PRETTY_FUNCTION__ << ": Unknown mode" << endl;
         exit(459);
     }
+    // Wait for everyone to finish before storing time
+    MPI_Barrier(MPI_COMM_WORLD);
+    double endTime = MPI_Wtime();
+    double totalTime = endTime - startTime;
+    std::cout << "MPI recorded time of " << totalTime << " seconds" << std::endl;
+    ofstream mpiTime;
+    mpiTime.open("totaltime.dat");
+    mpiTime << totalTime << std::endl;
+    mpiTime.close();
 }
 
 void MainApplication::finalize() {
