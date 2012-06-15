@@ -117,7 +117,6 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
     vec2 **moves = initialMonteCarlo->moves();
     for(int j = 0; j < nWalkersAlive; j++) {
         walkers[j]->initialize(moves[j]);
-
     }
     std::cout << "Done writing positions to file." << std::endl;
 
@@ -168,7 +167,7 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
             } else {
                 trialEnergy = meanEnergy;
             }
-            std::cout << "Trial energy is now " << setw(14) << setprecision(10) << trialEnergy << ", average " << setw(14) << setprecision(10) << totalEnergySum / nTotalEnergySamples << ",  acceptance: " << setw(8) <<  setprecision(6) << acceptances / double(acceptances + rejections) << ", with " << nWalkersAlive << " walkers at cycle " << cycle << std::endl;
+            std::cout << "DMC cycle " << cycle << ": Trial energy " << setw(14) << setprecision(10) << trialEnergy << ", average " << setw(14) << setprecision(10) << totalEnergySum / nTotalEnergySamples << ",  acceptance: " << setw(8) <<  setprecision(6) << acceptances / double(acceptances + rejections) << ", with " << nWalkersAlive << " walkers at cycle " << cycle << std::endl;
             // Renormalise the number of walkers to the target number by creating or deleting walkers
             //                        while(nWalkersAlive > nWalkersIdeal) {
             //                            int randomWalker = ran3(idumMC) * nWalkersMax;
@@ -196,6 +195,9 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
             for(int j = 0; j < nWalkersMax; j++) {
                 if(walkers[j]->aliveOld()) {
                     for(int i = 0; i < nParticles; i++) {
+                        if(walkers[j]->positionsNew()[i][0] == 0.0) {
+                            std::cerr << "WTF?" << std::endl;
+                        }
                         writePositionToFile(walkers[j]->positionsNew()[i]);
                     }
                 }

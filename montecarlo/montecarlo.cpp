@@ -116,5 +116,8 @@ void MonteCarlo::checkTerminalization(double localEnergy) {
 void MonteCarlo::writePositionToFile(vec2 &position) {
     if(movesFile.is_open()) {
         movesFile.write((char*)(&position[0]), nDimensions*sizeof(double));
+    } else {
+        std::cerr << "Movefile closed!" << std::endl;
+        exit(945);
     }
 }

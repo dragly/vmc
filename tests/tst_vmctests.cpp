@@ -61,17 +61,17 @@ public:
     void fullIdealHastingsTest();
     void fullIdealHastingsSlaterTest();
     void fullSlaterSixInteractionTest();
+    void fullSlaterSixNoInteractionTest();
 
     // unfinished tests
-    void diffusionMonteCarloTest();
     void evolutionaryMonteCarloTest();
     void geneticMinimizerTest();
     void evolverTest();
 private slots:
     // quick tests
     // slow tests
-    void fullSlaterSixNoInteractionTest();
     // unfinished tests
+    void diffusionMonteCarloTest();
 
 private:
     Config *oldConfig;
@@ -805,7 +805,7 @@ void VmcTests::fullSlaterSixNoInteractionTest()
     //    waveSlater1->setUseAnalyticalLaplace(false);
     MetropolisHastingsMonteCarlo *monteCarlo1 = new MetropolisHastingsMonteCarlo(config1);
     monteCarlo1->setOutputEnergies(true);
-    monteCarlo1->setSpawnRadius(2);
+    monteCarlo1->setSpawnRadius(0.1);
     //  Do the mc sampling
     monteCarlo1->sample(nCycles);
     double energy = monteCarlo1->energy();
@@ -916,18 +916,18 @@ void VmcTests::geneticMinimizerTest() {
 
 void VmcTests::diffusionMonteCarloTest() {
     Config *config = new Config(0, 1);
-    config->setNParticles(6);
+    config->setNParticles(2);
     config->setNDimensions(2);
     config->setInteractionEnabled(true);
     config->setDiffusionConstant(0.5);
-    config->setStepLength(0.001);
+    config->setStepLength(0.01);
     config->setOmega(1.0);
 
     double parameters[2];
-    //        parameters[0] = 0.987;
-    //        parameters[1] = 0.4;
-    parameters[0] = 0.9303;
-    parameters[1] = 0.5493;
+    parameters[0] = 0.987;
+    parameters[1] = 0.4;
+//    parameters[0] = 0.9303;
+//    parameters[1] = 0.5493;
     //    parameters[0] = 0.92;
     //    parameters[1] = 0.565;
 
@@ -940,8 +940,12 @@ void VmcTests::diffusionMonteCarloTest() {
     Hamiltonian *hamiltonianIdeal = new HamiltonianIdeal(config);
     config->setHamiltonian(hamiltonianIdeal);
 
+    MetropolisHastingsMonteCarlo *initialMonteCarlo = new MetropolisHastingsMonteCarlo(config);
+    initialMonteCarlo->setSpawnRadius(1.0);
+    config->setMonteCarlo(initialMonteCarlo);
+
     DiffusionMonteCarlo *diffusionMonteCarlo = new DiffusionMonteCarlo(config);
-    diffusionMonteCarlo->setTimeStep(0.0001);
+    diffusionMonteCarlo->setTimeStep(0.001);
     diffusionMonteCarlo->sample(40000);
     double energy = diffusionMonteCarlo->energy();
     std::cout << "Diffusion monte carlo returned energy of " << energy << std::endl;

@@ -68,12 +68,27 @@ elif autoMode == "status":
             
     for server in servers:
         print server + ":"
-        nProcs = subprocess.check_output("ssh " + server +  " 'ps aux | grep vmc | wc -l'", shell=True)
+        nProcs = subprocess.check_output("ssh " + server +  " 'ps aux | grep vmc | grep svennard | wc -l'", shell=True)
         if(int(nProcs) > 2):
             print bcolors.OKGREEN + "Running " + nProcs.replace("\n","") + bcolors.ENDC
-        users = subprocess.check_output("ssh " + server +  " 'users'", shell=True)
-        if users != "":
-            print bcolors.WARNING + users.replace("\n","") + bcolors.ENDC
+        runstring = "ssh " + server +  " \"ps aux | grep -v 'svennard\|root\|dbus\|rpc\|dbus\|hald\|xfs\|avahi\|gdm\|USER\|ntp' |  awk '{print \$1,\$3}'\""
+        users = subprocess.check_output(runstring, shell=True)
+        userlist = users.split("\n")
+        useroutput = ""
+        for userdata in userlist:
+            usersplit = userdata.split(" ")
+            if len(usersplit) > 1:
+                username = usersplit[0]
+                cpuusage = float(usersplit[1])
+                if cpuusage > 10:
+                    useroutput += username + " " + str(cpuusage) + " "
+        if useroutput != "":
+            print bcolors.FAIL + useroutput + bcolors.ENDC
+        #if users != "":
+        #    print bcolors.WARNING + users.replace("\n"," ") + bcolors.ENDC
+        #users2 = subprocess.check_output("ssh " + server + " \"users | grep -v svennard\"", shell=True)
+        #if users2 != "":
+        #    print bcolors.FAIL + users2.replace("\n","") + bcolors.ENDC
 elif autoMode == "run":
     for afile in files:
 	print "Found job in " + afile

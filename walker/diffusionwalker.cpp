@@ -39,11 +39,11 @@ void DiffusionWalker::advance(double trialEnergy) {
         }
         wave->prepareGradient(rNew[i], i);
         wave->gradient(rNew, quantumForceNew);
+        quantumForceNew *= 2;
         double ratio = wave->ratio(rNew[i], i);
         // Apply fixed node approximation (keep sign or reject move)
         if(ratio > 0) {
             // Compute weight function
-            quantumForceNew *= 2;
             double argSum = 0;
             for(int j = 0; j < nParticles; j++) { // TODO figure out if it is necessary to do this with all particles (is it not zero for non-moved particles?).
                 for(int k = 0; k < nDimensions; k++) {
@@ -70,7 +70,7 @@ void DiffusionWalker::advance(double trialEnergy) {
 
             double weight = ratio*ratio * greensRatio;
             // Accept move according to Metropolis probability
-            if(weight > ran3(idum)) {
+            if(ran3(idum) < weight) {
                 rOld[i] = rNew[i];
                 wave->acceptMove(i);
                 quantumForceOld = quantumForceNew;
