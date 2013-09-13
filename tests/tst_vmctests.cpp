@@ -36,6 +36,11 @@ public:
 
     // old tests
     void waveSimpleGradientTest(); // TODO - consider implementing this again
+
+    // unfinished tests
+    void evolutionaryMonteCarloTest();
+    void geneticMinimizerTest();
+    void evolverTest();
     void diffusionMonteCarloTest();
 private slots:
 
@@ -64,11 +69,6 @@ private slots:
     void fullIdealHastingsSlaterTest();
     void fullSlaterSixInteractionTest();
     void fullSlaterSixNoInteractionTest();
-
-    // unfinished tests
-    void evolutionaryMonteCarloTest();
-    void geneticMinimizerTest();
-    void evolverTest();
 
 private:
     Config *oldConfig;
