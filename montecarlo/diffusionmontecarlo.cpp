@@ -8,6 +8,8 @@
 
 #include <iostream>
 #include <iomanip>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 // disable annoying unused parameter warnings from the MPI library which we don't have any control over
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -79,6 +81,7 @@ void DiffusionMonteCarlo::updateWalkerParameters()
 }
 
 void DiffusionMonteCarlo::loadConfiguration(INIParser *settings) {
+    MonteCarlo::loadConfiguration(settings);
     double alpha = settings->GetDouble("DiffusionMonteCarlo", "alpha", 1.0);
     double beta = settings->GetDouble("DiffusionMonteCarlo", "beta", 1.0);
     nWalkersMax = settings->GetDouble("DiffusionMonteCarlo", "nWalkersMax", nWalkersMax);
@@ -104,10 +107,19 @@ void DiffusionMonteCarlo::sample() {
   */
 void DiffusionMonteCarlo::sample(int nSamplesLocal)
 {
+    if(config->myRank() == 0) {
+        struct stat st;
+        if(stat(scratchDir.c_str(), &st) != 0) {
+            if(mkdir(scratchDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0) {
+                std::cerr << "Error creating directory " << scratchDir << std::endl;
+                exit(948);
+            }
+        }
+    }
     std::cout << "Running VMC to initialize DMC" << std::endl;
     // Initialize ensemble of walkers from VMC best guess
     initialMonteCarlo->setOutputEnergies(true);
-    initialMonteCarlo->setRecordMoves(true, nWalkersAlive * nParticles, "vmc-positions.dat");
+    initialMonteCarlo->setRecordMoves(true, nWalkersAlive * nParticles, "/scratch/positions/vmc-positions.dat");
     initialMonteCarlo->setThermalizationEnabled(true);
     //    initialMonteCarlo->setThermalizationEnabled(false); // TODO set true
     initialMonteCarlo->sample(nWalkersAlive * correlationStep);
@@ -123,7 +135,7 @@ void DiffusionMonteCarlo::sample(int nSamplesLocal)
     ofstream energyFile;
     energyFile.open("dmc-energies.dat");
 
-    setRecordMoves(true, 0, "dmc-positions.dat");
+    setRecordMoves(true, 0, "/scratch/positions/dmc-positions.dat");
 
     int blockLength = 100;
     double energySum = 0;

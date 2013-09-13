@@ -12,13 +12,18 @@
 #include <stdlib.h>
 #include "mainapplication.h"
 
+#include <armadillo>
+
 using namespace std;
+
+using namespace arma;
 
 int main(int argc, char* argv[])
 {
     MainApplication *app = new MainApplication(&argc, &argv);
     app->runConfiguration();
     app->finalize();
+
     // A little output to help notice when the program is finished executing
     int ret = system("kdialog --title 'vmc' --passivepopup 'Execution finished' 3");
     (void)ret;

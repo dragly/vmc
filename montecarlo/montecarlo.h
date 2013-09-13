@@ -95,6 +95,8 @@ protected:
 
     bool sampleVariationalGradient;
     bool outputEnergies;
+
+    std::string scratchDir;
 };
 
 #endif // MONTECARLO_H

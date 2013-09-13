@@ -56,7 +56,7 @@ void StandardMonteCarlo::sample(int nSamples)
     int rejections = 0;
     // TODO Optimize step length by Newton's method
     // loop over monte carlo cycles
-    for (cycle = 0; cycle < nSamples; cycle++){
+    for (cycle = 0; cycle < nSamples || !terminalized; cycle++){
         // new position
         for (int i = 0; i < nParticles; i++) {
             for (int j=0; j < nDimensions; j++) {

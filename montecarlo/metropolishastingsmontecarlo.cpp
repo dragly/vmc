@@ -54,7 +54,7 @@ void MetropolisHastingsMonteCarlo::sample(int nCycles)
     int acceptances = 0;
     int rejections = 0;
     // loop over monte carlo cycles
-    for (cycle = 0; cycle < nCycles; cycle++){
+    for (cycle = 0; cycle < nCycles || !terminalized; cycle++){
         // new trial position
         for (int i = 0; i < nParticles; i++) {
 //            wave->gradient(rOld, quantumForceOld);

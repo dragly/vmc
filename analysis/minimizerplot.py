@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-
 from numpy import *
 from matplotlib import rc
 from sys import argv
@@ -11,14 +9,14 @@ mpl.rcParams['font.size'] = '16'
 first = True
 
 for datapath in argv:
-    try:
-	from enthought.mayavi.mlab import *
-	options.offscreen = True
-    except ImportError:
-	from mayavi.mlab import *
     if first:
 	first = False
 	continue
+    try:
+	from enthought.mayavi.mlab import *
+    except ImportError:
+	from mayavi.mlab import *
+    options.offscreen = True
     print "Plotting " + datapath
     try:
         param0 = loadtxt(datapath + "/parameters0.dat")
@@ -51,9 +49,9 @@ for datapath in argv:
     myaxes.axes.label_format = '%-#6.5g'
     
     # perspective view
-    fig.scene.camera.position = [25, -20, 12]
-    fig.scene.camera.focal_point = [5.3897238323904126, 5.434549130831372, -1.7158449313567394]
-    fig.scene.render()
+    #fig.scene.camera.position = [25, -20, 12]
+    #fig.scene.camera.focal_point = [5.3897238323904126, 5.434549130831372, -1.7158449313567394]
+    #fig.scene.render()
 
     savefig(datapath + "/minimizer.png")
     subprocess.call("convert " + datapath + "/minimizer.png -trim " + datapath + "/minimizer-trim.png", shell=True)
@@ -83,14 +81,14 @@ for datapath in argv:
     # plot 2D
     from pylab import *
     figure()
+    ax = axes([0.15, 0.12, 0.8, 0.83]) 
     imshow(transpose(data), extent=(param0.min(), param0.max(), param1.min(), param1.max()), origin="lower", interpolation='bilinear')
     cb = colorbar(format='$%g$')
     title(r"Energy")
-    contour(param0, param1, data, colors="k")
-    ax = axes()
+    contour(param0, param1, data, 20, colors="k")
     formatter = mpl.ticker.FormatStrFormatter('$%g$')
     ax.xaxis.set_major_formatter(formatter) 
     ax.yaxis.set_major_formatter(formatter)
     xlabel(r"$\alpha$")
-    xlabel(r"$\beta$")
+    ylabel(r"$\beta$")
     savefig(datapath + "/minimizer2d.pdf")

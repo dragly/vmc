@@ -36,6 +36,8 @@ public:
 
     // old tests
     void waveSimpleGradientTest(); // TODO - consider implementing this again
+    void diffusionMonteCarloTest();
+private slots:
 
     // quick tests
     void orbitalGradientTest();
@@ -67,11 +69,6 @@ public:
     void evolutionaryMonteCarloTest();
     void geneticMinimizerTest();
     void evolverTest();
-private slots:
-    // quick tests
-    // slow tests
-    // unfinished tests
-    void diffusionMonteCarloTest();
 
 private:
     Config *oldConfig;
@@ -856,8 +853,8 @@ void VmcTests::evolverTest()
     //    QBENCHMARK {
     FunctionEvolver *evolver = new FunctionEvolver(16, 16, 2);
     evolver->setRescaleLimits(1e-10, 1e10);
-    for(int step = 0; step < 100; step++) {
-        evolver->evolve(100,250);
+    for(int step = 0; step < 1000; step++) {
+        evolver->evolve(20,250);
         evolver->calculate(evolver->allBestGenes);
 
         ofstream data;

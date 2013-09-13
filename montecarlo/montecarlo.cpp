@@ -51,6 +51,7 @@ MonteCarlo::~MonteCarlo() {
 void MonteCarlo::loadConfiguration(INIParser *settings)
 {
     setSpawnRadius(settings->GetDouble("MonteCarlo", "spawnRadius", spawnRadius));
+    scratchDir = settings->GetString("MonteCarlo", "scratchDir", "/scratch/positions");
 }
 
 void MonteCarlo::randomizePositions() {

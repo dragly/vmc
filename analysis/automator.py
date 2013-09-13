@@ -19,12 +19,14 @@ autoMode = argv[1]
 runLocal = False
 
 currentDirectory = os.path.split(os.path.abspath(__file__))[0]
-if len(argv) > 2:
-    runLocal = argv[2]
+
+#    runLocal = argv[2]
 
 servers = servers.split(" ")
 
 files = dircache.listdir(runFolder)
+if len(argv) > 2:
+    files = argv[2:]
 i = 0
 
 if autoMode == "kill":
@@ -91,10 +93,17 @@ elif autoMode == "status":
         #    print bcolors.FAIL + users2.replace("\n","") + bcolors.ENDC
 elif autoMode == "run":
     for afile in files:
-	print "Found job in " + afile
 	configName = afile
-	
+	if len(argv) > 2:
+	    configName = afile.replace("runs/", "")
+	    configName = configName.replace("/", "")
+	else:
+	    configName = afile
+	    
 	myDir = runFolder + "/" + configName + "/"
+	
+	print "Found job in " + myDir
+	    
 	try:
             config = ConfigParser.ConfigParser()
             configFileName = myDir + "config.ini"
